@@ -160,5 +160,3 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 }
-
-WP_CLI::add_command( 'core', 'Core_Command' );
