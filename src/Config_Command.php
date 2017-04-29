@@ -149,6 +149,22 @@ class Config_Command extends WP_CLI_Command {
 		}
 	}
 
+	/**
+	 * Get the path to wp-config.php file.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Get wp-config.php file path
+	 *     $ wp config path
+	 *     /home/person/htdocs/project/wp-config.php
+	 */
+	public function path() {
+		$path = Utils\locate_wp_config();
+		if ( $path ) {
+			WP_CLI::line( $path );
+		}
+	}
+
 	private static function _read( $url ) {
 		$headers = array('Accept' => 'application/json');
 		$response = Utils\http_request( 'GET', $url, null, $headers, array( 'timeout' => 30 ) );
