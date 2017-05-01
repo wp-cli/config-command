@@ -115,7 +115,7 @@ class Config_Command extends WP_CLI_Command {
 
 		// Check DB connection
 		if ( ! \WP_CLI\Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
-			Utils\run_mysql_command( 'mysql --no-defaults', array(
+			Utils\run_mysql_command( '/usr/bin/env mysql --no-defaults', array(
 				'execute' => ';',
 				'host' => $assoc_args['dbhost'],
 				'user' => $assoc_args['dbuser'],
