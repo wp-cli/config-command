@@ -115,7 +115,7 @@ class Config_Command extends WP_CLI_Command {
 
 		// Check DB connection
 		if ( ! \WP_CLI\Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
-			Utils\run_mysql_command( 'mysql --no-defaults', array(
+			Utils\run_mysql_command( '/usr/bin/env mysql --no-defaults', array(
 				'execute' => ';',
 				'host' => $assoc_args['dbhost'],
 				'user' => $assoc_args['dbuser'],
@@ -139,7 +139,8 @@ class Config_Command extends WP_CLI_Command {
 			$assoc_args['add-wplang'] = false;
 		}
 
-		$out = Utils\mustache_render( dirname( dirname( __FILE__ ) ) . '/templates/wp-config.mustache', $assoc_args );
+		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
+		$out = Utils\mustache_render( $command_root . '/templates/wp-config.mustache', $assoc_args );
 
 		$bytes_written = file_put_contents( ABSPATH . 'wp-config.php', $out );
 		if ( ! $bytes_written ) {
