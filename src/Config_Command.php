@@ -208,7 +208,6 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function get( $_, $assoc_args ) {
-
 		$default_fields = array(
 			'key',
 			'value',
@@ -242,8 +241,8 @@ class Config_Command extends WP_CLI_Command {
 	/**
 	 * Filter wp-config.php file configurations.
 	 *
-	 * @param $list
-	 * @param $previous_list
+	 * @param array $list
+	 * @param array $previous_list
 	 * @param array $exclude_list
 	 * @return array
 	 */
