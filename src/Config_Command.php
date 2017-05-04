@@ -166,6 +166,90 @@ class Config_Command extends WP_CLI_Command {
 		}
 	}
 
+	/**
+	 * Get variables and constants defined in wp-config.php file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--fields=<fields>]
+	 * : Limit the output to specific fields. Defaults to all fields.
+	 *
+	 * [--format=<format>]
+	 * : Render output in a particular format.
+	 * ---
+	 * default: table
+	 * options:
+	 *   - table
+	 *   - csv
+	 *   - json
+	 *   - yaml
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # List variables and constants defined in wp-config.php file.
+	 *     $ wp config get --format=table
+	 *     +------------------+------------------------------------------------------------------+----------+
+	 *     | key              | value                                                            | type     |
+	 *     +------------------+------------------------------------------------------------------+----------+
+	 *     | table_prefix     | wp_                                                              | variable |
+	 *     | DB_NAME          | wp_cli_test                                                      | constant |
+	 *     | DB_USER          | root                                                             | constant |
+	 *     | DB_PASSWORD      | root                                                             | constant |
+	 *     | AUTH_KEY         | r6+@shP1yO&$)1gdu.hl[/j;7Zrvmt~o;#WxSsa0mlQOi24j2cR,7i+QM/#7S:o^ | constant |
+	 *     | SECURE_AUTH_KEY  | iO-z!_m--YH$Tx2tf/&V,YW*13Z_HiRLqi)d?$o-tMdY+82pK$`T.NYW~iTLW;xp | constant |
+	 *     +------------------+------------------------------------------------------------------+----------+
+	 *
+	 * @when before_wp_load
+	 */
+	public function get( $_, $assoc_args ) {
+		$default_fields = array(
+			'key',
+			'value',
+			'type',
+		);
+
+		$defaults = array(
+			'fields' => implode( ',', $default_fields ),
+			'format' => 'table',
+		);
+
+		$assoc_args = array_merge( $defaults, $assoc_args );
+
+		$wp_cli_original_defined_constants = get_defined_constants();
+		$wp_cli_original_defined_vars      = get_defined_vars();
+
+		eval( WP_CLI::get_runner()->get_wp_config_code() );
+
+		$wp_config_vars      = self::get_wp_config_vars( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
+		$wp_config_constants = self::get_wp_config_vars( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
+
+		WP_CLI\Utils\format_items( $assoc_args['format'], array_merge( $wp_config_vars, $wp_config_constants ), $assoc_args['fields'] );
+	}
+
+	/**
+	 * Filter wp-config.php file configurations.
+	 *
+	 * @param array $list
+	 * @param array $previous_list
+	 * @param array $exclude_list
+	 * @return array
+	 */
+	private static function get_wp_config_vars( $list, $previous_list, $type, $exclude_list = array() ) {
+		$result = array();
+		foreach ( $list as $key => $val ) {
+			if ( array_key_exists( $key, $previous_list ) || in_array( $key, $exclude_list ) ) {
+				continue;
+			}
+			$out = array();
+			$out['key'] = $key;
+			$out['value'] = $val;
+			$out['type'] = $type;
+			$result[] = $out;
+		}
+		return $result;
+	}
+
 	private static function _read( $url ) {
 		$headers = array('Accept' => 'application/json');
 		$response = Utils\http_request( 'GET', $url, null, $headers, array( 'timeout' => 30 ) );
