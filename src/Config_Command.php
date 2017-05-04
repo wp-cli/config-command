@@ -171,6 +171,9 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * ## OPTIONS
 	 *
+	 * [--fields=<fields>]
+	 * : Limit the output to specific fields. Defaults to all fields.
+	 *
 	 * [--format=<format>]
 	 * : Render output in a particular format.
 	 * ---
@@ -178,7 +181,6 @@ class Config_Command extends WP_CLI_Command {
 	 * options:
 	 *   - table
 	 *   - csv
-	 *   - ids
 	 *   - json
 	 *   - yaml
 	 * ---
@@ -187,23 +189,16 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 *     # List variables and constants defined in wp-config.php file.
 	 *     $ wp config get --format=table
-	 *     VARIABLES
-	 *     +--------------+-------+
-	 *     | key          | value |
-	 *     +--------------+-------+
-	 *     | table_prefix | wp_   |
-	 *     +--------------+-------+
-	 *
-	 *     CONSTANTS
-	 *     +------------------+------------------------------------------------------------------+
-	 *     | key              | value                                                            |
-	 *     +------------------+------------------------------------------------------------------+
-	 *     | DB_NAME          | testing                                                          |
-	 *     | DB_USER          | root                                                             |
-	 *     | DB_PASSWORD      | root                                                             |
-	 *     | AUTH_KEY         | r6+@shP1yO&$)1gdu.hl[/j;7Zrvmt~o;#WxSsa0mlQOi24j2cR,7i+QM/#7S:o^ |
-	 *     | SECURE_AUTH_KEY  | iO-z!_m--YH$Tx2tf/&V,YW*13Z_HiRLqi)d?$o-tMdY+82pK$`T.NYW~iTLW;xp |
-	 *     +------------------+------------------------------------------------------------------+
+	 *     +------------------+------------------------------------------------------------------+----------+
+	 *     | key              | value                                                            | type     |
+	 *     +------------------+------------------------------------------------------------------+----------+
+	 *     | table_prefix     | wp_                                                              | variable |
+	 *     | DB_NAME          | wp_cli_test                                                      | constant |
+	 *     | DB_USER          | root                                                             | constant |
+	 *     | DB_PASSWORD      | root                                                             | constant |
+	 *     | AUTH_KEY         | r6+@shP1yO&$)1gdu.hl[/j;7Zrvmt~o;#WxSsa0mlQOi24j2cR,7i+QM/#7S:o^ | constant |
+	 *     | SECURE_AUTH_KEY  | iO-z!_m--YH$Tx2tf/&V,YW*13Z_HiRLqi)d?$o-tMdY+82pK$`T.NYW~iTLW;xp | constant |
+	 *     +------------------+------------------------------------------------------------------+----------+
 	 *
 	 * @when before_wp_load
 	 */
@@ -211,6 +206,7 @@ class Config_Command extends WP_CLI_Command {
 		$default_fields = array(
 			'key',
 			'value',
+			'type',
 		);
 
 		$defaults = array(
@@ -225,17 +221,10 @@ class Config_Command extends WP_CLI_Command {
 
 		eval( WP_CLI::get_runner()->get_wp_config_code() );
 
-		$wp_config_vars      = self::get_wp_config_vars( get_defined_vars(), $wp_cli_original_defined_vars, array( 'wp_cli_original_defined_vars' ) );
-		$wp_config_constants = self::get_wp_config_vars( get_defined_constants(), $wp_cli_original_defined_constants );
+		$wp_config_vars      = self::get_wp_config_vars( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
+		$wp_config_constants = self::get_wp_config_vars( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
 
-		$formatter = new \WP_CLI\Formatter( $assoc_args );
-
-		WP_CLI::line( preg_replace( '/^([A-Z ]+)/m', WP_CLI::colorize( '%9\1%n' ), "VARIABLES\n" ) );
-		$formatter->display_items( $wp_config_vars );
-
-		WP_CLI::line( preg_replace( '/^([A-Z ]+)/m', WP_CLI::colorize( '%9\1%n' ), "\nCONSTANTS\n" ) );
-		$formatter->display_items( $wp_config_constants );
-
+		WP_CLI\Utils\format_items( $assoc_args['format'], array_merge( $wp_config_vars, $wp_config_constants ), $assoc_args['fields'] );
 	}
 
 	/**
@@ -246,7 +235,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @param array $exclude_list
 	 * @return array
 	 */
-	private static function get_wp_config_vars( $list, $previous_list, $exclude_list = array() ) {
+	private static function get_wp_config_vars( $list, $previous_list, $type, $exclude_list = array() ) {
 		$result = array();
 		foreach ( $list as $key => $val ) {
 			if ( array_key_exists( $key, $previous_list ) || in_array( $key, $exclude_list ) ) {
@@ -255,6 +244,7 @@ class Config_Command extends WP_CLI_Command {
 			$out = array();
 			$out['key'] = $key;
 			$out['value'] = $val;
+			$out['type'] = $type;
 			$result[] = $out;
 		}
 		return $result;
