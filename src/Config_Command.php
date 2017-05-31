@@ -167,7 +167,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Get variables and constants defined in wp-config.php file.
+	 * List variables and constants defined in wp-config.php file.
 	 *
 	 * ## OPTIONS
 	 *
@@ -188,7 +188,7 @@ class Config_Command extends WP_CLI_Command {
 	 * ## EXAMPLES
 	 *
 	 *     # List variables and constants defined in wp-config.php file.
-	 *     $ wp config get --format=table
+	 *     $ wp config list --format=table
 	 *     +------------------+------------------------------------------------------------------+----------+
 	 *     | key              | value                                                            | type     |
 	 *     +------------------+------------------------------------------------------------------+----------+
@@ -200,9 +200,10 @@ class Config_Command extends WP_CLI_Command {
 	 *     | SECURE_AUTH_KEY  | iO-z!_m--YH$Tx2tf/&V,YW*13Z_HiRLqi)d?$o-tMdY+82pK$`T.NYW~iTLW;xp | constant |
 	 *     +------------------+------------------------------------------------------------------+----------+
 	 *
+	 * @subcommand list
 	 * @when before_wp_load
 	 */
-	public function get( $_, $assoc_args ) {
+	public function list_( $_, $assoc_args ) {
 		$default_fields = array(
 			'key',
 			'value',
@@ -216,15 +217,58 @@ class Config_Command extends WP_CLI_Command {
 
 		$assoc_args = array_merge( $defaults, $assoc_args );
 
+		$values = self::get_wp_config_vars();
+
+		WP_CLI\Utils\format_items( $assoc_args['format'], $values, $assoc_args['fields'] );
+	}
+
+	/**
+	 * Get the value of a specific variable or constant defined in wp-config.php
+	 * file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <key>
+	 * : Key for the wp-config.php variable or constant.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Get the table_prefix as defined in wp-config.php file.
+	 *     $ wp config get table_prefix
+	 *     wp_
+	 *
+	 * @when before_wp_load
+	 */
+	public function get( $args, $assoc_args ) {
+		list( $key ) = $args;
+
+		$values = self::get_wp_config_vars();
+
+		foreach( $values as $value ) {
+			if ( (string) $value['key'] === $key ) {
+				WP_CLI::print_value( $value['value'], $assoc_args );
+				return;
+			}
+		}
+
+		WP_CLI::halt( 1 );
+	}
+
+	/**
+	 * Get the array of wp-config.php variables and constants.
+	 *
+	 * @return array
+	 */
+	private static function get_wp_config_vars() {
 		$wp_cli_original_defined_constants = get_defined_constants();
 		$wp_cli_original_defined_vars      = get_defined_vars();
 
 		eval( WP_CLI::get_runner()->get_wp_config_code() );
 
-		$wp_config_vars      = self::get_wp_config_vars( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
-		$wp_config_constants = self::get_wp_config_vars( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
+		$wp_config_vars      = self::get_wp_config_diff( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
+		$wp_config_constants = self::get_wp_config_diff( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
 
-		WP_CLI\Utils\format_items( $assoc_args['format'], array_merge( $wp_config_vars, $wp_config_constants ), $assoc_args['fields'] );
+		return array_merge( $wp_config_vars, $wp_config_constants );
 	}
 
 	/**
@@ -232,10 +276,11 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * @param array $list
 	 * @param array $previous_list
+	 * @param string $type
 	 * @param array $exclude_list
 	 * @return array
 	 */
-	private static function get_wp_config_vars( $list, $previous_list, $type, $exclude_list = array() ) {
+	private static function get_wp_config_diff( $list, $previous_list, $type, $exclude_list = array() ) {
 		$result = array();
 		foreach ( $list as $key => $val ) {
 			if ( array_key_exists( $key, $previous_list ) || in_array( $key, $exclude_list ) ) {
