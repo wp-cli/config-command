@@ -1,5 +1,4 @@
 <?php
-
 use \WP_CLI\Utils;
 
 /**
@@ -174,8 +173,15 @@ class Config_Command extends WP_CLI_Command {
 	 * [--fields=<fields>]
 	 * : Limit the output to specific fields. Defaults to all fields.
 	 *
+	 * [--constant=<constant>]
+	 * : Returns the value of a specific constant defined in wp-config.php file.
+	 *
+	 * [--global=<global>]
+	 * : Returns the value of a specific globall defined in wp-config.php file.
+	 *
 	 * [--format=<format>]
 	 * : Render output in a particular format.
+	 *
 	 * ---
 	 * default: table
 	 * options:
@@ -224,6 +230,14 @@ class Config_Command extends WP_CLI_Command {
 		$wp_config_vars      = self::get_wp_config_vars( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
 		$wp_config_constants = self::get_wp_config_vars( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
 
+		$get_constant        = ! empty( $assoc_args['constant'] );
+		$get_global          = ! empty( $assoc_args['global'] );
+
+		if( $get_constant || $get_global ){
+			return $this->return_constant_or_global( $assoc_args, $get_constant, $wp_config_constants, $wp_config_vars );
+		}
+
+
 		WP_CLI\Utils\format_items( $assoc_args['format'], array_merge( $wp_config_vars, $wp_config_constants ), $assoc_args['fields'] );
 	}
 
@@ -260,4 +274,55 @@ class Config_Command extends WP_CLI_Command {
 		}
 	}
 
+	/**
+	 * Prints the value of a constant or global defined in the wp-config.php file.
+	 *
+	 * If the constant or global is not defined in the wp-config.php file then an error will be returned.
+	 *
+	 * @param array $assoc_args
+	 * @param bool $get_constant
+	 * @param array $wp_config_constants
+	 * @param array $wp_config_vars
+	 */
+	public function return_constant_or_global( $assoc_args, $get_constant, $wp_config_constants, $wp_config_vars ) {
+		if ( $get_constant ) {
+			$key       = $assoc_args['constant'];
+			$type      = 'constant';
+			$look_into = $wp_config_constants;
+		} else {
+			$key       = $assoc_args['global'];
+			$type      = 'global';
+			$look_into = $wp_config_vars;
+		}
+
+		$found     = $candidate = false;
+		$filtered  = array_filter( array_map( function ( $entry ) use ( $key, &$found, &$candidate ) {
+			if ( $key === $entry['key'] ) {
+				$found = true;
+
+				return $entry['value'];
+			} else {
+				$distance = levenshtein( $key, $entry['key'] );
+				if ( $distance < 3 && ( false === $found || $found > $distance ) ) {
+					$candidate = $entry['key'];
+					$found     = $distance;
+				} else {
+					$found = $found;
+				}
+
+				return false;
+			}
+		}, $look_into ) );
+
+		if ( empty( $found ) ) {
+			WP_CLI::error( "the {$key} {$type} is not defined in the wp-config.php file." );
+		} elseif ( ! empty( $candidate ) ) {
+			WP_CLI::error( "the {$key} {$type} is not defined in the wp-config.php file; were you looking for {$candidate}?" );
+		}
+
+		WP_CLI::print_value( reset( $filtered ) );
+
+		return;
+	}
 }
+
