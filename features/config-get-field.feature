@@ -82,3 +82,11 @@ Feature: Get the value of a constant or global defined in wp-config.php file
       Error: the tabre_peffix global is not defined in the wp-config.php file.
       """
     And STDOUT should be empty
+
+  Scenario: Trying to get the value of a constant and a global should yield an error
+    When I try `wp config get --constant=DB_NAME --global=table_prefix`
+    Then STDERR should be:
+      """
+      Error: cannot request the value of a constant and a global at the same time.
+      """
+    And STDOUT should be empty
