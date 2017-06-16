@@ -177,7 +177,7 @@ class Config_Command extends WP_CLI_Command {
 	 * : Returns the value of a specific constant defined in wp-config.php file.
 	 *
 	 * [--global=<global>]
-	 * : Returns the value of a specific globall defined in wp-config.php file.
+	 * : Returns the value of a specific global defined in wp-config.php file.
 	 *
 	 * [--format=<format>]
 	 * : Render output in a particular format.
@@ -233,8 +233,15 @@ class Config_Command extends WP_CLI_Command {
 		$get_constant        = ! empty( $assoc_args['constant'] );
 		$get_global          = ! empty( $assoc_args['global'] );
 
-		if( $get_constant || $get_global ){
-			return $this->return_constant_or_global( $assoc_args, $get_constant, $wp_config_constants, $wp_config_vars );
+		if ( $get_constant && $get_global ) {
+			WP_CLI::error( 'cannot request the value of a constant and a global at the same time.' );
+		}
+
+		if ( $get_constant || $get_global ) {
+			$value = $this->return_constant_or_global( $assoc_args, $get_constant, $wp_config_constants, $wp_config_vars );
+			WP_CLI::log( $value );
+
+			return;
 		}
 
 
@@ -283,8 +290,11 @@ class Config_Command extends WP_CLI_Command {
 	 * @param bool $get_constant
 	 * @param array $wp_config_constants
 	 * @param array $wp_config_vars
+	 *
+	 * @return string The value of the requested constant or global as defined in the wp-config.php file; if the
+	 *                requested constant or global is not defined then the function will print an error and exit.
 	 */
-	public function return_constant_or_global( $assoc_args, $get_constant, $wp_config_constants, $wp_config_vars ) {
+	private function return_constant_or_global( $assoc_args, $get_constant, $wp_config_constants, $wp_config_vars ) {
 		if ( $get_constant ) {
 			$key       = $assoc_args['constant'];
 			$type      = 'constant';
@@ -295,34 +305,21 @@ class Config_Command extends WP_CLI_Command {
 			$look_into = $wp_config_vars;
 		}
 
-		$found     = $candidate = false;
-		$filtered  = array_filter( array_map( function ( $entry ) use ( $key, &$found, &$candidate ) {
-			if ( $key === $entry['key'] ) {
-				$found = true;
+		$keys = array_column( $look_into, 'key' );
 
-				return $entry['value'];
-			} else {
-				$distance = levenshtein( $key, $entry['key'] );
-				if ( $distance < 3 && ( false === $found || $found > $distance ) ) {
-					$candidate = $entry['key'];
-					$found     = $distance;
-				} else {
-					$found = $found;
-				}
+		if ( false !== $index = array_search( $key, $keys ) ) {
+			return $look_into[ $index ]['value'];
+		}
 
-				return false;
-			}
-		}, $look_into ) );
+		$candidate = Utils\get_suggestion( $key, $keys );
 
-		if ( empty( $found ) ) {
+		if ( empty( $candidate ) ) {
 			WP_CLI::error( "the {$key} {$type} is not defined in the wp-config.php file." );
-		} elseif ( ! empty( $candidate ) ) {
+		} elseif ( $candidate !== $key ) {
 			WP_CLI::error( "the {$key} {$type} is not defined in the wp-config.php file; were you looking for {$candidate}?" );
 		}
 
-		WP_CLI::print_value( reset( $filtered ) );
-
-		return;
+		return $look_into[ $candidate ];
 	}
 }
 
