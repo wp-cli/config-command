@@ -174,14 +174,13 @@ class Config_Command extends WP_CLI_Command {
 	 * : Limit the output to specific fields. Defaults to all fields.
 	 *
 	 * [--constant=<constant>]
-	 * : Returns the value of a specific constant defined in wp-config.php file.
+	 * : Returns the value of a specific constant defined in the wp-config.php file.
 	 *
 	 * [--global=<global>]
-	 * : Returns the value of a specific global defined in wp-config.php file.
+	 * : Returns the value of a specific global defined in the wp-config.php file.
 	 *
 	 * [--format=<format>]
 	 * : Render output in a particular format.
-	 *
 	 * ---
 	 * default: table
 	 * options:
