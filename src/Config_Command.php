@@ -1,5 +1,4 @@
 <?php
-
 use \WP_CLI\Utils;
 
 /**
@@ -174,8 +173,15 @@ class Config_Command extends WP_CLI_Command {
 	 * [--fields=<fields>]
 	 * : Limit the output to specific fields. Defaults to all fields.
 	 *
+	 * [--constant=<constant>]
+	 * : Returns the value of a specific constant defined in wp-config.php file.
+	 *
+	 * [--global=<global>]
+	 * : Returns the value of a specific global defined in wp-config.php file.
+	 *
 	 * [--format=<format>]
 	 * : Render output in a particular format.
+	 *
 	 * ---
 	 * default: table
 	 * options:
@@ -224,6 +230,21 @@ class Config_Command extends WP_CLI_Command {
 		$wp_config_vars      = self::get_wp_config_vars( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
 		$wp_config_constants = self::get_wp_config_vars( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
 
+		$get_constant        = ! empty( $assoc_args['constant'] );
+		$get_global          = ! empty( $assoc_args['global'] );
+
+		if ( $get_constant && $get_global ) {
+			WP_CLI::error( 'Cannot request the value of a constant and a global at the same time.' );
+		}
+
+		if ( $get_constant || $get_global ) {
+			$value = $this->return_constant_or_global( $assoc_args, $get_constant, $wp_config_constants, $wp_config_vars );
+			WP_CLI::log( $value );
+
+			return;
+		}
+
+
 		WP_CLI\Utils\format_items( $assoc_args['format'], array_merge( $wp_config_vars, $wp_config_constants ), $assoc_args['fields'] );
 	}
 
@@ -260,4 +281,45 @@ class Config_Command extends WP_CLI_Command {
 		}
 	}
 
+	/**
+	 * Prints the value of a constant or global defined in the wp-config.php file.
+	 *
+	 * If the constant or global is not defined in the wp-config.php file then an error will be returned.
+	 *
+	 * @param array $assoc_args
+	 * @param bool $get_constant
+	 * @param array $wp_config_constants
+	 * @param array $wp_config_vars
+	 *
+	 * @return string The value of the requested constant or global as defined in the wp-config.php file; if the
+	 *                requested constant or global is not defined then the function will print an error and exit.
+	 */
+	private function return_constant_or_global( $assoc_args, $get_constant, $wp_config_constants, $wp_config_vars ) {
+		if ( $get_constant ) {
+			$key       = $assoc_args['constant'];
+			$type      = 'constant';
+			$look_into = $wp_config_constants;
+		} else {
+			$key       = $assoc_args['global'];
+			$type      = 'global';
+			$look_into = $wp_config_vars;
+		}
+
+		$keys = array_column( $look_into, 'key' );
+
+		if ( false !== $index = array_search( $key, $keys ) ) {
+			return $look_into[ $index ]['value'];
+		}
+
+		$candidate = Utils\get_suggestion( $key, $keys );
+
+		if ( empty( $candidate ) ) {
+			WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file." );
+		} elseif ( $candidate !== $key ) {
+			WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file.\nDid you mean '{$candidate}'?" );
+		}
+
+		return $look_into[ $candidate ];
+	}
 }
+
