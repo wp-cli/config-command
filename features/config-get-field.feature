@@ -23,7 +23,7 @@ Feature: Get the value of a constant or global defined in wp-config.php file
     When I try `wp config get --constant=FOO`
     Then STDERR should be:
       """
-      Error: the FOO constant is not defined in the wp-config.php file.
+      Error: The 'FOO' constant is not defined in the wp-config.php file.
       """
     And STDOUT should be empty
 
@@ -31,7 +31,7 @@ Feature: Get the value of a constant or global defined in wp-config.php file
     When I try `wp config get --global=foo`
     Then STDERR should be:
       """
-      Error: the foo global is not defined in the wp-config.php file.
+      Error: The 'foo' global is not defined in the wp-config.php file.
       """
     And STDOUT should be empty
 
@@ -39,7 +39,7 @@ Feature: Get the value of a constant or global defined in wp-config.php file
     When I try `wp config get --constant=db_name`
     Then STDERR should be:
       """
-      Error: the db_name constant is not defined in the wp-config.php file.
+      Error: The 'db_name' constant is not defined in the wp-config.php file.
       """
     And STDOUT should be empty
 
@@ -47,7 +47,7 @@ Feature: Get the value of a constant or global defined in wp-config.php file
     When I try `wp config get --global=TABLE_PREFIX`
     Then STDERR should be:
       """
-      Error: the TABLE_PREFIX global is not defined in the wp-config.php file.
+      Error: The 'TABLE_PREFIX' global is not defined in the wp-config.php file.
       """
     And STDOUT should be empty
 
@@ -55,7 +55,8 @@ Feature: Get the value of a constant or global defined in wp-config.php file
     When I try `wp config get --constant=DB_NOME`
     Then STDERR should be:
       """
-      Error: the DB_NOME constant is not defined in the wp-config.php file; were you looking for DB_NAME?
+      Error: The 'DB_NOME' constant is not defined in the wp-config.php file.
+      Did you mean 'DB_NAME'?
       """
     And STDOUT should be empty
 
@@ -63,7 +64,8 @@ Feature: Get the value of a constant or global defined in wp-config.php file
     When I try `wp config get --global=table_perfix`
     Then STDERR should be:
       """
-      Error: the table_perfix global is not defined in the wp-config.php file; were you looking for table_prefix?
+      Error: The 'table_perfix' global is not defined in the wp-config.php file.
+      Did you mean 'table_prefix'?
       """
     And STDOUT should be empty
 
@@ -71,7 +73,7 @@ Feature: Get the value of a constant or global defined in wp-config.php file
     When I try `wp config get --constant=DB_NOOOOZLE`
     Then STDERR should be:
       """
-      Error: the DB_NOOOOZLE constant is not defined in the wp-config.php file.
+      Error: The 'DB_NOOOOZLE' constant is not defined in the wp-config.php file.
       """
     And STDOUT should be empty
 
@@ -79,7 +81,7 @@ Feature: Get the value of a constant or global defined in wp-config.php file
     When I try `wp config get --global=tabre_peffix`
     Then STDERR should be:
       """
-      Error: the tabre_peffix global is not defined in the wp-config.php file.
+      Error: The 'tabre_peffix' global is not defined in the wp-config.php file.
       """
     And STDOUT should be empty
 
@@ -87,6 +89,6 @@ Feature: Get the value of a constant or global defined in wp-config.php file
     When I try `wp config get --constant=DB_NAME --global=table_prefix`
     Then STDERR should be:
       """
-      Error: cannot request the value of a constant and a global at the same time.
+      Error: Cannot request the value of a constant and a global at the same time.
       """
     And STDOUT should be empty
