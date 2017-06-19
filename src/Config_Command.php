@@ -234,7 +234,7 @@ class Config_Command extends WP_CLI_Command {
 		$get_global          = ! empty( $assoc_args['global'] );
 
 		if ( $get_constant && $get_global ) {
-			WP_CLI::error( 'cannot request the value of a constant and a global at the same time.' );
+			WP_CLI::error( 'Cannot request the value of a constant and a global at the same time.' );
 		}
 
 		if ( $get_constant || $get_global ) {
@@ -314,9 +314,9 @@ class Config_Command extends WP_CLI_Command {
 		$candidate = Utils\get_suggestion( $key, $keys );
 
 		if ( empty( $candidate ) ) {
-			WP_CLI::error( "the {$key} {$type} is not defined in the wp-config.php file." );
+			WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file." );
 		} elseif ( $candidate !== $key ) {
-			WP_CLI::error( "the {$key} {$type} is not defined in the wp-config.php file; were you looking for {$candidate}?" );
+			WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file.\nDid you mean '{$candidate}'?" );
 		}
 
 		return $look_into[ $candidate ];
