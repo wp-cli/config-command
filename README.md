@@ -108,13 +108,19 @@ the database constants are correct.
 Get variables and constants defined in wp-config.php file.
 
 ~~~
-wp config get [--fields=<fields>] [--format=<format>]
+wp config get [--fields=<fields>] [--constant=<constant>] [--global=<global>] [--format=<format>]
 ~~~
 
 **OPTIONS**
 
 	[--fields=<fields>]
 		Limit the output to specific fields. Defaults to all fields.
+
+	[--constant=<constant>]
+		Returns the value of a specific constant defined in the wp-config.php file.
+
+	[--global=<global>]
+		Returns the value of a specific global defined in the wp-config.php file.
 
 	[--format=<format>]
 		Render output in a particular format.
