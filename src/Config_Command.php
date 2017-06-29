@@ -237,8 +237,9 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		unset( $wp_config_vars[ $key_backup ] );
-		$wp_config_vars      = array_values( $wp_config_vars );
-		$wp_config_includes  = array_diff( get_included_files(), $wp_cli_original_includes );
+		$wp_config_vars           = array_values( $wp_config_vars );
+		$wp_config_includes       = array_diff( get_included_files(), $wp_cli_original_includes );
+		$wp_config_includes_array = array();
 
 		foreach ( $wp_config_includes as $key => $value ) {
 			$wp_config_includes_array[] = array(
