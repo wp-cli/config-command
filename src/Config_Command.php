@@ -233,6 +233,7 @@ class Config_Command extends WP_CLI_Command {
 		foreach ( $wp_config_vars as $key => $value ) {
 			if ( 'wp_cli_original_includes' === $value['key'] ) {
 				$key_backup = $key;
+				break;
 			}
 		}
 
