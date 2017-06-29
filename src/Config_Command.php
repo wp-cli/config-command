@@ -223,14 +223,33 @@ class Config_Command extends WP_CLI_Command {
 
 		$wp_cli_original_defined_constants = get_defined_constants();
 		$wp_cli_original_defined_vars      = get_defined_vars();
+		$wp_cli_original_includes          = get_included_files();
 
 		eval( WP_CLI::get_runner()->get_wp_config_code() );
 
 		$wp_config_vars      = self::get_wp_config_vars( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
 		$wp_config_constants = self::get_wp_config_vars( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
 
-		$get_constant        = ! empty( $assoc_args['constant'] );
-		$get_global          = ! empty( $assoc_args['global'] );
+		foreach ( $wp_config_vars as $key => $value ) {
+			if ( 'wp_cli_original_includes' === $value['key'] ) {
+				$key_backup = $key;
+			}
+		}
+
+		unset( $wp_config_vars[ $key_backup ] );
+		$wp_config_vars      = array_values( $wp_config_vars );
+		$wp_config_includes  = array_diff( get_included_files(), $wp_cli_original_includes );
+
+		foreach ( $wp_config_includes as $key => $value ) {
+			$wp_config_includes_array[] = array(
+				'key'   => 'FILE',
+				'value' => $value,
+				'type'  => 'includes',
+			);
+		}
+
+		$get_constant = ! empty( $assoc_args['constant'] );
+		$get_global   = ! empty( $assoc_args['global'] );
 
 		if ( $get_constant && $get_global ) {
 			WP_CLI::error( 'Cannot request the value of a constant and a global at the same time.' );
@@ -243,8 +262,7 @@ class Config_Command extends WP_CLI_Command {
 			return;
 		}
 
-
-		WP_CLI\Utils\format_items( $assoc_args['format'], array_merge( $wp_config_vars, $wp_config_constants ), $assoc_args['fields'] );
+		WP_CLI\Utils\format_items( $assoc_args['format'], array_merge( $wp_config_vars, $wp_config_constants, $wp_config_includes_array ), $assoc_args['fields'] );
 	}
 
 	/**
