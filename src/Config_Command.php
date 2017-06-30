@@ -244,7 +244,7 @@ class Config_Command extends WP_CLI_Command {
 
 		foreach ( $wp_config_includes as $key => $value ) {
 			$wp_config_includes_array[] = array(
-				'key'   => 'FILE',
+				'key'   => basename( $value ),
 				'value' => $value,
 				'type'  => 'includes',
 			);
