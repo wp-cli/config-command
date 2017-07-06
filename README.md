@@ -87,25 +87,26 @@ the database constants are correct.
 **EXAMPLES**
 
     # Standard wp-config.php file
-    $ wp core config --dbname=testing --dbuser=wp --dbpass=securepswd --locale=ro_RO
+    $ wp config create --dbname=testing --dbuser=wp --dbpass=securepswd --locale=ro_RO
     Success: Generated 'wp-config.php' file.
 
     # Enable WP_DEBUG and WP_DEBUG_LOG
-    $ wp core config --dbname=testing --dbuser=wp --dbpass=securepswd --extra-php <<PHP
+    $ wp config create --dbname=testing --dbuser=wp --dbpass=securepswd --extra-php <<PHP
     $ define( 'WP_DEBUG', true );
     $ define( 'WP_DEBUG_LOG', true );
     $ PHP
     Success: Generated 'wp-config.php' file.
 
     # Avoid disclosing password to bash history by reading from password.txt
-    $ wp core config --dbname=testing --dbuser=wp --prompt=dbpass < password.txt
+    # Using --prompt=dbpass will prompt for the 'dbpass' argument
+    $ wp config create --dbname=testing --dbuser=wp --prompt=dbpass < password.txt
     Success: Generated 'wp-config.php' file.
 
 
 
 ### wp config get
 
-Get variables and constants defined in wp-config.php file.
+Get variables, constants, and file includes defined in wp-config.php file.
 
 ~~~
 wp config get [--fields=<fields>] [--constant=<constant>] [--global=<global>] [--format=<format>]
