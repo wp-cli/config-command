@@ -76,11 +76,11 @@ class Config_Command extends WP_CLI_Command {
 	 * ## EXAMPLES
 	 *
 	 *     # Standard wp-config.php file
-	 *     $ wp core config --dbname=testing --dbuser=wp --dbpass=securepswd --locale=ro_RO
+	 *     $ wp config create --dbname=testing --dbuser=wp --dbpass=securepswd --locale=ro_RO
 	 *     Success: Generated 'wp-config.php' file.
 	 *
 	 *     # Enable WP_DEBUG and WP_DEBUG_LOG
-	 *     $ wp core config --dbname=testing --dbuser=wp --dbpass=securepswd --extra-php <<PHP
+	 *     $ wp config create --dbname=testing --dbuser=wp --dbpass=securepswd --extra-php <<PHP
 	 *     $ define( 'WP_DEBUG', true );
 	 *     $ define( 'WP_DEBUG_LOG', true );
 	 *     $ PHP
@@ -88,7 +88,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 *     # Avoid disclosing password to bash history by reading from password.txt
 	 *     # Using --prompt=dbpass will prompt for the 'dbpass' argument
-	 *     $ wp core config --dbname=testing --dbuser=wp --prompt=dbpass < password.txt
+	 *     $ wp config create --dbname=testing --dbuser=wp --prompt=dbpass < password.txt
 	 *     Success: Generated 'wp-config.php' file.
 	 */
 	public function create( $_, $assoc_args ) {
@@ -167,7 +167,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Get variables and constants defined in wp-config.php file.
+	 * Get variables, constants, and file includes defined in wp-config.php file.
 	 *
 	 * ## OPTIONS
 	 *
