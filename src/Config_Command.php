@@ -158,11 +158,15 @@ class Config_Command extends WP_CLI_Command {
 	 *     # Get wp-config.php file path
 	 *     $ wp config path
 	 *     /home/person/htdocs/project/wp-config.php
+	 *
+	 * @when before_wp_load
 	 */
 	public function path() {
 		$path = Utils\locate_wp_config();
 		if ( $path ) {
 			WP_CLI::line( $path );
+		} else {
+			WP_CLI::error( "'wp-config.php' not found." );
 		}
 	}
 
@@ -221,6 +225,11 @@ class Config_Command extends WP_CLI_Command {
 		);
 
 		$assoc_args = array_merge( $defaults, $assoc_args );
+
+		$path = Utils\locate_wp_config();
+		if ( ! $path ) {
+			WP_CLI::error( "'wp-config.php' not found." );
+		}
 
 		$wp_cli_original_defined_constants = get_defined_constants();
 		$wp_cli_original_defined_vars      = get_defined_vars();
