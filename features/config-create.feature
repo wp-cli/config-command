@@ -26,7 +26,7 @@ Feature: Create a wp-config file
     When I run `wp core config {CORE_CONFIG_SETTINGS} --extra-php < wp-config-extra.php`
     Then the wp-config.php file should contain:
       """
-      define('AUTH_SALT',
+      'AUTH_SALT',
       """
     And the wp-config.php file should contain:
       """
@@ -85,7 +85,7 @@ Feature: Create a wp-config file
       define( 'AUTH_SALT',
       """
 
-  @require-php-5.6
+  @less-than-php-7.0
   Scenario: Configure with salts fetched from WordPress.org
     Given an empty directory
     And WP files
