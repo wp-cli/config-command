@@ -69,6 +69,32 @@ Feature: Create a wp-config file
       """
       define('AUTH_SALT',
       """
+    And the wp-config.php file should not contain:
+      """
+      define( 'AUTH_SALT',
+      """
+
+  @require-php-7.0
+  Scenario: Configure with salts generated
+    Given an empty directory
+    And WP files
+
+    When I run `wp core config {CORE_CONFIG_SETTINGS}`
+    Then the wp-config.php file should contain:
+      """
+      define( 'AUTH_SALT',
+      """
+
+  @require-php-5.6
+  Scenario: Configure with salts fetched from WordPress.org
+    Given an empty directory
+    And WP files
+
+    When I run `wp core config {CORE_CONFIG_SETTINGS}`
+    Then the wp-config.php file should contain:
+      """
+      define('AUTH_SALT',
+      """
 
   Scenario: Define WPLANG when running WP < 4.0
     Given an empty directory
