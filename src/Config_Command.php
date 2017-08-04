@@ -366,9 +366,15 @@ class Config_Command extends WP_CLI_Command {
 	/**
 	 * Generate a unique key/salt for the wp-config.php file.
 	 *
+	 * @throws Exception
+	 *
 	 * @return string
 	 */
 	private static function unique_key() {
+		if ( ! function_exists( 'random_int' ) ) {
+			throw new Exception( "'random_int' does not exist" );
+		}
+
 		$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_ []{}<>~`+=,.;:/?|';
 		$key = '';
 
