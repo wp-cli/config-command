@@ -127,10 +127,22 @@ class Config_Command extends WP_CLI_Command {
 			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
 		}
 
-		// TODO: adapt more resilient code from wp-admin/setup-config.php
 		if ( ! \WP_CLI\Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
-			$assoc_args['keys-and-salts'] = self::_read(
-				'https://api.wordpress.org/secret-key/1.1/salt/' );
+			try {
+				$assoc_args['keys-and-salts'] = true;
+				$assoc_args['auth-key'] = self::unique_key();
+				$assoc_args['secure-auth-key'] = self::unique_key();
+				$assoc_args['logged-in-key'] = self::unique_key();
+				$assoc_args['nonce-key'] = self::unique_key();
+				$assoc_args['auth-salt'] = self::unique_key();
+				$assoc_args['secure-auth-salt'] = self::unique_key();
+				$assoc_args['logged-in-salt'] = self::unique_key();
+				$assoc_args['nonce-salt'] = self::unique_key();
+			} catch ( Exception $e ) {
+				$assoc_args['keys-and-salts'] = false;
+				$assoc_args['keys-and-salts-alt'] = self::_read(
+					'https://api.wordpress.org/secret-key/1.1/salt/' );
+			}
 		}
 
 		if ( \WP_CLI\Utils\wp_version_compare( '4.0', '<' ) ) {
@@ -349,6 +361,28 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		return $look_into[ $candidate ];
+	}
+
+	/**
+	 * Generate a unique key/salt for the wp-config.php file.
+	 *
+	 * @throws Exception
+	 *
+	 * @return string
+	 */
+	private static function unique_key() {
+		if ( ! function_exists( 'random_int' ) ) {
+			throw new Exception( "'random_int' does not exist" );
+		}
+
+		$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_ []{}<>~`+=,.;:/?|';
+		$key = '';
+
+		for ( $i = 0; $i < 64; $i++ ) {
+			$key .= substr( $chars, random_int( 0, strlen( $chars ) - 1 ), 1 );
+		}
+
+		return $key;
 	}
 }
 
