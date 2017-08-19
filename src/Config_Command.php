@@ -244,7 +244,7 @@ class Config_Command extends WP_CLI_Command {
 				$match = preg_replace( $pattern, $replace, $match );
 			}
 			$configs = implode( PHP_EOL, array_replace( $lines, $matches ) );
-		} elseif ( $add ) {
+		} elseif ( ! $matches && $add ) {
 			$search  = PHP_EOL . "/* That's all, stop editing! Happy blogging. */";
 			$configs = str_replace( $search, $replace . PHP_EOL . $search, $configs );
 		}
