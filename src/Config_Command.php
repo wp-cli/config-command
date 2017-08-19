@@ -250,11 +250,10 @@ class Config_Command extends WP_CLI_Command {
 			$changes = str_replace( $search, $replace . PHP_EOL . $search, $configs );
 		}
 
-		if ( $changes === $configs ) {
+		$result = ( $changes === $configs ) ? 0 : file_put_contents( Utils\locate_wp_config(), $changes, LOCK_EX );
+
+		if ( 0 === $result ) {
 			WP_CLI::warning( 'No changes detected.' );
-			$result = 0;
-		} else {
-			$result = file_put_contents( Utils\locate_wp_config(), $changes, LOCK_EX );
 		}
 
 		if ( false === $result ) {
