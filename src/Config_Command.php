@@ -238,20 +238,26 @@ class Config_Command extends WP_CLI_Command {
 		$configs = file_get_contents( Utils\locate_wp_config() );
 		$lines   = explode( PHP_EOL, $configs );
 		$matches = preg_grep( $pattern, $lines );
+		$changes = '';
 
 		if ( $matches && $update ) {
 			foreach ( $matches as &$match ) {
 				$match = preg_replace( $pattern, $replace, $match );
 			}
-			$configs = implode( PHP_EOL, array_replace( $lines, $matches ) );
+			$changes = implode( PHP_EOL, array_replace( $lines, $matches ) );
 		} elseif ( ! $matches && $add ) {
 			$search  = PHP_EOL . "/* That's all, stop editing! Happy blogging. */";
-			$configs = str_replace( $search, $replace . PHP_EOL . $search, $configs );
+			$changes = str_replace( $search, $replace . PHP_EOL . $search, $configs );
 		}
 
-		$result = file_put_contents( Utils\locate_wp_config(), $configs, LOCK_EX );
+		if ( $changes === $configs ) {
+			WP_CLI::warning( 'No changes detected.' );
+			$result = 0;
+		} else {
+			$result = file_put_contents( Utils\locate_wp_config(), $changes, LOCK_EX );
+		}
 
-		if ( ! $result ) {
+		if ( false === $result ) {
 			WP_CLI::error( 'wp-config.php file could not be updated.' );
 		}
 
