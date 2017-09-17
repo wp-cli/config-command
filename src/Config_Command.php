@@ -163,6 +163,107 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
+	 * Define a constant in the wp-config.php file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [<name>]
+	 * : The constant name to be defined.
+	 *
+	 * [<value>]
+	 * : The constant value to be defined.
+	 *
+	 * [--add]
+	 * : Add definition if it doesn't exist. Default: true
+	 *
+	 * [--update]
+	 * : Update definition if it already exists. Default: true
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Boolean value.
+	 *     $ wp config define WP_DEBUG true --no-update
+	 *     Success: Defined constant 'WP_DEBUG' in wp-config.php.
+	 *
+	 *     # Only update an existing definition.
+	 *     $ wp config define WP_DEBUG true --no-add
+	 *     Success: Defined constant 'WP_DEBUG' in wp-config.php.
+	 *
+	 *     # Don't update existing definitions, only add new ones.
+	 *     $ wp config define WP_DEBUG true --no-update
+	 *     Success: Defined constant 'WP_DEBUG' in wp-config.php.
+	 *
+	 *     $ Integer value.
+	 *     $ wp config define WP_POST_REVISIONS 10
+	 *     Success: Defined constant 'WP_POST_REVISIONS' in wp-config.php.
+	 *
+	 *     $ Float value.
+	 *     $ wp config define MMMM_PIE 3.14
+	 *     Success: Defined constant 'MMMM_PIE' in wp-config.php.
+	 *
+	 *     $ String value.
+	 *     $ wp config define DB_NAME wordpress
+	 *     Success: Defined constant 'DB_HOST' in wp-config.php.
+	 *
+	 *     $ Array value.
+	 *     $ wp config define FOO_ARRAY "array( 'foo' => 'bar' )"
+	 *     Success: Defined constant 'FOO_ARRAY' in wp-config.php.
+	 *
+	 * @when before_wp_load
+	 */
+	public function define( $args, $assoc_args ) {
+		$add    = WP_CLI\Utils\get_flag_value( $assoc_args, 'add', true );
+		$update = WP_CLI\Utils\get_flag_value( $assoc_args, 'update', true );
+
+		if ( ! $add && ! $update ) {
+			WP_CLI::error( "'--no-add' and '--no-update' can't be used together." );
+		}
+
+		$name  = strtoupper( $args[0] );
+		$value = $args[1];
+
+		switch ( true ) {
+			case ( 'true' === strtolower( $value ) || 'false' === strtolower( $value ) ) :
+				$value = strtolower( $value );
+				break;
+			case preg_match( '/^(?:array\(|\[).*(?:\]|\))$/i', $value ) :
+				break;
+			case ! is_numeric( $value ) :
+				$value = sprintf( "'%s'", addcslashes( $value, "'\\" ) );
+				break;
+		}
+
+		$pattern = sprintf( '/^define\(.*[\'"]%s[\'"].*\)\s*;?/i', preg_quote( $name ) );
+		$replace = sprintf( "define( '%s', %s );", $name, $value );
+		$configs = file_get_contents( Utils\locate_wp_config() );
+		$lines   = explode( PHP_EOL, $configs );
+		$matches = preg_grep( $pattern, $lines );
+		$changes = '';
+
+		if ( $matches && $update ) {
+			foreach ( $matches as &$match ) {
+				$match = preg_replace( $pattern, $replace, $match );
+			}
+			$changes = implode( PHP_EOL, array_replace( $lines, $matches ) );
+		} elseif ( ! $matches && $add ) {
+			$search  = PHP_EOL . "/* That's all, stop editing! Happy blogging. */";
+			$changes = str_replace( $search, $replace . PHP_EOL . $search, $configs );
+		}
+
+		$result = ( $changes === $configs ) ? 0 : file_put_contents( Utils\locate_wp_config(), $changes, LOCK_EX );
+
+		if ( 0 === $result ) {
+			WP_CLI::warning( 'No changes detected.' );
+		}
+
+		if ( false === $result ) {
+			WP_CLI::error( 'wp-config.php file could not be updated.' );
+		}
+
+		WP_CLI::success( sprintf( "Defined constant '%s' in wp-config.php.", $name ) );
+	}
+
+	/**
 	 * Get the path to wp-config.php file.
 	 *
 	 * ## EXAMPLES
