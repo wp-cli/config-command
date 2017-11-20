@@ -1,0 +1,22 @@
+# Used by Probot Settings: https://probot.github.io/apps/settings/
+repository:
+  description: Manage the wp-config.php file.
+  labels:
+    - name: scope:documentation
+      color: 0e8a16
+    - name: scope:testing
+      color: 5319e7
+    - name: good-first-issue
+      color: eb6420
+    - name: state:unconfirmed
+      color: bfe5bf
+    - name: state:unsupported
+      color: bfe5bf
+    - name: command:config
+      color: c5def5
+    - name: command:config-create
+      color: c5def5
+    - name: command:config-get
+      color: c5def5
+    - name: command:config-path
+      color: c5def5
