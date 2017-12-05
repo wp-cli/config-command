@@ -2,7 +2,7 @@
 use \WP_CLI\Utils;
 
 /**
- * Manage the wp-config.php file
+ * Creates and retrieves the wp-config.php file.
  */
 class Config_Command extends WP_CLI_Command {
 
@@ -18,7 +18,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Generate a wp-config.php file.
+	 * Generates a wp-config.php file.
 	 *
 	 * Creates a new wp-config.php with database constants, and verifies that
 	 * the database constants are correct.
@@ -163,7 +163,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Get the path to wp-config.php file.
+	 * Gets the path to wp-config.php file.
 	 *
 	 * ## EXAMPLES
 	 *
@@ -183,7 +183,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Get variables, constants, and file includes defined in wp-config.php file.
+	 * Gets variables, constants, and file includes defined in wp-config.php file.
 	 *
 	 * ## OPTIONS
 	 *
@@ -290,7 +290,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Filter wp-config.php file configurations.
+	 * Filters wp-config.php file configurations.
 	 *
 	 * @param array $list
 	 * @param array $previous_list
@@ -364,7 +364,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Generate a unique key/salt for the wp-config.php file.
+	 * Generates a unique key/salt for the wp-config.php file.
 	 *
 	 * @throws Exception
 	 *

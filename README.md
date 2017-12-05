@@ -13,7 +13,7 @@ This package implements the following commands:
 
 ### wp config
 
-Manage the wp-config.php file
+Creates and retrieves the wp-config.php file.
 
 ~~~
 wp config
@@ -25,7 +25,7 @@ wp config
 
 ### wp config create
 
-Generate a wp-config.php file.
+Generates a wp-config.php file.
 
 ~~~
 wp config create --dbname=<dbname> --dbuser=<dbuser> [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--locale=<locale>] [--extra-php] [--skip-salts] [--skip-check] [--force]
@@ -106,7 +106,7 @@ the database constants are correct.
 
 ### wp config get
 
-Get variables, constants, and file includes defined in wp-config.php file.
+Gets variables, constants, and file includes defined in wp-config.php file.
 
 ~~~
 wp config get [--fields=<fields>] [--constant=<constant>] [--global=<global>] [--format=<format>]
@@ -153,7 +153,7 @@ wp config get [--fields=<fields>] [--constant=<constant>] [--global=<global>] [-
 
 ### wp config path
 
-Get the path to wp-config.php file.
+Gets the path to wp-config.php file.
 
 ~~~
 wp config path 
