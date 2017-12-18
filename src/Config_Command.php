@@ -2,7 +2,7 @@
 use \WP_CLI\Utils;
 
 /**
- * Creates and retrieves the wp-config.php file.
+ * Generates and reads the wp-config.php file.
  */
 class Config_Command extends WP_CLI_Command {
 

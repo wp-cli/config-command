@@ -1,6 +1,6 @@
 {
     "name": "wp-cli/config-command",
-    "description": "Manage the wp-config.php file.",
+    "description": "Generates and reads the wp-config.php file.",
     "type": "wp-cli-package",
     "homepage": "https://github.com/wp-cli/config-command",
     "support": {
