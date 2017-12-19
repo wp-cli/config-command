@@ -1,6 +1,6 @@
 # Used by Probot Settings: https://probot.github.io/apps/settings/
 repository:
-  description: Manage the wp-config.php file.
+  description: Generates and reads the wp-config.php file.
 labels:
   - name: bug
     color: fc2929
