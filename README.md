@@ -1,7 +1,7 @@
 wp-cli/config-command
 =====================
 
-Manage the wp-config.php file.
+Generates and reads the wp-config.php file.
 
 [![Build Status](https://travis-ci.org/wp-cli/config-command.svg?branch=master)](https://travis-ci.org/wp-cli/config-command)
 
@@ -13,7 +13,7 @@ This package implements the following commands:
 
 ### wp config
 
-Creates and retrieves the wp-config.php file.
+Generates and reads the wp-config.php file.
 
 ~~~
 wp config
