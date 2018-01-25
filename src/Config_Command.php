@@ -246,7 +246,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @subcommand list
 	 */
 	public function list_( $args, $assoc_args ) {
- 	    $path = Utils\locate_wp_config();
+		$path = Utils\locate_wp_config();
 		if ( ! $path ) {
 			WP_CLI::error( "'wp-config.php' not found." );
 		}
@@ -310,7 +310,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function get( $args, $assoc_args ) {
- 	    $path = Utils\locate_wp_config();
+		$path = Utils\locate_wp_config();
 		if ( ! $path ) {
 			WP_CLI::error( "'wp-config.php' not found." );
 		}
@@ -328,14 +328,14 @@ class Config_Command extends WP_CLI_Command {
 	 * @return array
 	 */
 	private static function get_wp_config_vars() {
- 	    $wp_cli_original_defined_constants = get_defined_constants();
+		$wp_cli_original_defined_constants = get_defined_constants();
 		$wp_cli_original_defined_vars      = get_defined_vars();
 		$wp_cli_original_includes          = get_included_files();
 
 		eval( WP_CLI::get_runner()->get_wp_config_code() );
 
 		$wp_config_vars      = self::get_wp_config_diff( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
- 		$wp_config_constants = self::get_wp_config_diff( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
+		$wp_config_constants = self::get_wp_config_diff( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
 
 		foreach ( $wp_config_vars as $key => $value ) {
 			if ( 'wp_cli_original_includes' === $value['key'] ) {
@@ -357,7 +357,7 @@ class Config_Command extends WP_CLI_Command {
 			);
 		}
 
- 		return array_merge( $wp_config_vars, $wp_config_constants, $wp_config_includes_array );
+		return array_merge( $wp_config_vars, $wp_config_constants, $wp_config_includes_array );
 	}
 
 	/**
