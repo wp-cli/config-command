@@ -93,6 +93,12 @@ Feature: List the values of a wp-config.php file
       DB_NAME
       """
 
+    When I try `wp config list --fields=key --strict`
+    Then STDERR should be:
+      """
+      Error: The --strict option can only be used in combination with a filter.
+      """
+
     When I try `wp config list --fields=key DB_ --strict`
     Then STDERR should be:
       """
