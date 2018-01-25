@@ -106,7 +106,7 @@ the database constants are correct.
 
 ### wp config get
 
-Get the value of a specific variable or constant defined in wp-config.php
+Gets the value of a specific variable or constant defined in wp-config.php
 
 ~~~
 wp config get <key> [--type=<type>]
@@ -139,7 +139,7 @@ file.
 
 ### wp config list
 
-List variables, constants, and file includes defined in wp-config.php file.
+Lists variables, constants, and file includes defined in wp-config.php file.
 
 ~~~
 wp config list [<filter>...] [--fields=<fields>] [--format=<format>] [--strict]

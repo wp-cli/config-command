@@ -183,7 +183,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * List variables, constants, and file includes defined in wp-config.php file.
+	 * Lists variables, constants, and file includes defined in wp-config.php file.
 	 *
 	 * ## OPTIONS
 	 *
@@ -283,7 +283,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Get the value of a specific variable or constant defined in wp-config.php
+	 * Gets the value of a specific variable or constant defined in wp-config.php
 	 * file.
 	 *
 	 * ## OPTIONS
@@ -456,7 +456,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Filter the values based on a provider filter key.
+	 * Filters the values based on a provider filter key.
 	 *
 	 * @param array $values
 	 * @param array $filters
