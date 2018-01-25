@@ -106,22 +106,49 @@ the database constants are correct.
 
 ### wp config get
 
-Gets variables, constants, and file includes defined in wp-config.php file.
+Get the value of a specific variable or constant defined in wp-config.php
 
 ~~~
-wp config get [--fields=<fields>] [--constant=<constant>] [--global=<global>] [--format=<format>]
+wp config get <key> [--type=<type>]
+~~~
+
+file.
+
+**OPTIONS**
+
+	<key>
+		Key for the wp-config.php variable or constant.
+
+	[--type=<type>]
+		Type of config value to retrieve. Defaults to 'all'.
+		---
+		default: all
+		options:
+		  - constant
+		  - variable
+		  - all
+		---
+
+**EXAMPLES**
+
+    # Get the table_prefix as defined in wp-config.php file.
+    $ wp config get table_prefix
+    wp_
+
+
+
+### wp config list
+
+List variables, constants, and file includes defined in wp-config.php file.
+
+~~~
+wp config list [--fields=<fields>] [--format=<format>]
 ~~~
 
 **OPTIONS**
 
 	[--fields=<fields>]
 		Limit the output to specific fields. Defaults to all fields.
-
-	[--constant=<constant>]
-		Returns the value of a specific constant defined in the wp-config.php file.
-
-	[--global=<global>]
-		Returns the value of a specific global defined in the wp-config.php file.
 
 	[--format=<format>]
 		Render output in a particular format.
@@ -137,7 +164,7 @@ wp config get [--fields=<fields>] [--constant=<constant>] [--global=<global>] [-
 **EXAMPLES**
 
     # List variables and constants defined in wp-config.php file.
-    $ wp config get --format=table
+    $ wp config list --format=table
     +------------------+------------------------------------------------------------------+----------+
     | key              | value                                                            | type     |
     +------------------+------------------------------------------------------------------+----------+
