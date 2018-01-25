@@ -133,3 +133,38 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
       Error: The 'DB_NOOOOZLE' variable or constant is not defined in the wp-config.php file.
       """
     And STDOUT should be empty
+
+  Scenario: Get the value of a key that exists as both a variable and a constant should yield a helpful error
+    Given a wp-config.php file:
+      """
+      $SOMEKEY = 'value-a';
+      define( 'SOMEKEY', 'value-b' );
+      require_once( ABSPATH . 'wp-settings.php' );
+      """
+
+    When I run `wp config list --format=table`
+    Then STDOUT should be a table containing rows:
+      | key     | value   | type     |
+      | SOMEKEY | value-a | variable |
+      | SOMEKEY | value-b | constant |
+    And STDERR should be empty
+
+    When I try `wp config get SOMEKEY`
+    Then STDERR should be:
+      """
+      Error: Found multiple values for 'SOMEKEY' in the wp-config.php file. Use --type=<type> to disambiguate.
+      """
+
+    When I run `wp config get SOMEKEY --type=variable`
+    Then STDOUT should be:
+      """
+      value-a
+      """
+    And STDERR should be empty
+
+        When I run `wp config get SOMEKEY --type=constant`
+    Then STDOUT should be:
+      """
+      value-b
+      """
+    And STDERR should be empty
