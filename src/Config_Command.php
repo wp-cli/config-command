@@ -114,7 +114,7 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( '--dbprefix can only contain numbers, letters, and underscores.' );
 
 		// Check DB connection
-		if ( ! \WP_CLI\Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
+		if ( ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
 			Utils\run_mysql_command( '/usr/bin/env mysql --no-defaults', array(
 				'execute' => ';',
 				'host' => $assoc_args['dbhost'],
@@ -123,11 +123,11 @@ class Config_Command extends WP_CLI_Command {
 			) );
 		}
 
-		if ( \WP_CLI\Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
+		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
 			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
 		}
 
-		if ( ! \WP_CLI\Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
+		if ( ! Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
 			try {
 				$assoc_args['keys-and-salts'] = true;
 				$assoc_args['auth-key'] = self::unique_key();
@@ -145,7 +145,7 @@ class Config_Command extends WP_CLI_Command {
 			}
 		}
 
-		if ( \WP_CLI\Utils\wp_version_compare( '4.0', '<' ) ) {
+		if ( Utils\wp_version_compare( '4.0', '<' ) ) {
 			$assoc_args['add-wplang'] = true;
 		} else {
 			$assoc_args['add-wplang'] = false;
@@ -187,6 +187,9 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * ## OPTIONS
 	 *
+	 * [<filter>...]
+	 * : Key or partial key to filter the list by.
+	 *
 	 * [--fields=<fields>]
 	 * : Limit the output to specific fields. Defaults to all fields.
 	 *
@@ -201,10 +204,13 @@ class Config_Command extends WP_CLI_Command {
 	 *   - yaml
 	 * ---
 	 *
+	 * [--strict]
+	 * : Enforce strict matching when a filter is provided.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # List variables and constants defined in wp-config.php file.
-	 *     $ wp config list --format=table
+	 *     $ wp config list
 	 *     +------------------+------------------------------------------------------------------+----------+
 	 *     | key              | value                                                            | type     |
 	 *     +------------------+------------------------------------------------------------------+----------+
@@ -216,13 +222,38 @@ class Config_Command extends WP_CLI_Command {
 	 *     | SECURE_AUTH_KEY  | iO-z!_m--YH$Tx2tf/&V,YW*13Z_HiRLqi)d?$o-tMdY+82pK$`T.NYW~iTLW;xp | constant |
 	 *     +------------------+------------------------------------------------------------------+----------+
 	 *
+	 *     # List only database user and password from wp-config.php file.
+	 *     $ wp config list DB_USER DB_PASSWORD --strict
+	 *     +------------------+-------+----------+
+	 *     | key              | value | type     |
+	 *     +------------------+-------+----------+
+	 *     | DB_USER          | root  | constant |
+	 *     | DB_PASSWORD      | root  | constant |
+	 *     +------------------+-------+----------+
+	 *
+	 *     # List all salts from wp-config.php file.
+	 *     $ wp config list _SALT
+	 *     +------------------+------------------------------------------------------------------+----------+
+	 *     | key              | value                                                            | type     |
+	 *     +------------------+------------------------------------------------------------------+----------+
+	 *     | AUTH_SALT        | n:]Xditk+_7>Qi=>BmtZHiH-6/Ecrvl(V5ceeGP:{>?;BT^=[B3-0>,~F5z$(+Q$ | constant |
+	 *     | SECURE_AUTH_SALT | ?Z/p|XhDw3w}?c.z%|+BAr|(Iv*H%%U+Du&kKR y?cJOYyRVRBeB[2zF-`(>+LCC | constant |
+	 *     | LOGGED_IN_SALT   | +$@(1{b~Z~s}Cs>8Y]6[m6~TnoCDpE>O%e75u}&6kUH!>q:7uM4lxbB6[1pa_X,q | constant |
+	 *     | NONCE_SALT       | _x+F li|QL?0OSQns1_JZ{|Ix3Jleox-71km/gifnyz8kmo=w-;@AE8W,(fP<N}2 | constant |
+	 *     +------------------+------------------------------------------------------------------+----------+
+	 *
 	 * @when before_wp_load
 	 * @subcommand list
 	 */
-	public function list_( $_, $assoc_args ) {
+	public function list_( $args, $assoc_args ) {
  	    $path = Utils\locate_wp_config();
 		if ( ! $path ) {
 			WP_CLI::error( "'wp-config.php' not found." );
+		}
+
+		$strict = Utils\get_flag_value( $assoc_args, 'strict' );
+		if ( $strict && empty( $args ) ) {
+			WP_CLI::error( 'The --strict option can only be used in combination with a filter.' );
 		}
 
 		$default_fields = array(
@@ -240,7 +271,15 @@ class Config_Command extends WP_CLI_Command {
 
 		$values = self::get_wp_config_vars();
 
-		WP_CLI\Utils\format_items( $assoc_args['format'], $values, $assoc_args['fields'] );
+		if ( ! empty( $args ) ) {
+			$values = $this->filter_values( $values, $args, $strict );
+		}
+
+		if ( empty( $values ) ) {
+			WP_CLI::error( "No matching keys found in 'wp-config.php'." );
+		}
+
+		Utils\format_items( $assoc_args['format'], $values, $assoc_args['fields'] );
 	}
 
 	/**
@@ -414,6 +453,35 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		return $key;
+	}
+
+	/**
+	 * Filter the values based on a provider filter key.
+	 *
+	 * @param array $values
+	 * @param array $filters
+	 * @param bool $strict
+	 *
+	 * @return array
+	 */
+	private function filter_values( $values, $filters, $strict ) {
+		$result = array();
+
+		foreach ( $values as $value ) {
+			foreach ( $filters as $filter ) {
+				if ( $strict && $filter !== $value['key'] ) {
+					continue;
+				}
+
+				if ( false === strpos( $value['key'], $filter ) ) {
+					continue;
+				}
+
+				$result[] = $value;
+			}
+		}
+
+		return $result;
 	}
 }
 
