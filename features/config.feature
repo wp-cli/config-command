@@ -1,6 +1,6 @@
 Feature: Manage wp-config.php file
 
-  Scenario: List constants, globals and files included from wp-config.php
+  Scenario: List constants, variables and files included from wp-config.php
     Given an empty directory
     And WP files
     And a wp-config-extra.php file:
@@ -17,7 +17,7 @@ Feature: Manage wp-config.php file
       Generated 'wp-config.php' file.
       """
 
-    When I run `wp config get --fields=key,type`
+    When I run `wp config list --fields=key,type`
     Then STDOUT should be a table containing rows:
       | key                | type     |
       | DB_NAME            | constant |
@@ -26,14 +26,14 @@ Feature: Manage wp-config.php file
       | DB_HOST            | constant |
       | custom-include.php | includes |
 
-    When I try `wp config get`
+    When I try `wp config list`
     Then STDOUT should be a table containing rows:
       | key | value | type |
 
   Scenario: Getting config should produce error when no config is found
     Given an empty directory
 
-    When I try `wp config get`
+    When I try `wp config list`
     Then STDERR should be:
       """
       Error: 'wp-config.php' not found.
