@@ -114,7 +114,7 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( '--dbprefix can only contain numbers, letters, and underscores.' );
 
 		// Check DB connection
-		if ( ! \WP_CLI\Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
+		if ( ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
 			Utils\run_mysql_command( '/usr/bin/env mysql --no-defaults', array(
 				'execute' => ';',
 				'host' => $assoc_args['dbhost'],
@@ -123,11 +123,11 @@ class Config_Command extends WP_CLI_Command {
 			) );
 		}
 
-		if ( \WP_CLI\Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
+		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
 			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
 		}
 
-		if ( ! \WP_CLI\Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
+		if ( ! Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
 			try {
 				$assoc_args['keys-and-salts'] = true;
 				$assoc_args['auth-key'] = self::unique_key();
@@ -145,7 +145,7 @@ class Config_Command extends WP_CLI_Command {
 			}
 		}
 
-		if ( \WP_CLI\Utils\wp_version_compare( '4.0', '<' ) ) {
+		if ( Utils\wp_version_compare( '4.0', '<' ) ) {
 			$assoc_args['add-wplang'] = true;
 		} else {
 			$assoc_args['add-wplang'] = false;
@@ -174,27 +174,19 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function path() {
-		$path = Utils\locate_wp_config();
-		if ( $path ) {
-			WP_CLI::line( $path );
-		} else {
-			WP_CLI::error( "'wp-config.php' not found." );
-		}
+		WP_CLI::line( $this->get_config_path() );
 	}
 
 	/**
-	 * Gets variables, constants, and file includes defined in wp-config.php file.
+	 * Lists variables, constants, and file includes defined in wp-config.php file.
 	 *
 	 * ## OPTIONS
 	 *
+	 * [<filter>...]
+	 * : Key or partial key to filter the list by.
+	 *
 	 * [--fields=<fields>]
 	 * : Limit the output to specific fields. Defaults to all fields.
-	 *
-	 * [--constant=<constant>]
-	 * : Returns the value of a specific constant defined in the wp-config.php file.
-	 *
-	 * [--global=<global>]
-	 * : Returns the value of a specific global defined in the wp-config.php file.
 	 *
 	 * [--format=<format>]
 	 * : Render output in a particular format.
@@ -207,10 +199,13 @@ class Config_Command extends WP_CLI_Command {
 	 *   - yaml
 	 * ---
 	 *
+	 * [--strict]
+	 * : Enforce strict matching when a filter is provided.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # List variables and constants defined in wp-config.php file.
-	 *     $ wp config get --format=table
+	 *     $ wp config list
 	 *     +------------------+------------------------------------------------------------------+----------+
 	 *     | key              | value                                                            | type     |
 	 *     +------------------+------------------------------------------------------------------+----------+
@@ -222,9 +217,37 @@ class Config_Command extends WP_CLI_Command {
 	 *     | SECURE_AUTH_KEY  | iO-z!_m--YH$Tx2tf/&V,YW*13Z_HiRLqi)d?$o-tMdY+82pK$`T.NYW~iTLW;xp | constant |
 	 *     +------------------+------------------------------------------------------------------+----------+
 	 *
+	 *     # List only database user and password from wp-config.php file.
+	 *     $ wp config list DB_USER DB_PASSWORD --strict
+	 *     +------------------+-------+----------+
+	 *     | key              | value | type     |
+	 *     +------------------+-------+----------+
+	 *     | DB_USER          | root  | constant |
+	 *     | DB_PASSWORD      | root  | constant |
+	 *     +------------------+-------+----------+
+	 *
+	 *     # List all salts from wp-config.php file.
+	 *     $ wp config list _SALT
+	 *     +------------------+------------------------------------------------------------------+----------+
+	 *     | key              | value                                                            | type     |
+	 *     +------------------+------------------------------------------------------------------+----------+
+	 *     | AUTH_SALT        | n:]Xditk+_7>Qi=>BmtZHiH-6/Ecrvl(V5ceeGP:{>?;BT^=[B3-0>,~F5z$(+Q$ | constant |
+	 *     | SECURE_AUTH_SALT | ?Z/p|XhDw3w}?c.z%|+BAr|(Iv*H%%U+Du&kKR y?cJOYyRVRBeB[2zF-`(>+LCC | constant |
+	 *     | LOGGED_IN_SALT   | +$@(1{b~Z~s}Cs>8Y]6[m6~TnoCDpE>O%e75u}&6kUH!>q:7uM4lxbB6[1pa_X,q | constant |
+	 *     | NONCE_SALT       | _x+F li|QL?0OSQns1_JZ{|Ix3Jleox-71km/gifnyz8kmo=w-;@AE8W,(fP<N}2 | constant |
+	 *     +------------------+------------------------------------------------------------------+----------+
+	 *
 	 * @when before_wp_load
+	 * @subcommand list
 	 */
-	public function get( $_, $assoc_args ) {
+	public function list_( $args, $assoc_args ) {
+		$path = $this->get_config_path();
+
+		$strict = Utils\get_flag_value( $assoc_args, 'strict' );
+		if ( $strict && empty( $args ) ) {
+			WP_CLI::error( 'The --strict option can only be used in combination with a filter.' );
+		}
+
 		$default_fields = array(
 			'key',
 			'value',
@@ -238,19 +261,70 @@ class Config_Command extends WP_CLI_Command {
 
 		$assoc_args = array_merge( $defaults, $assoc_args );
 
-		$path = Utils\locate_wp_config();
-		if ( ! $path ) {
-			WP_CLI::error( "'wp-config.php' not found." );
+		$values = self::get_wp_config_vars();
+
+		if ( ! empty( $args ) ) {
+			$values = $this->filter_values( $values, $args, $strict );
 		}
 
+		if ( empty( $values ) ) {
+			WP_CLI::error( "No matching keys found in 'wp-config.php'." );
+		}
+
+		Utils\format_items( $assoc_args['format'], $values, $assoc_args['fields'] );
+	}
+
+	/**
+	 * Gets the value of a specific variable or constant defined in wp-config.php
+	 * file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <key>
+	 * : Key for the wp-config.php variable or constant.
+	 *
+	 * [--type=<type>]
+	 * : Type of config value to retrieve. Defaults to 'all'.
+	 * ---
+	 * default: all
+	 * options:
+	 *   - constant
+	 *   - variable
+	 *   - all
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Get the table_prefix as defined in wp-config.php file.
+	 *     $ wp config get table_prefix
+	 *     wp_
+	 *
+	 * @when before_wp_load
+	 */
+	public function get( $args, $assoc_args ) {
+		$path = $this->get_config_path();
+
+		list( $key ) = $args;
+		$type = Utils\get_flag_value( $assoc_args, 'type' );
+
+		$value = $this->return_value( $key, $type, self::get_wp_config_vars() );
+		WP_CLI::log( $value );
+	}
+
+	/**
+	 * Get the array of wp-config.php variables and constants.
+	 *
+	 * @return array
+	 */
+	private static function get_wp_config_vars() {
 		$wp_cli_original_defined_constants = get_defined_constants();
 		$wp_cli_original_defined_vars      = get_defined_vars();
 		$wp_cli_original_includes          = get_included_files();
 
 		eval( WP_CLI::get_runner()->get_wp_config_code() );
 
-		$wp_config_vars      = self::get_wp_config_vars( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
-		$wp_config_constants = self::get_wp_config_vars( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
+		$wp_config_vars      = self::get_wp_config_diff( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
+		$wp_config_constants = self::get_wp_config_diff( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
 
 		foreach ( $wp_config_vars as $key => $value ) {
 			if ( 'wp_cli_original_includes' === $value['key'] ) {
@@ -272,21 +346,7 @@ class Config_Command extends WP_CLI_Command {
 			);
 		}
 
-		$get_constant = ! empty( $assoc_args['constant'] );
-		$get_global   = ! empty( $assoc_args['global'] );
-
-		if ( $get_constant && $get_global ) {
-			WP_CLI::error( 'Cannot request the value of a constant and a global at the same time.' );
-		}
-
-		if ( $get_constant || $get_global ) {
-			$value = $this->return_constant_or_global( $assoc_args, $get_constant, $wp_config_constants, $wp_config_vars );
-			WP_CLI::log( $value );
-
-			return;
-		}
-
-		WP_CLI\Utils\format_items( $assoc_args['format'], array_merge( $wp_config_vars, $wp_config_constants, $wp_config_includes_array ), $assoc_args['fields'] );
+		return array_merge( $wp_config_vars, $wp_config_constants, $wp_config_includes_array );
 	}
 
 	/**
@@ -294,10 +354,11 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * @param array $list
 	 * @param array $previous_list
+	 * @param string $type
 	 * @param array $exclude_list
 	 * @return array
 	 */
-	private static function get_wp_config_vars( $list, $previous_list, $type, $exclude_list = array() ) {
+	private static function get_wp_config_diff( $list, $previous_list, $type, $exclude_list = array() ) {
 		$result = array();
 		foreach ( $list as $key => $val ) {
 			if ( array_key_exists( $key, $previous_list ) || in_array( $key, $exclude_list ) ) {
@@ -323,44 +384,42 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Prints the value of a constant or global defined in the wp-config.php file.
+	 * Prints the value of a constant or variable defined in the wp-config.php file.
 	 *
-	 * If the constant or global is not defined in the wp-config.php file then an error will be returned.
+	 * If the constant or variable is not defined in the wp-config.php file then an error will be returned.
 	 *
-	 * @param array $assoc_args
-	 * @param bool $get_constant
-	 * @param array $wp_config_constants
-	 * @param array $wp_config_vars
+	 * @param string $key
+	 * @param string $type
+	 * @param array $values
 	 *
-	 * @return string The value of the requested constant or global as defined in the wp-config.php file; if the
-	 *                requested constant or global is not defined then the function will print an error and exit.
+	 * @return string The value of the requested constant or variable as defined in the wp-config.php file; if the
+	 *                requested constant or variable is not defined then the function will print an error and exit.
 	 */
-	private function return_constant_or_global( $assoc_args, $get_constant, $wp_config_constants, $wp_config_vars ) {
-		if ( $get_constant ) {
-			$key       = $assoc_args['constant'];
-			$type      = 'constant';
-			$look_into = $wp_config_constants;
-		} else {
-			$key       = $assoc_args['global'];
-			$type      = 'global';
-			$look_into = $wp_config_vars;
+	private function return_value( $key, $type, $values ) {
+		$results = array();
+		foreach ( $values as $value ) {
+			if ( $key === $value['key'] && ( $type === 'all' || $type === $value['type'] ) ) {
+				$results[] = $value;
+			}
 		}
 
-		$keys = array_column( $look_into, 'key' );
-
-		if ( false !== $index = array_search( $key, $keys ) ) {
-			return $look_into[ $index ]['value'];
+		if ( count( $results ) > 1 ) {
+			WP_CLI::error( "Found multiple values for '{$key}' in the wp-config.php file. Use --type=<type> to disambiguate." );
 		}
 
+		if ( ! empty( $results ) ) {
+			return $results[0]['value'];
+		}
+
+		$type = $type === 'all' ? 'variable or constant' : $type;
+		$keys = array_column( $values, 'key' );
 		$candidate = Utils\get_suggestion( $key, $keys );
 
-		if ( empty( $candidate ) ) {
-			WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file." );
-		} elseif ( $candidate !== $key ) {
+		if ( ! empty( $candidate ) && $candidate !== $key ) {
 			WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file.\nDid you mean '{$candidate}'?" );
 		}
 
-		return $look_into[ $candidate ];
+		WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file." );
 	}
 
 	/**
@@ -383,6 +442,49 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		return $key;
+	}
+
+	/**
+	 * Filters the values based on a provider filter key.
+	 *
+	 * @param array $values
+	 * @param array $filters
+	 * @param bool $strict
+	 *
+	 * @return array
+	 */
+	private function filter_values( $values, $filters, $strict ) {
+		$result = array();
+
+		foreach ( $values as $value ) {
+			foreach ( $filters as $filter ) {
+				if ( $strict && $filter !== $value['key'] ) {
+					continue;
+				}
+
+				if ( false === strpos( $value['key'], $filter ) ) {
+					continue;
+				}
+
+				$result[] = $value;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Gets the path to the wp-config.php file or gives a helpful error if none
+	 * found.
+	 *
+	 * @return string Path to wp-config.php file.
+	 */
+	private function get_config_path() {
+		$path = Utils\locate_wp_config();
+		if ( ! $path ) {
+			WP_CLI::error( "'wp-config.php' not found.\nEither create one manually or use `wp config create`." );
+		}
+		return $path;
 	}
 }
 

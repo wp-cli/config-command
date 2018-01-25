@@ -106,22 +106,52 @@ the database constants are correct.
 
 ### wp config get
 
-Gets variables, constants, and file includes defined in wp-config.php file.
+Gets the value of a specific variable or constant defined in wp-config.php
 
 ~~~
-wp config get [--fields=<fields>] [--constant=<constant>] [--global=<global>] [--format=<format>]
+wp config get <key> [--type=<type>]
+~~~
+
+file.
+
+**OPTIONS**
+
+	<key>
+		Key for the wp-config.php variable or constant.
+
+	[--type=<type>]
+		Type of config value to retrieve. Defaults to 'all'.
+		---
+		default: all
+		options:
+		  - constant
+		  - variable
+		  - all
+		---
+
+**EXAMPLES**
+
+    # Get the table_prefix as defined in wp-config.php file.
+    $ wp config get table_prefix
+    wp_
+
+
+
+### wp config list
+
+Lists variables, constants, and file includes defined in wp-config.php file.
+
+~~~
+wp config list [<filter>...] [--fields=<fields>] [--format=<format>] [--strict]
 ~~~
 
 **OPTIONS**
 
+	[<filter>...]
+		Key or partial key to filter the list by.
+
 	[--fields=<fields>]
 		Limit the output to specific fields. Defaults to all fields.
-
-	[--constant=<constant>]
-		Returns the value of a specific constant defined in the wp-config.php file.
-
-	[--global=<global>]
-		Returns the value of a specific global defined in the wp-config.php file.
 
 	[--format=<format>]
 		Render output in a particular format.
@@ -134,10 +164,13 @@ wp config get [--fields=<fields>] [--constant=<constant>] [--global=<global>] [-
 		  - yaml
 		---
 
+	[--strict]
+		Enforce strict matching when a filter is provided.
+
 **EXAMPLES**
 
     # List variables and constants defined in wp-config.php file.
-    $ wp config get --format=table
+    $ wp config list
     +------------------+------------------------------------------------------------------+----------+
     | key              | value                                                            | type     |
     +------------------+------------------------------------------------------------------+----------+
@@ -147,6 +180,26 @@ wp config get [--fields=<fields>] [--constant=<constant>] [--global=<global>] [-
     | DB_PASSWORD      | root                                                             | constant |
     | AUTH_KEY         | r6+@shP1yO&$)1gdu.hl[/j;7Zrvmt~o;#WxSsa0mlQOi24j2cR,7i+QM/#7S:o^ | constant |
     | SECURE_AUTH_KEY  | iO-z!_m--YH$Tx2tf/&V,YW*13Z_HiRLqi)d?$o-tMdY+82pK$`T.NYW~iTLW;xp | constant |
+    +------------------+------------------------------------------------------------------+----------+
+
+    # List only database user and password from wp-config.php file.
+    $ wp config list DB_USER DB_PASSWORD --strict
+    +------------------+-------+----------+
+    | key              | value | type     |
+    +------------------+-------+----------+
+    | DB_USER          | root  | constant |
+    | DB_PASSWORD      | root  | constant |
+    +------------------+-------+----------+
+
+    # List all salts from wp-config.php file.
+    $ wp config list _SALT
+    +------------------+------------------------------------------------------------------+----------+
+    | key              | value                                                            | type     |
+    +------------------+------------------------------------------------------------------+----------+
+    | AUTH_SALT        | n:]Xditk+_7>Qi=>BmtZHiH-6/Ecrvl(V5ceeGP:{>?;BT^=[B3-0>,~F5z$(+Q$ | constant |
+    | SECURE_AUTH_SALT | ?Z/p|XhDw3w}?c.z%|+BAr|(Iv*H%%U+Du&kKR y?cJOYyRVRBeB[2zF-`(>+LCC | constant |
+    | LOGGED_IN_SALT   | +$@(1{b~Z~s}Cs>8Y]6[m6~TnoCDpE>O%e75u}&6kUH!>q:7uM4lxbB6[1pa_X,q | constant |
+    | NONCE_SALT       | _x+F li|QL?0OSQns1_JZ{|Ix3Jleox-71km/gifnyz8kmo=w-;@AE8W,(fP<N}2 | constant |
     +------------------+------------------------------------------------------------------+----------+
 
 
