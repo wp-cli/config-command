@@ -7,18 +7,21 @@ Feature: Manage wp-config.php file
     Then STDERR should be:
       """
       Error: 'wp-config.php' not found.
+      Either create one manually or use `wp config create`.
       """
 
     When I try `wp config get SOME_KEY`
     Then STDERR should be:
       """
       Error: 'wp-config.php' not found.
+      Either create one manually or use `wp config create`.
       """
 
     When I try `wp config path`
     Then STDERR should be:
       """
       Error: 'wp-config.php' not found.
+      Either create one manually or use `wp config create`.
       """
 
   Scenario: Get a wp-config.php file path

@@ -174,12 +174,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function path() {
-		$path = Utils\locate_wp_config();
-		if ( $path ) {
-			WP_CLI::line( $path );
-		} else {
-			WP_CLI::error( "'wp-config.php' not found." );
-		}
+		WP_CLI::line( $this->get_config_path() );
 	}
 
 	/**
@@ -246,10 +241,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @subcommand list
 	 */
 	public function list_( $args, $assoc_args ) {
-		$path = Utils\locate_wp_config();
-		if ( ! $path ) {
-			WP_CLI::error( "'wp-config.php' not found." );
-		}
+		$path = $this->get_config_path();
 
 		$strict = Utils\get_flag_value( $assoc_args, 'strict' );
 		if ( $strict && empty( $args ) ) {
@@ -310,10 +302,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function get( $args, $assoc_args ) {
-		$path = Utils\locate_wp_config();
-		if ( ! $path ) {
-			WP_CLI::error( "'wp-config.php' not found." );
-		}
+		$path = $this->get_config_path();
 
 		list( $key ) = $args;
 		$type = Utils\get_flag_value( $assoc_args, 'type' );
@@ -482,6 +471,20 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Gets the path to the wp-config.php file or gives a helpful error if none
+	 * found.
+	 *
+	 * @return string Path to wp-config.php file.
+	 */
+	private function get_config_path() {
+		$path = Utils\locate_wp_config();
+		if ( ! $path ) {
+			WP_CLI::error( "'wp-config.php' not found.\nEither create one manually or use `wp config create`." );
+		}
+		return $path;
 	}
 }
 
