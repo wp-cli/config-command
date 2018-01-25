@@ -217,8 +217,9 @@ class Config_Command extends WP_CLI_Command {
 	 *     +------------------+------------------------------------------------------------------+----------+
 	 *
 	 * @when before_wp_load
+	 * @subcommand list
 	 */
-	public function list( $_, $assoc_args ) {
+	public function list_( $_, $assoc_args ) {
  	    $path = Utils\locate_wp_config();
 		if ( ! $path ) {
 			WP_CLI::error( "'wp-config.php' not found." );
