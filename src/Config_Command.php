@@ -317,9 +317,6 @@ class Config_Command extends WP_CLI_Command {
 			);
 		}
 
-		$get_constant = ! empty( $assoc_args['constant'] );
-		$get_variable   = ! empty( $assoc_args['variable'] );
-
  		return array_merge( $wp_config_vars, $wp_config_constants, $wp_config_includes_array );
 	}
 
