@@ -9,13 +9,7 @@ Feature: Manage wp-config.php file
       Error: 'wp-config.php' not found.
       """
 
-    When I try `wp config get`
-    Then STDERR should be:
-      """
-      Error: 'wp-config.php' not found.
-      """
-
-    When I try `wp config set`
+    When I try `wp config get SOME_KEY`
     Then STDERR should be:
       """
       Error: 'wp-config.php' not found.
