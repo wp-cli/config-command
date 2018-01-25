@@ -36,6 +36,7 @@
             "config",
             "config create",
             "config get",
+            "config list",
             "config path"
         ]
     }
