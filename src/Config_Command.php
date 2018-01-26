@@ -469,7 +469,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Delete a specific variable or constant from the wp-config.php file.
+	 * Deletes a specific variable or constant from the wp-config.php file.
 	 *
 	 * ## OPTIONS
 	 *
@@ -529,6 +529,69 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		WP_CLI::success( "Deleted the key '{$key}' from the 'wp-config.php' file." );
+	}
+
+	/**
+	 * Checks whether a specific variable or constant exists in the
+	 * wp-config.php file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <key>
+	 * : Key for the wp-config.php variable or constant.
+	 *
+	 * [--type=<type>]
+	 * : Type of the config value to set. Defaults to 'all'.
+	 * ---
+	 * default: all
+	 * options:
+	 *   - constant
+	 *   - variable
+	 *   - all
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Check whether the DB_PASSWORD constant exists in the wp-config.php file.
+	 *     $ wp config has DB_PASSWORD
+	 *
+	 * @when before_wp_load
+	 */
+	public function has( $args, $assoc_args ) {
+		$path = $this->get_config_path();
+
+		list( $key ) = $args;
+		$type = Utils\get_flag_value( $assoc_args, 'type' );
+
+		try {
+			$config_transformer = new WPConfigTransformer( $path );
+
+			switch ( $type ) {
+				case 'all':
+					$has_constant = $config_transformer->exists( 'constant', $key );
+					$has_variable = $config_transformer->exists( 'variable', $key );
+					if ( $has_constant && $has_variable ) {
+						WP_CLI::error( "Found multiple values for '{$key}' in the wp-config.php file. Use --type=<type> to disambiguate." );
+					}
+					if ( ! $has_constant && ! $has_variable ) {
+						WP_CLI::halt( 1 );
+					} else {
+						WP_CLI::halt( 0 );
+					}
+					break;
+				case 'constant':
+				case 'variable':
+					if ( ! $config_transformer->exists( $type, $key ) ) {
+						WP_CLI::halt( 1 );
+					}
+					WP_CLI::halt( 0 );
+			}
+
+			$config_transformer->remove( $type, $key );
+
+		} catch ( Exception $exception ) {
+			WP_CLI::error( "Could not process the wp-config.php transformation.\nReason: " . $exception->getMessage() );
+		}
 	}
 
 	/**

@@ -65,7 +65,7 @@ Feature: Delete a constant or global from the wp-config.php file
       Error: The 'NEW_CONSTANT' variable is not defined in the wp-config.php file.
       """
 
-  Scenario: Ambiguous change requests throw errors
+  Scenario: Ambiguous delete requests throw errors
     When I run `wp config set SOME_KEY some_value --type=constant`
     Then STDOUT should be:
       """
