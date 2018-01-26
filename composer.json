@@ -12,6 +12,11 @@
             "name": "Daniel Bachhuber",
             "email": "daniel@runcommand.io",
             "homepage": "https://runcommand.io"
+        },
+        {
+            "name": "Alain Schlesser",
+            "email": "alain.schlesser@gmail.com",
+            "homepage": "https://www.alainschlesser.com"
         }
     ],
     "minimum-stability": "dev",
@@ -22,7 +27,9 @@
         },
         "files": [ "config-command.php" ]
     },
-    "require": {},
+    "require": {
+        "wp-cli/wp-config-transformer": "^1"
+    },
     "require-dev": {
         "behat/behat": "~2.5",
         "wp-cli/wp-cli": "*"
@@ -34,10 +41,13 @@
         "bundled": true,
         "commands": [
             "config",
+            "config delete",
             "config create",
             "config get",
+            "config has",
             "config list",
-            "config path"
+            "config path",
+            "config set"
         ]
     }
 }
