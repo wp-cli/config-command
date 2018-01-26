@@ -350,6 +350,125 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
+	 * Sets the value of a specific variable or constant defined in
+	 * wp-config.php file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <key>
+	 * : Key for the wp-config.php variable or constant.
+	 *
+	 * <value>
+	 * : Value to set the wp-config.php variable or constant to.
+	 *
+	 * [--add]
+	 * : Add the value if it doesn't exist yet. This is the default behavior. Override with --no-add.
+	 *
+	 * [--raw]
+	 * : Place the value into the wp-config.php file as-is (executable), instead of as a quoted string.
+	 *
+	 * [--target=<target>]
+	 * : Target string to decide where to add new values. Defaults to "/** Absolute path to the WordPress directory".
+	 *
+	 * [--placement=<placement>]
+	 * : Where to place the new values in relation to the target string.
+	 * ---
+	 * default: 'before'
+	 * options:
+	 *   - before
+	 *   - after
+	 * ---
+	 *
+	 * [--buffer=<buffer>]
+	 * : Buffer string to put between an added value and its target string. Defaults to two EOLs.
+	 *
+	 * [--type=<type>]
+	 * : Type of the config value to set. Defaults to 'all'.
+	 * ---
+	 * default: all
+	 * options:
+	 *   - constant
+	 *   - variable
+	 *   - all
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Set the WP_DEBUG constant to true.
+	 *     $ wp config set WP_DEBUG true --raw
+	 *
+	 * @when before_wp_load
+	 */
+	public function set( $args, $assoc_args ) {
+		$path = $this->get_config_path();
+
+		list( $key, $value ) = $args;
+		$type = Utils\get_flag_value( $assoc_args, 'type' );
+
+		$options = array();
+
+		$option_flags = array(
+			'raw'       => false,
+			'add'       => true,
+			'target'    => null,
+			'placement' => null,
+			'buffer'    => null,
+		);
+
+		foreach ( $option_flags as $option => $default ) {
+			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
+			if ( null !== $option_value ) {
+				$options[ $option ] = $option_value;
+				if ( $option === 'buffer' ) {
+					$options['buffer'] = $this->parse_buffer( $options['buffer'] );
+				}
+			}
+		}
+
+		$adding = false;
+		try {
+			$config_transformer = new WPConfigTransformer( $path );
+
+			switch ( $type ) {
+				case 'all':
+					$has_constant = $config_transformer->exists( 'constant', $key );
+					$has_variable = $config_transformer->exists( 'variable', $key );
+					if ( $has_constant && $has_variable ) {
+						WP_CLI::error( "Found multiple values for '{$key}' in the wp-config.php file. Use --type=<type> to disambiguate." );
+					}
+					if ( ! $has_constant && ! $has_variable ) {
+						if ( ! $options['add'] ) {
+							WP_CLI::error( "The '{$key}' variable or constant is not defined in the wp-config.php file." );
+						}
+						// Default to adding constants if in doubt.
+						$type   = 'constant';
+						$adding = true;
+					} else {
+						$type = $has_constant ? 'constant' : 'variable';
+					}
+					break;
+				case 'constant':
+				case 'variable':
+					if ( ! $config_transformer->exists( $type, $key ) ) {
+						if ( ! $options['add'] ) {
+							WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file." );
+						}
+						$adding = true;
+					}
+			}
+
+			$config_transformer->update( $type, $key, $value, $options );
+
+		} catch ( Exception $exception ) {
+			WP_CLI::error( "Could not process the wp-config.php transformation.\nReason: " . $exception->getMessage() );
+		}
+
+		$verb = $adding ? 'Added' : 'Updated';
+		$raw  = $options['raw'] ? 'raw ' : '';
+		WP_CLI::success( "{$verb} the key '{$key}' in the 'wp-config.php' file with the {$raw}value '{$value}'." );
+	}
+
+	/**
 	 * Filters wp-config.php file configurations.
 	 *
 	 * @param array $list
@@ -485,6 +604,27 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( "'wp-config.php' not found.\nEither create one manually or use `wp config create`." );
 		}
 		return $path;
+	}
+
+	/**
+	 * Parses the buffer argument, to allow for special character handling.
+	 *
+	 * Does the following transformations:
+	 * - '\n' => "\n" (newline)
+	 * - '\t' => "\t" (tab)
+	 *
+	 * @param string $buffer Buffer string to parse.
+	 *
+	 * @return mixed Parsed buffer string.
+	 */
+	private function parse_buffer( $buffer ) {
+		$buffer = str_replace(
+			array( '\n', '\t' ),
+			array( "\n", "\t" ),
+			$buffer
+		);
+
+		return $buffer;
 	}
 }
 
