@@ -23,6 +23,36 @@ wp config
 
 
 
+### wp config delete
+
+Deletes a specific variable or constant from the wp-config.php file.
+
+~~~
+wp config delete <key> [--type=<type>]
+~~~
+
+**OPTIONS**
+
+	<key>
+		Key for the wp-config.php variable or constant.
+
+	[--type=<type>]
+		Type of the config value to set. Defaults to 'all'.
+		---
+		default: all
+		options:
+		  - constant
+		  - variable
+		  - all
+		---
+
+**EXAMPLES**
+
+    # Delete the COOKIE_DOMAIN constant from the wp-config.php file.
+    $ wp config delete COOKIE_DOMAIN
+
+
+
 ### wp config create
 
 Generates a wp-config.php file.
@@ -137,6 +167,38 @@ file.
 
 
 
+### wp config has
+
+Checks whether a specific variable or constant exists in the
+
+~~~
+wp config has <key> [--type=<type>]
+~~~
+
+wp-config.php file.
+
+**OPTIONS**
+
+	<key>
+		Key for the wp-config.php variable or constant.
+
+	[--type=<type>]
+		Type of the config value to set. Defaults to 'all'.
+		---
+		default: all
+		options:
+		  - constant
+		  - variable
+		  - all
+		---
+
+**EXAMPLES**
+
+    # Check whether the DB_PASSWORD constant exists in the wp-config.php file.
+    $ wp config has DB_PASSWORD
+
+
+
 ### wp config list
 
 Lists variables, constants, and file includes defined in wp-config.php file.
@@ -217,6 +279,62 @@ wp config path
     # Get wp-config.php file path
     $ wp config path
     /home/person/htdocs/project/wp-config.php
+
+
+
+### wp config set
+
+Sets the value of a specific variable or constant defined in
+
+~~~
+wp config set <key> <value> [--add] [--raw] [--target=<target>] [--placement=<placement>] [--buffer=<buffer>] [--type=<type>]
+~~~
+
+wp-config.php file.
+
+**OPTIONS**
+
+	<key>
+		Key for the wp-config.php variable or constant.
+
+	<value>
+		Value to set the wp-config.php variable or constant to.
+
+	[--add]
+		Add the value if it doesn't exist yet. This is the default behavior. Override with --no-add.
+
+	[--raw]
+		Place the value into the wp-config.php file as-is (executable), instead of as a quoted string.
+
+	[--target=<target>]
+		Target string to decide where to add new values. Defaults to "/** Absolute path to the WordPress directory".
+
+	[--placement=<placement>]
+		Where to place the new values in relation to the target string.
+		---
+		default: 'before'
+		options:
+		  - before
+		  - after
+		---
+
+	[--buffer=<buffer>]
+		Buffer string to put between an added value and its target string. Defaults to two EOLs.
+
+	[--type=<type>]
+		Type of the config value to set. Defaults to 'all'.
+		---
+		default: all
+		options:
+		  - constant
+		  - variable
+		  - all
+		---
+
+**EXAMPLES**
+
+    # Set the WP_DEBUG constant to true.
+    $ wp config set WP_DEBUG true --raw
 
 ## Installing
 
