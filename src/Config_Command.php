@@ -362,13 +362,15 @@ class Config_Command extends WP_CLI_Command {
 	 * : Value to set the wp-config.php variable or constant to.
 	 *
 	 * [--add]
-	 * : Add the value if it doesn't exist yet. This is the default behavior. Override with --no-add.
+	 * : Add the value if it doesn't exist yet.
+	 * This is the default behavior, override with --no-add.
 	 *
 	 * [--raw]
 	 * : Place the value into the wp-config.php file as-is (executable), instead of as a quoted string.
 	 *
 	 * [--target=<target>]
-	 * : Target string to decide where to add new values. Defaults to "/** Absolute path to the WordPress directory".
+	 * : Target string to decide where to add new values.
+	 * Defaults to "/** Absolute path to the WordPress directory".
 	 *
 	 * [--placement=<placement>]
 	 * : Where to place the new values in relation to the target string.
@@ -380,7 +382,9 @@ class Config_Command extends WP_CLI_Command {
 	 * ---
 	 *
 	 * [--buffer=<buffer>]
-	 * : Buffer string to put between an added value and its target string. Defaults to two EOLs.
+	 * : Buffer string to put between an added value and its target string.
+	 * The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\t' => tab.
+	 * Defaults to two EOLs.
 	 *
 	 * [--type=<type>]
 	 * : Type of the config value to set. Defaults to 'all'.
