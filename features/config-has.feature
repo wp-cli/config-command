@@ -1,4 +1,4 @@
-Feature: Check whether the wp-config.php file has a certain variable or constant
+Feature: Check whether the wp-config.php file has a certain constant or variable
 
   Background:
     Given a WP install
@@ -43,26 +43,26 @@ Feature: Check whether the wp-config.php file has a certain variable or constant
     And the return code should be 1
 
   Scenario: Ambiguous check throw errors
-    When I run `wp config set SOME_KEY some_value --type=constant`
+    When I run `wp config set SOME_NAME some_value --type=constant`
     Then STDOUT should be:
       """
-      Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the 'SOME_NAME' entry in the 'wp-config.php' file with the value 'some_value'.
       """
 
-    When I run `wp config set SOME_KEY some_value --type=variable`
+    When I run `wp config set SOME_NAME some_value --type=variable`
     Then STDOUT should be:
       """
-      Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the 'SOME_NAME' entry in the 'wp-config.php' file with the value 'some_value'.
       """
 
-    When I run `wp config list --fields=key,type SOME_KEY --strict`
+    When I run `wp config list --fields=name,type SOME_NAME --strict`
     Then STDOUT should be a table containing rows:
-      | key      | type     |
-      | SOME_KEY | constant |
-      | SOME_KEY | variable |
+      | name      | type     |
+      | SOME_NAME | constant |
+      | SOME_NAME | variable |
 
-    When I try `wp config has SOME_KEY`
+    When I try `wp config has SOME_NAME`
     Then STDERR should be:
       """
-      Error: Found both a constant and a variable 'SOME_KEY' in the 'wp-config.php' file. Use --type=<type> to disambiguate.
+      Error: Found both a constant and a variable 'SOME_NAME' in the 'wp-config.php' file. Use --type=<type> to disambiguate.
       """

@@ -17,9 +17,9 @@ Feature: List the values of a wp-config.php file
       Generated 'wp-config.php' file.
       """
 
-    When I run `wp config list --fields=key,type`
+    When I run `wp config list --fields=name,type`
     Then STDOUT should be a table containing rows:
-      | key                | type     |
+      | name               | type     |
       | DB_NAME            | constant |
       | DB_USER            | constant |
       | DB_PASSWORD        | constant |
@@ -28,7 +28,7 @@ Feature: List the values of a wp-config.php file
 
     When I try `wp config list`
     Then STDOUT should be a table containing rows:
-      | key | value | type |
+      | name | value | type |
 
   Scenario: Filter the list of values of a wp-config.php file
     Given an empty directory
@@ -39,9 +39,9 @@ Feature: List the values of a wp-config.php file
       Generated 'wp-config.php' file.
       """
 
-    When I run `wp config list --fields=key`
+    When I run `wp config list --fields=name`
     Then STDOUT should be a table containing rows:
-      | key              |
+      | name             |
       | table_prefix     |
       | DB_NAME          |
       | DB_USER          |
@@ -58,15 +58,15 @@ Feature: List the values of a wp-config.php file
       | LOGGED_IN_SALT   |
       | NONCE_SALT       |
 
-    When I run `wp config list --fields=key DB_`
+    When I run `wp config list --fields=name DB_`
     Then STDOUT should be a table containing rows:
-      | key              |
-      | DB_NAME          |
-      | DB_USER          |
-      | DB_PASSWORD      |
-      | DB_HOST          |
-      | DB_CHARSET       |
-      | DB_COLLATE       |
+      | name        |
+      | DB_NAME     |
+      | DB_USER     |
+      | DB_PASSWORD |
+      | DB_HOST     |
+      | DB_CHARSET  |
+      | DB_COLLATE  |
     Then STDOUT should not contain:
       """
       table_prefix
@@ -76,10 +76,10 @@ Feature: List the values of a wp-config.php file
       AUTH_KEY
       """
 
-    When I run `wp config list --fields=key DB_HOST`
+    When I run `wp config list --fields=name DB_HOST`
     Then STDOUT should be a table containing rows:
-      | key              |
-      | DB_HOST          |
+      | name    |
+      | DB_HOST |
     Then STDOUT should not contain:
       """
       table_prefix
@@ -93,23 +93,23 @@ Feature: List the values of a wp-config.php file
       DB_NAME
       """
 
-    When I try `wp config list --fields=key --strict`
+    When I try `wp config list --fields=name --strict`
     Then STDERR should be:
       """
       Error: The --strict option can only be used in combination with a filter.
       """
 
-    When I try `wp config list --fields=key DB_ --strict`
+    When I try `wp config list --fields=name DB_ --strict`
     Then STDERR should be:
       """
-      Error: No matching keys found in 'wp-config.php'.
+      Error: No matching entries found in 'wp-config.php'.
       """
 
-    When I run `wp config list --fields=key DB_USER DB_PASSWORD`
+    When I run `wp config list --fields=name DB_USER DB_PASSWORD`
     Then STDOUT should be a table containing rows:
-      | key              |
-      | DB_USER          |
-      | DB_PASSWORD      |
+      | name        |
+      | DB_USER     |
+      | DB_PASSWORD |
     Then STDOUT should not contain:
       """
       table_prefix
@@ -123,11 +123,11 @@ Feature: List the values of a wp-config.php file
       DB_HOST
       """
 
-    When I run `wp config list --fields=key DB_USER DB_PASSWORD --strict`
+    When I run `wp config list --fields=name DB_USER DB_PASSWORD --strict`
     Then STDOUT should be a table containing rows:
-      | key              |
-      | DB_USER          |
-      | DB_PASSWORD      |
+      | name        |
+      | DB_USER     |
+      | DB_PASSWORD |
     Then STDOUT should not contain:
       """
       table_prefix
@@ -141,9 +141,9 @@ Feature: List the values of a wp-config.php file
       DB_HOST
       """
 
-    When I run `wp config list --fields=key _KEY _SALT`
+    When I run `wp config list --fields=name _KEY _SALT`
     Then STDOUT should be a table containing rows:
-      | key              |
+      | name             |
       | AUTH_KEY         |
       | SECURE_AUTH_KEY  |
       | LOGGED_IN_KEY    |
