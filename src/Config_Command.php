@@ -364,7 +364,7 @@ class Config_Command extends WP_CLI_Command {
 	 * This is the default behavior, override with --no-add.
 	 *
 	 * [--raw]
-	 * : Place the value into the wp-config.php file as-is (executable), instead of as a quoted string.
+	 * : Place the value into the wp-config.php file as is, instead of as a quoted string.
 	 *
 	 * [--target=<target>]
 	 * : Target string to decide where to add new values.
