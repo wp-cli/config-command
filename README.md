@@ -136,13 +136,11 @@ the database constants are correct.
 
 ### wp config get
 
-Gets the value of a specific variable or constant defined in wp-config.php
+Gets the value of a specific variable or constant defined in wp-config.php file.
 
 ~~~
 wp config get <key> [--type=<type>]
 ~~~
-
-file.
 
 **OPTIONS**
 
@@ -169,13 +167,11 @@ file.
 
 ### wp config has
 
-Checks whether a specific variable or constant exists in the
+Checks whether a specific variable or constant exists in the wp-config.php file.
 
 ~~~
 wp config has <key> [--type=<type>]
 ~~~
-
-wp-config.php file.
 
 **OPTIONS**
 
@@ -284,13 +280,11 @@ wp config path
 
 ### wp config set
 
-Sets the value of a specific variable or constant defined in
+Sets the value of a specific variable or constant defined in wp-config.php file.
 
 ~~~
-wp config set <key> <value> [--add] [--raw] [--target=<target>] [--placement=<placement>] [--buffer=<buffer>] [--type=<type>]
+wp config set <key> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<placement>] [--separator=<separator>] [--type=<type>]
 ~~~
-
-wp-config.php file.
 
 **OPTIONS**
 
@@ -305,14 +299,14 @@ wp-config.php file.
 		This is the default behavior, override with --no-add.
 
 	[--raw]
-		Place the value into the wp-config.php file as-is (executable), instead of as a quoted string.
+		Place the value into the wp-config.php file as is, instead of as a quoted string.
 
-	[--target=<target>]
-		Target string to decide where to add new values.
+	[--anchor=<anchor>]
+		Anchor string where additions of new values are anchored around.
 		Defaults to "/** Absolute path to the WordPress directory".
 
 	[--placement=<placement>]
-		Where to place the new values in relation to the target string.
+		Where to place the new values in relation to the anchor string.
 		---
 		default: 'before'
 		options:
@@ -320,10 +314,10 @@ wp-config.php file.
 		  - after
 		---
 
-	[--buffer=<buffer>]
-		Buffer string to put between an added value and its target string.
-		The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\t' => tab.
-		Defaults to two EOLs.
+	[--separator=<separator>]
+		Separator string to put between an added value and its anchor string.
+		The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\r' => carriage return, '\t' => tab.
+		Defaults to a single EOL ("\n" on *nix and "\r\n" on Windows).
 
 	[--type=<type>]
 		Type of the config value to set. Defaults to 'all'.
