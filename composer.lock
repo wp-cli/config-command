@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "09b2406802ed6035363bd9a720a4a6fc",
+    "content-hash": "091d41d54eea2aaf4f0447fa129f751e",
     "packages": [
         {
             "name": "wp-cli/wp-config-transformer",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-cli/wp-config-transformer.git",
-                "reference": "a21f186766e2736887ea93d259f106f295068235"
+                "reference": "535007c241ea8425a8840cdb2fa0d395010a0f1c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-cli/wp-config-transformer/zipball/a21f186766e2736887ea93d259f106f295068235",
-                "reference": "a21f186766e2736887ea93d259f106f295068235",
+                "url": "https://api.github.com/repos/wp-cli/wp-config-transformer/zipball/535007c241ea8425a8840cdb2fa0d395010a0f1c",
+                "reference": "535007c241ea8425a8840cdb2fa0d395010a0f1c",
                 "shasum": ""
             },
             "require": {
@@ -45,7 +45,7 @@
                 }
             ],
             "description": "Programmatically edit a wp-config.php file.",
-            "time": "2018-01-27T11:21:33+00:00"
+            "time": "2018-01-27T11:50:22+00:00"
         }
     ],
     "packages-dev": [
