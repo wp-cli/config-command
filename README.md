@@ -25,16 +25,16 @@ wp config
 
 ### wp config delete
 
-Deletes a specific variable or constant from the wp-config.php file.
+Deletes a specific constant or variable from the wp-config.php file.
 
 ~~~
-wp config delete <key> [--type=<type>]
+wp config delete <name> [--type=<type>]
 ~~~
 
 **OPTIONS**
 
-	<key>
-		Key for the wp-config.php variable or constant.
+	<name>
+		Name for the wp-config.php constant or variable.
 
 	[--type=<type>]
 		Type of the config value to set. Defaults to 'all'.
@@ -136,16 +136,16 @@ the database constants are correct.
 
 ### wp config get
 
-Gets the value of a specific variable or constant defined in wp-config.php file.
+Gets the value of a specific constant or variable defined in wp-config.php file.
 
 ~~~
-wp config get <key> [--type=<type>]
+wp config get <name> [--type=<type>]
 ~~~
 
 **OPTIONS**
 
-	<key>
-		Key for the wp-config.php variable or constant.
+	<name>
+		Name for the wp-config.php constant or variable.
 
 	[--type=<type>]
 		Type of config value to retrieve. Defaults to 'all'.
@@ -167,16 +167,16 @@ wp config get <key> [--type=<type>]
 
 ### wp config has
 
-Checks whether a specific variable or constant exists in the wp-config.php file.
+Checks whether a specific constant or variable exists in the wp-config.php file.
 
 ~~~
-wp config has <key> [--type=<type>]
+wp config has <name> [--type=<type>]
 ~~~
 
 **OPTIONS**
 
-	<key>
-		Key for the wp-config.php variable or constant.
+	<name>
+		Name for the wp-config.php constant or variable.
 
 	[--type=<type>]
 		Type of the config value to set. Defaults to 'all'.
@@ -206,7 +206,7 @@ wp config list [<filter>...] [--fields=<fields>] [--format=<format>] [--strict]
 **OPTIONS**
 
 	[<filter>...]
-		Key or partial key to filter the list by.
+		Name or partial name to filter the list by.
 
 	[--fields=<fields>]
 		Limit the output to specific fields. Defaults to all fields.
@@ -227,7 +227,7 @@ wp config list [<filter>...] [--fields=<fields>] [--format=<format>] [--strict]
 
 **EXAMPLES**
 
-    # List variables and constants defined in wp-config.php file.
+    # List constants and variables defined in wp-config.php file.
     $ wp config list
     +------------------+------------------------------------------------------------------+----------+
     | key              | value                                                            | type     |
@@ -280,19 +280,19 @@ wp config path
 
 ### wp config set
 
-Sets the value of a specific variable or constant defined in wp-config.php file.
+Sets the value of a specific constant or variable defined in wp-config.php file.
 
 ~~~
-wp config set <key> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<placement>] [--separator=<separator>] [--type=<type>]
+wp config set <name> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<placement>] [--separator=<separator>] [--type=<type>]
 ~~~
 
 **OPTIONS**
 
-	<key>
-		Key for the wp-config.php variable or constant.
+	<name>
+		Name for the wp-config.php constant or variable.
 
 	<value>
-		Value to set the wp-config.php variable or constant to.
+		Value to set the wp-config.php constant or variable to.
 
 	[--add]
 		Add the value if it doesn't exist yet.
