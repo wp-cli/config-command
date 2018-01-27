@@ -64,5 +64,5 @@ Feature: Check whether the wp-config.php file has a certain variable or constant
     When I try `wp config has SOME_KEY`
     Then STDERR should be:
       """
-      Error: Found multiple values for 'SOME_KEY' in the wp-config.php file. Use --type=<type> to disambiguate.
+      Error: Found both a constant and a variable 'SOME_KEY' in the 'wp-config.php' file. Use --type=<type> to disambiguate.
       """

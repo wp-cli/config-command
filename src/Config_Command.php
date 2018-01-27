@@ -436,11 +436,11 @@ class Config_Command extends WP_CLI_Command {
 					$has_constant = $config_transformer->exists( 'constant', $key );
 					$has_variable = $config_transformer->exists( 'variable', $key );
 					if ( $has_constant && $has_variable ) {
-						WP_CLI::error( "Found multiple values for '{$key}' in the wp-config.php file. Use --type=<type> to disambiguate." );
+						WP_CLI::error( "Found both a constant and a variable '{$key}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
 					}
 					if ( ! $has_constant && ! $has_variable ) {
 						if ( ! $options['add'] ) {
-							WP_CLI::error( "The '{$key}' variable or constant is not defined in the wp-config.php file." );
+							WP_CLI::error( "The '{$key}' variable or constant is not defined in the 'wp-config.php' file." );
 						}
 						// Default to adding constants if in doubt.
 						$type   = 'constant';
@@ -453,7 +453,7 @@ class Config_Command extends WP_CLI_Command {
 				case 'variable':
 					if ( ! $config_transformer->exists( $type, $key ) ) {
 						if ( ! $options['add'] ) {
-							WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file." );
+							WP_CLI::error( "The '{$key}' {$type} is not defined in the 'wp-config.php' file." );
 						}
 						$adding = true;
 					}
@@ -509,10 +509,10 @@ class Config_Command extends WP_CLI_Command {
 					$has_constant = $config_transformer->exists( 'constant', $key );
 					$has_variable = $config_transformer->exists( 'variable', $key );
 					if ( $has_constant && $has_variable ) {
-						WP_CLI::error( "Found multiple values for '{$key}' in the wp-config.php file. Use --type=<type> to disambiguate." );
+						WP_CLI::error( "Found both a constant and a variable '{$key}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
 					}
 					if ( ! $has_constant && ! $has_variable ) {
-						WP_CLI::error( "The '{$key}' variable or constant is not defined in the wp-config.php file." );
+						WP_CLI::error( "The '{$key}' variable or constant is not defined in the 'wp-config.php' file." );
 					} else {
 						$type = $has_constant ? 'constant' : 'variable';
 					}
@@ -520,7 +520,7 @@ class Config_Command extends WP_CLI_Command {
 				case 'constant':
 				case 'variable':
 					if ( ! $config_transformer->exists( $type, $key ) ) {
-						WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file." );
+						WP_CLI::error( "The '{$key}' {$type} is not defined in the 'wp-config.php' file." );
 					}
 			}
 
@@ -572,7 +572,7 @@ class Config_Command extends WP_CLI_Command {
 					$has_constant = $config_transformer->exists( 'constant', $key );
 					$has_variable = $config_transformer->exists( 'variable', $key );
 					if ( $has_constant && $has_variable ) {
-						WP_CLI::error( "Found multiple values for '{$key}' in the wp-config.php file. Use --type=<type> to disambiguate." );
+						WP_CLI::error( "Found both a constant and a variable '{$key}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
 					}
 					if ( ! $has_constant && ! $has_variable ) {
 						WP_CLI::halt( 1 );
@@ -650,7 +650,7 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		if ( count( $results ) > 1 ) {
-			WP_CLI::error( "Found multiple values for '{$key}' in the wp-config.php file. Use --type=<type> to disambiguate." );
+			WP_CLI::error( "Found both a constant and a variable '{$key}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
 		}
 
 		if ( ! empty( $results ) ) {
@@ -662,10 +662,10 @@ class Config_Command extends WP_CLI_Command {
 		$candidate = Utils\get_suggestion( $key, $keys );
 
 		if ( ! empty( $candidate ) && $candidate !== $key ) {
-			WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file.\nDid you mean '{$candidate}'?" );
+			WP_CLI::error( "The '{$key}' {$type} is not defined in the 'wp-config.php' file.\nDid you mean '{$candidate}'?" );
 		}
 
-		WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file." );
+		WP_CLI::error( "The '{$key}' {$type} is not defined in the 'wp-config.php' file." );
 	}
 
 	/**

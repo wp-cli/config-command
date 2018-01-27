@@ -33,25 +33,25 @@ Feature: Set the value of a constant or global defined in wp-config.php file
     When I try `wp config set NEW_CONSTANT constant_value --no-add`
     Then STDERR should be:
       """
-      Error: The 'NEW_CONSTANT' variable or constant is not defined in the wp-config.php file.
+      Error: The 'NEW_CONSTANT' variable or constant is not defined in the 'wp-config.php' file.
       """
 
     When I try `wp config set NEW_CONSTANT constant_value --type=constant --no-add`
     Then STDERR should be:
       """
-      Error: The 'NEW_CONSTANT' constant is not defined in the wp-config.php file.
+      Error: The 'NEW_CONSTANT' constant is not defined in the 'wp-config.php' file.
       """
 
     When I try `wp config set NEW_CONSTANT constant_value --type=variable --no-add`
     Then STDERR should be:
       """
-      Error: The 'NEW_CONSTANT' variable is not defined in the wp-config.php file.
+      Error: The 'NEW_CONSTANT' variable is not defined in the 'wp-config.php' file.
       """
 
     When I try `wp config set table_prefix new_prefix --type=constant --no-add`
     Then STDERR should be:
       """
-      Error: The 'table_prefix' constant is not defined in the wp-config.php file.
+      Error: The 'table_prefix' constant is not defined in the 'wp-config.php' file.
       """
 
     When I run `wp config set table_prefix new_prefix --type=variable --no-add`
@@ -63,7 +63,7 @@ Feature: Set the value of a constant or global defined in wp-config.php file
     When I try `wp config set DB_HOST db.example.com --type=variable --no-add`
     Then STDERR should be:
       """
-      Error: The 'DB_HOST' variable is not defined in the wp-config.php file.
+      Error: The 'DB_HOST' variable is not defined in the 'wp-config.php' file.
       """
 
     When I run `wp config set DB_HOST db.example.com --type=constant --no-add`
@@ -119,7 +119,7 @@ Feature: Set the value of a constant or global defined in wp-config.php file
     When I try `wp config set SOME_KEY some_value`
     Then STDERR should be:
       """
-      Error: Found multiple values for 'SOME_KEY' in the wp-config.php file. Use --type=<type> to disambiguate.
+      Error: Found both a constant and a variable 'SOME_KEY' in the 'wp-config.php' file. Use --type=<type> to disambiguate.
       """
 
   Scenario: Additions can be properly placed
