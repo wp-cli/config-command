@@ -131,7 +131,7 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       require_once( ABSPATH . 'wp-settings.php' );
       """
 
-    When I run `wp config set SOME_KEY some_value --anchor="/** ANCHOR */" --placement=before --buffer="\n"`
+    When I run `wp config set SOME_KEY some_value --anchor="/** ANCHOR */" --placement=before --separator="\n"`
     Then STDOUT should be:
       """
       Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
@@ -145,7 +145,7 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       require_once( ABSPATH . 'wp-settings.php' );
       """
 
-    When I run `wp config set ANOTHER_KEY another_value --anchor="/** ANCHOR */" --placement=after --buffer="\n"`
+    When I run `wp config set ANOTHER_KEY another_value --anchor="/** ANCHOR */" --placement=after --separator="\n"`
     Then STDOUT should be:
       """
       Success: Added the key 'ANOTHER_KEY' in the 'wp-config.php' file with the value 'another_value'.
