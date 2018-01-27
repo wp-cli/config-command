@@ -379,10 +379,10 @@ class Config_Command extends WP_CLI_Command {
 	 *   - after
 	 * ---
 	 *
-	 * [--buffer=<buffer>]
-	 * : Buffer string to put between an added value and its anchor string.
-	 * The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\t' => tab.
-	 * Defaults to two EOLs.
+	 * [--separator=<separator>]
+	 * : Separator string to put between an added value and its anchor string.
+	 * The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\r' => carriage return, '\t' => tab.
+	 * Defaults to a single EOL ("\n" on *nix and "\r\n" on Windows).
 	 *
 	 * [--type=<type>]
 	 * : Type of the config value to set. Defaults to 'all'.
@@ -414,15 +414,15 @@ class Config_Command extends WP_CLI_Command {
 			'add'       => true,
 			'anchor'    => null,
 			'placement' => null,
-			'buffer'    => null,
+			'separator'    => null,
 		);
 
 		foreach ( $option_flags as $option => $default ) {
 			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
 			if ( null !== $option_value ) {
 				$options[ $option ] = $option_value;
-				if ( $option === 'buffer' ) {
-					$options['buffer'] = $this->parse_buffer( $options['buffer'] );
+				if ( $option === 'separator' ) {
+					$options['separator'] = $this->parse_separator( $options['separator'] );
 				}
 			}
 		}
@@ -733,24 +733,25 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Parses the buffer argument, to allow for special character handling.
+	 * Parses the separator argument, to allow for special character handling.
 	 *
 	 * Does the following transformations:
 	 * - '\n' => "\n" (newline)
+	 * - '\r' => "\r" (carriage return)
 	 * - '\t' => "\t" (tab)
 	 *
-	 * @param string $buffer Buffer string to parse.
+	 * @param string $separator Separator string to parse.
 	 *
-	 * @return mixed Parsed buffer string.
+	 * @return mixed Parsed separator string.
 	 */
-	private function parse_buffer( $buffer ) {
-		$buffer = str_replace(
-			array( '\n', '\t' ),
-			array( "\n", "\t" ),
-			$buffer
+	private function parse_separator( $separator ) {
+		$separator = str_replace(
+			array( '\n', '\r', '\t' ),
+			array( "\n", "\r", "\t" ),
+			$separator
 		);
 
-		return $buffer;
+		return $separator;
 	}
 }
 
