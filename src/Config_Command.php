@@ -439,7 +439,7 @@ class Config_Command extends WP_CLI_Command {
 						WP_CLI::error( "Found both a constant and a variable '{$name}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
 					}
 					if ( ! $has_constant && ! $has_variable ) {
-						WP_CLI::error( "The '{$name}' constant or variable is not defined in the 'wp-config.php' file." );
+						WP_CLI::error( "The constant or variable '{$name}' is not defined in the 'wp-config.php' file." );
 					} else {
 						$type = $has_constant ? 'constant' : 'variable';
 					}
@@ -448,7 +448,7 @@ class Config_Command extends WP_CLI_Command {
 				case 'variable':
 					if ( ! $config_transformer->exists( $type, $name ) ) {
 						if ( ! $options['add'] ) {
-							WP_CLI::error( "The '{$name}' {$type} is not defined in the 'wp-config.php' file." );
+							WP_CLI::error( "The {$type} '{$name}' is not defined in the 'wp-config.php' file." );
 						}
 						$adding = true;
 					}
@@ -462,7 +462,7 @@ class Config_Command extends WP_CLI_Command {
 
 		$verb = $adding ? 'Added' : 'Updated';
 		$raw  = $options['raw'] ? 'raw ' : '';
-		WP_CLI::success( "{$verb} the '{$name}' {$type} in the 'wp-config.php' file with the {$raw}value '{$value}'." );
+		WP_CLI::success( "{$verb} the {$type} '{$name}' in the 'wp-config.php' file with the {$raw}value '{$value}'." );
 	}
 
 	/**
@@ -507,7 +507,7 @@ class Config_Command extends WP_CLI_Command {
 						WP_CLI::error( "Found both a constant and a variable '{$name}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
 					}
 					if ( ! $has_constant && ! $has_variable ) {
-						WP_CLI::error( "The '{$name}' constant or variable is not defined in the 'wp-config.php' file." );
+						WP_CLI::error( "The constant or variable '{$name}' is not defined in the 'wp-config.php' file." );
 					} else {
 						$type = $has_constant ? 'constant' : 'variable';
 					}
@@ -515,7 +515,7 @@ class Config_Command extends WP_CLI_Command {
 				case 'constant':
 				case 'variable':
 					if ( ! $config_transformer->exists( $type, $name ) ) {
-						WP_CLI::error( "The '{$name}' {$type} is not defined in the 'wp-config.php' file." );
+						WP_CLI::error( "The {$type} '{$name}' is not defined in the 'wp-config.php' file." );
 					}
 			}
 
@@ -525,7 +525,7 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
 		}
 
-		WP_CLI::success( "Deleted the '{$name}' entry from the 'wp-config.php' file." );
+		WP_CLI::success( "Deleted the {$type} '{$name}' from the 'wp-config.php' file." );
 	}
 
 	/**
@@ -657,10 +657,10 @@ class Config_Command extends WP_CLI_Command {
 		$candidate = Utils\get_suggestion( $name, $names );
 
 		if ( ! empty( $candidate ) && $candidate !== $name ) {
-			WP_CLI::error( "The '{$name}' {$type} is not defined in the 'wp-config.php' file.\nDid you mean '{$candidate}'?" );
+			WP_CLI::error( "The {$type} '{$name}' is not defined in the 'wp-config.php' file.\nDid you mean '{$candidate}'?" );
 		}
 
-		WP_CLI::error( "The '{$name}' {$type} is not defined in the 'wp-config.php' file." );
+		WP_CLI::error( "The {$type} '{$name}' is not defined in the 'wp-config.php' file." );
 	}
 
 	/**
