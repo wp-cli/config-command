@@ -4,36 +4,32 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     Given a WP install
 
   Scenario: Get the value of an existing wp-config.php constant
-    When I try `wp config get DB_NAME --type=constant`
+    When I run `wp config get DB_NAME --type=constant`
     Then STDOUT should be:
       """
       wp_cli_test
       """
-    And STDERR should be empty
 
   Scenario: Get the value of an existing wp-config.php constant without explicit type
-    When I try `wp config get DB_NAME`
+    When I run `wp config get DB_NAME`
     Then STDOUT should be:
       """
       wp_cli_test
       """
-    And STDERR should be empty
 
   Scenario: Get the value of an existing wp-config.php variable
-    When I try `wp config get table_prefix --type=variable`
+    When I run `wp config get table_prefix --type=variable`
     Then STDOUT should be:
       """
       wp_
       """
-    And STDERR should be empty
 
   Scenario: Get the value of an existing wp-config.php variable without explicit type
-    When I try `wp config get table_prefix`
+    When I run `wp config get table_prefix`
     Then STDOUT should be:
       """
       wp_
       """
-    And STDERR should be empty
 
   Scenario: Get the value of a non existing wp-config.php key
     When I try `wp config get FOO`
@@ -147,7 +143,6 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
       | key     | value   | type     |
       | SOMEKEY | value-a | variable |
       | SOMEKEY | value-b | constant |
-    And STDERR should be empty
 
     When I try `wp config get SOMEKEY`
     Then STDERR should be:
@@ -160,11 +155,9 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
       """
       value-a
       """
-    And STDERR should be empty
 
-        When I run `wp config get SOMEKEY --type=constant`
+    When I run `wp config get SOMEKEY --type=constant`
     Then STDOUT should be:
       """
       value-b
       """
-    And STDERR should be empty

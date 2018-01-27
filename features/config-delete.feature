@@ -9,7 +9,6 @@ Feature: Delete a constant or global from the wp-config.php file
       """
       Success: Deleted the key 'DB_PASSWORD' from the 'wp-config.php' file.
       """
-    And STDERR should be empty
 
     When I try `wp config get DB_PASSWORD`
     Then STDERR should be:
@@ -23,7 +22,6 @@ Feature: Delete a constant or global from the wp-config.php file
       """
       Success: Deleted the key 'DB_HOST' from the 'wp-config.php' file.
       """
-    And STDERR should be empty
 
     When I try `wp config get DB_HOST --type=constant`
     Then STDERR should be:
@@ -37,7 +35,6 @@ Feature: Delete a constant or global from the wp-config.php file
       """
       Success: Deleted the key 'table_prefix' from the 'wp-config.php' file.
       """
-    And STDERR should be empty
 
     When I try `wp config get table_prefix --type=variable`
     Then STDERR should be:
@@ -71,14 +68,12 @@ Feature: Delete a constant or global from the wp-config.php file
       """
       Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
       """
-    And STDERR should be empty
 
     When I run `wp config set SOME_KEY some_value --type=variable`
     Then STDOUT should be:
       """
       Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
       """
-    And STDERR should be empty
 
     When I run `wp config list --fields=key,type SOME_KEY --strict`
     Then STDOUT should be a table containing rows:

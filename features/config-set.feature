@@ -9,7 +9,6 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       """
       Success: Updated the key 'DB_HOST' in the 'wp-config.php' file with the value 'db.example.com'.
       """
-    And STDERR should be empty
 
     When I run `wp config get DB_HOST`
     Then STDOUT should be:
@@ -23,7 +22,6 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       """
       Success: Added the key 'NEW_CONSTANT' in the 'wp-config.php' file with the value 'constant_value'.
       """
-    And STDERR should be empty
 
     When I run `wp config get NEW_CONSTANT`
     Then STDOUT should be:
@@ -56,12 +54,11 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       Error: The 'table_prefix' constant is not defined in the wp-config.php file.
       """
 
-    When I try `wp config set table_prefix new_prefix --type=variable --no-add`
+    When I run `wp config set table_prefix new_prefix --type=variable --no-add`
     Then STDOUT should be:
       """
       Success: Updated the key 'table_prefix' in the 'wp-config.php' file with the value 'new_prefix'.
       """
-    And STDERR should be empty
 
     When I try `wp config set DB_HOST db.example.com --type=variable --no-add`
     Then STDERR should be:
@@ -74,7 +71,6 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       """
       Success: Updated the key 'DB_HOST' in the 'wp-config.php' file with the value 'db.example.com'.
       """
-    And STDERR should be empty
 
   Scenario: Update raw values
     When I run `wp config set WP_DEBUG true`
@@ -82,7 +78,6 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       """
       Success: Added the key 'WP_DEBUG' in the 'wp-config.php' file with the value 'true'.
       """
-    And STDERR should be empty
 
     When I run `wp config list WP_DEBUG --strict --format=json`
     Then STDOUT should contain:
@@ -95,7 +90,6 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       """
       Success: Updated the key 'WP_DEBUG' in the 'wp-config.php' file with the raw value 'true'.
       """
-    And STDERR should be empty
 
     When I run `wp config list WP_DEBUG --strict --format=json`
     Then STDOUT should contain:
@@ -109,14 +103,12 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       """
       Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
       """
-    And STDERR should be empty
 
     When I run `wp config set SOME_KEY some_value --type=variable`
     Then STDOUT should be:
       """
       Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
       """
-    And STDERR should be empty
 
     When I run `wp config list --fields=key,type SOME_KEY --strict`
     Then STDOUT should be a table containing rows:
@@ -144,7 +136,6 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       """
       Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
       """
-    And STDERR should be empty
     And the wp-config.php file should be:
       """
       define( 'CONST_A', 'val-a' );
@@ -159,7 +150,6 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       """
       Success: Added the key 'ANOTHER_KEY' in the 'wp-config.php' file with the value 'another_value'.
       """
-    And STDERR should be empty
     And the wp-config.php file should be:
       """
       define( 'CONST_A', 'val-a' );

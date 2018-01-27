@@ -6,17 +6,14 @@ Feature: Check whether the wp-config.php file has a certain variable or constant
   Scenario: Check the existence of an existing wp-config.php constant or variable
     When I run `wp config has DB_NAME`
     Then STDOUT should be empty
-    And STDERR should be empty
     And the return code should be 0
 
     When I run `wp config has DB_USER --type=constant`
     Then STDOUT should be empty
-    And STDERR should be empty
     And the return code should be 0
 
     When I run `wp config has table_prefix --type=variable`
     Then STDOUT should be empty
-    And STDERR should be empty
     And the return code should be 0
 
   Scenario: Check the existence of a non-existing wp-config.php constant or variable
@@ -51,14 +48,12 @@ Feature: Check whether the wp-config.php file has a certain variable or constant
       """
       Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
       """
-    And STDERR should be empty
 
     When I run `wp config set SOME_KEY some_value --type=variable`
     Then STDOUT should be:
       """
       Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
       """
-    And STDERR should be empty
 
     When I run `wp config list --fields=key,type SOME_KEY --strict`
     Then STDOUT should be a table containing rows:
