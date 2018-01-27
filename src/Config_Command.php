@@ -275,8 +275,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Gets the value of a specific variable or constant defined in wp-config.php
-	 * file.
+	 * Gets the value of a specific variable or constant defined in wp-config.php file.
 	 *
 	 * ## OPTIONS
 	 *
@@ -350,8 +349,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Sets the value of a specific variable or constant defined in
-	 * wp-config.php file.
+	 * Sets the value of a specific variable or constant defined in wp-config.php file.
 	 *
 	 * ## OPTIONS
 	 *
@@ -536,8 +534,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Checks whether a specific variable or constant exists in the
-	 * wp-config.php file.
+	 * Checks whether a specific variable or constant exists in the wp-config.php file.
 	 *
 	 * ## OPTIONS
 	 *
@@ -723,8 +720,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Gets the path to the wp-config.php file or gives a helpful error if none
-	 * found.
+	 * Gets the path to the wp-config.php file or gives a helpful error if none found.
 	 *
 	 * @return string Path to wp-config.php file.
 	 */
