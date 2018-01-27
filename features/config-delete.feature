@@ -13,7 +13,7 @@ Feature: Delete a constant or global from the wp-config.php file
     When I try `wp config get DB_PASSWORD`
     Then STDERR should be:
       """
-      Error: The 'DB_PASSWORD' variable or constant is not defined in the wp-config.php file.
+      Error: The 'DB_PASSWORD' variable or constant is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
@@ -26,7 +26,7 @@ Feature: Delete a constant or global from the wp-config.php file
     When I try `wp config get DB_HOST --type=constant`
     Then STDERR should be:
       """
-      Error: The 'DB_HOST' constant is not defined in the wp-config.php file.
+      Error: The 'DB_HOST' constant is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
@@ -39,7 +39,7 @@ Feature: Delete a constant or global from the wp-config.php file
     When I try `wp config get table_prefix --type=variable`
     Then STDERR should be:
       """
-      Error: The 'table_prefix' variable is not defined in the wp-config.php file.
+      Error: The 'table_prefix' variable is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
@@ -47,19 +47,19 @@ Feature: Delete a constant or global from the wp-config.php file
     When I try `wp config delete NEW_CONSTANT`
     Then STDERR should be:
       """
-      Error: The 'NEW_CONSTANT' variable or constant is not defined in the wp-config.php file.
+      Error: The 'NEW_CONSTANT' variable or constant is not defined in the 'wp-config.php' file.
       """
 
     When I try `wp config delete NEW_CONSTANT --type=constant`
     Then STDERR should be:
       """
-      Error: The 'NEW_CONSTANT' constant is not defined in the wp-config.php file.
+      Error: The 'NEW_CONSTANT' constant is not defined in the 'wp-config.php' file.
       """
 
     When I try `wp config delete NEW_CONSTANT --type=variable`
     Then STDERR should be:
       """
-      Error: The 'NEW_CONSTANT' variable is not defined in the wp-config.php file.
+      Error: The 'NEW_CONSTANT' variable is not defined in the 'wp-config.php' file.
       """
 
   Scenario: Ambiguous delete requests throw errors
@@ -84,5 +84,5 @@ Feature: Delete a constant or global from the wp-config.php file
     When I try `wp config delete SOME_KEY`
     Then STDERR should be:
       """
-      Error: Found multiple values for 'SOME_KEY' in the wp-config.php file. Use --type=<type> to disambiguate.
+      Error: Found both a constant and a variable 'SOME_KEY' in the 'wp-config.php' file. Use --type=<type> to disambiguate.
       """
