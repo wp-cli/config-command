@@ -46,13 +46,13 @@ Feature: Check whether the wp-config.php file has a certain constant or variable
     When I run `wp config set SOME_NAME some_value --type=constant`
     Then STDOUT should be:
       """
-      Success: Added the 'SOME_NAME' constant in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the constant 'SOME_NAME' in the 'wp-config.php' file with the value 'some_value'.
       """
 
     When I run `wp config set SOME_NAME some_value --type=variable`
     Then STDOUT should be:
       """
-      Success: Added the 'SOME_NAME' variable in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the variable 'SOME_NAME' in the 'wp-config.php' file with the value 'some_value'.
       """
 
     When I run `wp config list --fields=name,type SOME_NAME --strict`

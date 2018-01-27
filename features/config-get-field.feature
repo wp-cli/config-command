@@ -35,7 +35,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get FOO`
     Then STDERR should be:
       """
-      Error: The 'FOO' constant or variable is not defined in the 'wp-config.php' file.
+      Error: The constant or variable 'FOO' is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
@@ -43,7 +43,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get FOO --type=constant`
     Then STDERR should be:
       """
-      Error: The 'FOO' constant is not defined in the 'wp-config.php' file.
+      Error: The constant 'FOO' is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
@@ -51,7 +51,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get foo --type=variable`
     Then STDERR should be:
       """
-      Error: The 'foo' variable is not defined in the 'wp-config.php' file.
+      Error: The variable 'foo' is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
@@ -59,7 +59,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get db_name --type=constant`
     Then STDERR should be:
       """
-      Error: The 'db_name' constant is not defined in the 'wp-config.php' file.
+      Error: The constant 'db_name' is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
@@ -67,7 +67,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get TABLE_PREFIX --type=variable`
     Then STDERR should be:
       """
-      Error: The 'TABLE_PREFIX' variable is not defined in the 'wp-config.php' file.
+      Error: The variable 'TABLE_PREFIX' is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
@@ -75,7 +75,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get TABLE_PREFIX`
     Then STDERR should be:
       """
-      Error: The 'TABLE_PREFIX' constant or variable is not defined in the 'wp-config.php' file.
+      Error: The constant or variable 'TABLE_PREFIX' is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
@@ -83,7 +83,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get DB_NOME --type=constant`
     Then STDERR should be:
       """
-      Error: The 'DB_NOME' constant is not defined in the 'wp-config.php' file.
+      Error: The constant 'DB_NOME' is not defined in the 'wp-config.php' file.
       Did you mean 'DB_NAME'?
       """
     And STDOUT should be empty
@@ -92,7 +92,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get table_perfix --type=variable`
     Then STDERR should be:
       """
-      Error: The 'table_perfix' variable is not defined in the 'wp-config.php' file.
+      Error: The variable 'table_perfix' is not defined in the 'wp-config.php' file.
       Did you mean 'table_prefix'?
       """
     And STDOUT should be empty
@@ -101,7 +101,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get DB_NOME`
     Then STDERR should be:
       """
-      Error: The 'DB_NOME' constant or variable is not defined in the 'wp-config.php' file.
+      Error: The constant or variable 'DB_NOME' is not defined in the 'wp-config.php' file.
       Did you mean 'DB_NAME'?
       """
     And STDOUT should be empty
@@ -110,7 +110,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get DB_NOOOOZLE --type=constant`
     Then STDERR should be:
       """
-      Error: The 'DB_NOOOOZLE' constant is not defined in the 'wp-config.php' file.
+      Error: The constant 'DB_NOOOOZLE' is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
@@ -118,7 +118,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get tabre_peffix --type=variable`
     Then STDERR should be:
       """
-      Error: The 'tabre_peffix' variable is not defined in the 'wp-config.php' file.
+      Error: The variable 'tabre_peffix' is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
@@ -126,7 +126,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
     When I try `wp config get DB_NOOOOZLE`
     Then STDERR should be:
       """
-      Error: The 'DB_NOOOOZLE' constant or variable is not defined in the 'wp-config.php' file.
+      Error: The constant or variable 'DB_NOOOOZLE' is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
