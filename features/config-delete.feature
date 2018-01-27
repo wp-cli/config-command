@@ -1,4 +1,4 @@
-Feature: Delete a constant or global from the wp-config.php file
+Feature: Delete a constant or variable from the wp-config.php file
 
   Background:
     Given a WP install
@@ -7,20 +7,20 @@ Feature: Delete a constant or global from the wp-config.php file
     When I run `wp config delete DB_PASSWORD`
     Then STDOUT should be:
       """
-      Success: Deleted the key 'DB_PASSWORD' from the 'wp-config.php' file.
+      Success: Deleted the 'DB_PASSWORD' entry from the 'wp-config.php' file.
       """
 
     When I try `wp config get DB_PASSWORD`
     Then STDERR should be:
       """
-      Error: The 'DB_PASSWORD' variable or constant is not defined in the 'wp-config.php' file.
+      Error: The 'DB_PASSWORD' constant or variable is not defined in the 'wp-config.php' file.
       """
     And STDOUT should be empty
 
     When I run `wp config delete DB_HOST --type=constant`
     Then STDOUT should be:
       """
-      Success: Deleted the key 'DB_HOST' from the 'wp-config.php' file.
+      Success: Deleted the 'DB_HOST' entry from the 'wp-config.php' file.
       """
 
     When I try `wp config get DB_HOST --type=constant`
@@ -33,7 +33,7 @@ Feature: Delete a constant or global from the wp-config.php file
     When I run `wp config delete table_prefix --type=variable`
     Then STDOUT should be:
       """
-      Success: Deleted the key 'table_prefix' from the 'wp-config.php' file.
+      Success: Deleted the 'table_prefix' entry from the 'wp-config.php' file.
       """
 
     When I try `wp config get table_prefix --type=variable`
@@ -47,7 +47,7 @@ Feature: Delete a constant or global from the wp-config.php file
     When I try `wp config delete NEW_CONSTANT`
     Then STDERR should be:
       """
-      Error: The 'NEW_CONSTANT' variable or constant is not defined in the 'wp-config.php' file.
+      Error: The 'NEW_CONSTANT' constant or variable is not defined in the 'wp-config.php' file.
       """
 
     When I try `wp config delete NEW_CONSTANT --type=constant`
@@ -63,26 +63,26 @@ Feature: Delete a constant or global from the wp-config.php file
       """
 
   Scenario: Ambiguous delete requests throw errors
-    When I run `wp config set SOME_KEY some_value --type=constant`
+    When I run `wp config set SOME_NAME some_value --type=constant`
     Then STDOUT should be:
       """
-      Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the 'SOME_NAME' entry in the 'wp-config.php' file with the value 'some_value'.
       """
 
-    When I run `wp config set SOME_KEY some_value --type=variable`
+    When I run `wp config set SOME_NAME some_value --type=variable`
     Then STDOUT should be:
       """
-      Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the 'SOME_NAME' entry in the 'wp-config.php' file with the value 'some_value'.
       """
 
-    When I run `wp config list --fields=key,type SOME_KEY --strict`
+    When I run `wp config list --fields=name,type SOME_NAME --strict`
     Then STDOUT should be a table containing rows:
-      | key      | type     |
-      | SOME_KEY | constant |
-      | SOME_KEY | variable |
+      | name      | type     |
+      | SOME_NAME | constant |
+      | SOME_NAME | variable |
 
-    When I try `wp config delete SOME_KEY`
+    When I try `wp config delete SOME_NAME`
     Then STDERR should be:
       """
-      Error: Found both a constant and a variable 'SOME_KEY' in the 'wp-config.php' file. Use --type=<type> to disambiguate.
+      Error: Found both a constant and a variable 'SOME_NAME' in the 'wp-config.php' file. Use --type=<type> to disambiguate.
       """
