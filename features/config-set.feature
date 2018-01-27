@@ -126,12 +126,12 @@ Feature: Set the value of a constant or global defined in wp-config.php file
     Given a wp-config.php file:
       """
       define( 'CONST_A', 'val-a' );
-      /** TARGET */
+      /** ANCHOR */
       define( 'CONST_B', 'val-b' );
       require_once( ABSPATH . 'wp-settings.php' );
       """
 
-    When I run `wp config set SOME_KEY some_value --target="/** TARGET */" --placement=before --buffer="\n"`
+    When I run `wp config set SOME_KEY some_value --anchor="/** ANCHOR */" --placement=before --buffer="\n"`
     Then STDOUT should be:
       """
       Success: Added the key 'SOME_KEY' in the 'wp-config.php' file with the value 'some_value'.
@@ -140,12 +140,12 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       """
       define( 'CONST_A', 'val-a' );
       define( 'SOME_KEY', 'some_value' );
-      /** TARGET */
+      /** ANCHOR */
       define( 'CONST_B', 'val-b' );
       require_once( ABSPATH . 'wp-settings.php' );
       """
 
-    When I run `wp config set ANOTHER_KEY another_value --target="/** TARGET */" --placement=after --buffer="\n"`
+    When I run `wp config set ANOTHER_KEY another_value --anchor="/** ANCHOR */" --placement=after --buffer="\n"`
     Then STDOUT should be:
       """
       Success: Added the key 'ANOTHER_KEY' in the 'wp-config.php' file with the value 'another_value'.
@@ -154,7 +154,7 @@ Feature: Set the value of a constant or global defined in wp-config.php file
       """
       define( 'CONST_A', 'val-a' );
       define( 'SOME_KEY', 'some_value' );
-      /** TARGET */
+      /** ANCHOR */
       define( 'ANOTHER_KEY', 'another_value' );
       define( 'CONST_B', 'val-b' );
       require_once( ABSPATH . 'wp-settings.php' );
