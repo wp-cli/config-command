@@ -37,7 +37,7 @@ wp config delete <name> [--type=<type>]
 		Name for the wp-config.php constant or variable.
 
 	[--type=<type>]
-		Type of the config value to set. Defaults to 'all'.
+		Type of the config value to delete. Defaults to 'all'.
 		---
 		default: all
 		options:
