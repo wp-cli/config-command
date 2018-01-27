@@ -28,7 +28,7 @@
         "files": [ "config-command.php" ]
     },
     "require": {
-        "wp-cli/wp-config-transformer": "^1"
+        "wp-cli/wp-config-transformer": "^1.1"
     },
     "require-dev": {
         "behat/behat": "~2.5",

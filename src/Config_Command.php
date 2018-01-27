@@ -366,12 +366,12 @@ class Config_Command extends WP_CLI_Command {
 	 * [--raw]
 	 * : Place the value into the wp-config.php file as is, instead of as a quoted string.
 	 *
-	 * [--target=<target>]
-	 * : Target string to decide where to add new values.
+	 * [--anchor=<anchor>]
+	 * : Anchor string where additions of new values are anchored around.
 	 * Defaults to "/** Absolute path to the WordPress directory".
 	 *
 	 * [--placement=<placement>]
-	 * : Where to place the new values in relation to the target string.
+	 * : Where to place the new values in relation to the anchor string.
 	 * ---
 	 * default: 'before'
 	 * options:
@@ -380,7 +380,7 @@ class Config_Command extends WP_CLI_Command {
 	 * ---
 	 *
 	 * [--buffer=<buffer>]
-	 * : Buffer string to put between an added value and its target string.
+	 * : Buffer string to put between an added value and its anchor string.
 	 * The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\t' => tab.
 	 * Defaults to two EOLs.
 	 *
@@ -412,7 +412,7 @@ class Config_Command extends WP_CLI_Command {
 		$option_flags = array(
 			'raw'       => false,
 			'add'       => true,
-			'target'    => null,
+			'anchor'    => null,
 			'placement' => null,
 			'buffer'    => null,
 		);
