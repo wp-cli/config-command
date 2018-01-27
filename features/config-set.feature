@@ -20,7 +20,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I run `wp config set NEW_CONSTANT constant_value --type=constant`
     Then STDOUT should be:
       """
-      Success: Added the constant 'NEW_CONSTANT' in the 'wp-config.php' file with the value 'constant_value'.
+      Success: Added the constant 'NEW_CONSTANT' to the 'wp-config.php' file with the value 'constant_value'.
       """
 
     When I run `wp config get NEW_CONSTANT`
@@ -32,7 +32,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I run `wp config set new_variable variable_value --type=variable`
     Then STDOUT should be:
       """
-      Success: Added the variable 'new_variable' in the 'wp-config.php' file with the value 'variable_value'.
+      Success: Added the variable 'new_variable' to the 'wp-config.php' file with the value 'variable_value'.
       """
 
     When I run `wp config get new_variable`
@@ -100,7 +100,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I run `wp config set WP_DEBUG true --type=constant`
     Then STDOUT should be:
       """
-      Success: Added the constant 'WP_DEBUG' in the 'wp-config.php' file with the value 'true'.
+      Success: Added the constant 'WP_DEBUG' to the 'wp-config.php' file with the value 'true'.
       """
 
     When I run `wp config list WP_DEBUG --strict --format=json`
@@ -125,13 +125,13 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I run `wp config set SOME_NAME some_value --type=constant`
     Then STDOUT should be:
       """
-      Success: Added the constant 'SOME_NAME' in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the constant 'SOME_NAME' to the 'wp-config.php' file with the value 'some_value'.
       """
 
     When I run `wp config set SOME_NAME some_value --type=variable`
     Then STDOUT should be:
       """
-      Success: Added the variable 'SOME_NAME' in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the variable 'SOME_NAME' to the 'wp-config.php' file with the value 'some_value'.
       """
 
     When I run `wp config list --fields=name,type SOME_NAME --strict`
@@ -158,7 +158,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I run `wp config set SOME_NAME some_value --type=constant --anchor="/** ANCHOR */" --placement=before --separator="\n"`
     Then STDOUT should be:
       """
-      Success: Added the constant 'SOME_NAME' in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the constant 'SOME_NAME' to the 'wp-config.php' file with the value 'some_value'.
       """
     And the wp-config.php file should be:
       """
@@ -172,7 +172,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I run `wp config set ANOTHER_NAME another_value --type=constant --anchor="/** ANCHOR */" --placement=after --separator="\n"`
     Then STDOUT should be:
       """
-      Success: Added the constant 'ANOTHER_NAME' in the 'wp-config.php' file with the value 'another_value'.
+      Success: Added the constant 'ANOTHER_NAME' to the 'wp-config.php' file with the value 'another_value'.
       """
     And the wp-config.php file should be:
       """

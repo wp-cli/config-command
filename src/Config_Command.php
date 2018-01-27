@@ -460,9 +460,14 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
 		}
 
-		$verb = $adding ? 'Added' : 'Updated';
 		$raw  = $options['raw'] ? 'raw ' : '';
-		WP_CLI::success( "{$verb} the {$type} '{$name}' in the 'wp-config.php' file with the {$raw}value '{$value}'." );
+		if ( $adding ) {
+			$message = "Added the {$type} '{$name}' to the 'wp-config.php' file with the {$raw}value '{$value}'.";
+		} else {
+			$message = "Updated the {$type} '{$name}' in the 'wp-config.php' file with the {$raw}value '{$value}'.";
+		}
+
+		WP_CLI::success( $message );
 	}
 
 	/**
