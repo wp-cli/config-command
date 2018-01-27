@@ -439,12 +439,7 @@ class Config_Command extends WP_CLI_Command {
 						WP_CLI::error( "Found both a constant and a variable '{$name}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
 					}
 					if ( ! $has_constant && ! $has_variable ) {
-						if ( ! $options['add'] ) {
-							WP_CLI::error( "The '{$name}' constant or variable is not defined in the 'wp-config.php' file." );
-						}
-						// Default to adding constants if in doubt.
-						$type   = 'constant';
-						$adding = true;
+						WP_CLI::error( "The '{$name}' constant or variable is not defined in the 'wp-config.php' file." );
 					} else {
 						$type = $has_constant ? 'constant' : 'variable';
 					}
@@ -467,7 +462,7 @@ class Config_Command extends WP_CLI_Command {
 
 		$verb = $adding ? 'Added' : 'Updated';
 		$raw  = $options['raw'] ? 'raw ' : '';
-		WP_CLI::success( "{$verb} the '{$name}' entry in the 'wp-config.php' file with the {$raw}value '{$value}'." );
+		WP_CLI::success( "{$verb} the '{$name}' {$type} in the 'wp-config.php' file with the {$raw}value '{$value}'." );
 	}
 
 	/**

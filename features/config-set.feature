@@ -7,7 +7,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I run `wp config set DB_HOST db.example.com`
     Then STDOUT should be:
       """
-      Success: Updated the 'DB_HOST' entry in the 'wp-config.php' file with the value 'db.example.com'.
+      Success: Updated the 'DB_HOST' constant in the 'wp-config.php' file with the value 'db.example.com'.
       """
 
     When I run `wp config get DB_HOST`
@@ -17,16 +17,40 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
       """
 
   Scenario: Add a new value to wp-config.php
-    When I run `wp config set NEW_CONSTANT constant_value`
+    When I run `wp config set NEW_CONSTANT constant_value --type=constant`
     Then STDOUT should be:
       """
-      Success: Added the 'NEW_CONSTANT' entry in the 'wp-config.php' file with the value 'constant_value'.
+      Success: Added the 'NEW_CONSTANT' constant in the 'wp-config.php' file with the value 'constant_value'.
       """
 
     When I run `wp config get NEW_CONSTANT`
     Then STDOUT should be:
       """
       constant_value
+      """
+
+    When I run `wp config set new_variable variable_value --type=variable`
+    Then STDOUT should be:
+      """
+      Success: Added the 'new_variable' variable in the 'wp-config.php' file with the value 'variable_value'.
+      """
+
+    When I run `wp config get new_variable`
+    Then STDOUT should be:
+      """
+      variable_value
+      """
+
+    When I try `wp config set SOME_NAME some_value`
+    Then STDERR should be:
+      """
+      Error: The 'SOME_NAME' constant or variable is not defined in the 'wp-config.php' file.
+      """
+
+    When I try `wp config get SOME_NAME`
+    Then STDERR should be:
+      """
+      Error: The 'SOME_NAME' constant or variable is not defined in the 'wp-config.php' file.
       """
 
   Scenario: Updating a non-existent value without --add
@@ -57,7 +81,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I run `wp config set table_prefix new_prefix --type=variable --no-add`
     Then STDOUT should be:
       """
-      Success: Updated the 'table_prefix' entry in the 'wp-config.php' file with the value 'new_prefix'.
+      Success: Updated the 'table_prefix' variable in the 'wp-config.php' file with the value 'new_prefix'.
       """
 
     When I try `wp config set DB_HOST db.example.com --type=variable --no-add`
@@ -69,14 +93,14 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I run `wp config set DB_HOST db.example.com --type=constant --no-add`
     Then STDOUT should be:
       """
-      Success: Updated the 'DB_HOST' entry in the 'wp-config.php' file with the value 'db.example.com'.
+      Success: Updated the 'DB_HOST' constant in the 'wp-config.php' file with the value 'db.example.com'.
       """
 
   Scenario: Update raw values
-    When I run `wp config set WP_DEBUG true`
+    When I run `wp config set WP_DEBUG true --type=constant`
     Then STDOUT should be:
       """
-      Success: Added the 'WP_DEBUG' entry in the 'wp-config.php' file with the value 'true'.
+      Success: Added the 'WP_DEBUG' constant in the 'wp-config.php' file with the value 'true'.
       """
 
     When I run `wp config list WP_DEBUG --strict --format=json`
@@ -88,7 +112,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I run `wp config set WP_DEBUG true --raw`
     Then STDOUT should be:
       """
-      Success: Updated the 'WP_DEBUG' entry in the 'wp-config.php' file with the raw value 'true'.
+      Success: Updated the 'WP_DEBUG' constant in the 'wp-config.php' file with the raw value 'true'.
       """
 
     When I run `wp config list WP_DEBUG --strict --format=json`
@@ -101,13 +125,13 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I run `wp config set SOME_NAME some_value --type=constant`
     Then STDOUT should be:
       """
-      Success: Added the 'SOME_NAME' entry in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the 'SOME_NAME' constant in the 'wp-config.php' file with the value 'some_value'.
       """
 
     When I run `wp config set SOME_NAME some_value --type=variable`
     Then STDOUT should be:
       """
-      Success: Added the 'SOME_NAME' entry in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the 'SOME_NAME' variable in the 'wp-config.php' file with the value 'some_value'.
       """
 
     When I run `wp config list --fields=name,type SOME_NAME --strict`
@@ -131,10 +155,10 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
       require_once( ABSPATH . 'wp-settings.php' );
       """
 
-    When I run `wp config set SOME_NAME some_value --anchor="/** ANCHOR */" --placement=before --separator="\n"`
+    When I run `wp config set SOME_NAME some_value --type=constant --anchor="/** ANCHOR */" --placement=before --separator="\n"`
     Then STDOUT should be:
       """
-      Success: Added the 'SOME_NAME' entry in the 'wp-config.php' file with the value 'some_value'.
+      Success: Added the 'SOME_NAME' constant in the 'wp-config.php' file with the value 'some_value'.
       """
     And the wp-config.php file should be:
       """
@@ -145,10 +169,10 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
       require_once( ABSPATH . 'wp-settings.php' );
       """
 
-    When I run `wp config set ANOTHER_NAME another_value --anchor="/** ANCHOR */" --placement=after --separator="\n"`
+    When I run `wp config set ANOTHER_NAME another_value --type=constant --anchor="/** ANCHOR */" --placement=after --separator="\n"`
     Then STDOUT should be:
       """
-      Success: Added the 'ANOTHER_NAME' entry in the 'wp-config.php' file with the value 'another_value'.
+      Success: Added the 'ANOTHER_NAME' constant in the 'wp-config.php' file with the value 'another_value'.
       """
     And the wp-config.php file should be:
       """
