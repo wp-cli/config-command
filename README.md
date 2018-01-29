@@ -23,6 +23,36 @@ wp config
 
 
 
+### wp config delete
+
+Deletes a specific constant or variable from the wp-config.php file.
+
+~~~
+wp config delete <name> [--type=<type>]
+~~~
+
+**OPTIONS**
+
+	<name>
+		Name of the wp-config.php constant or variable.
+
+	[--type=<type>]
+		Type of the config value to delete. Defaults to 'all'.
+		---
+		default: all
+		options:
+		  - constant
+		  - variable
+		  - all
+		---
+
+**EXAMPLES**
+
+    # Delete the COOKIE_DOMAIN constant from the wp-config.php file.
+    $ wp config delete COOKIE_DOMAIN
+
+
+
 ### wp config create
 
 Generates a wp-config.php file.
@@ -106,18 +136,16 @@ the database constants are correct.
 
 ### wp config get
 
-Gets the value of a specific variable or constant defined in wp-config.php
+Gets the value of a specific constant or variable defined in wp-config.php file.
 
 ~~~
-wp config get <key> [--type=<type>]
+wp config get <name> [--type=<type>]
 ~~~
-
-file.
 
 **OPTIONS**
 
-	<key>
-		Key for the wp-config.php variable or constant.
+	<name>
+		Name of the wp-config.php constant or variable.
 
 	[--type=<type>]
 		Type of config value to retrieve. Defaults to 'all'.
@@ -137,6 +165,36 @@ file.
 
 
 
+### wp config has
+
+Checks whether a specific constant or variable exists in the wp-config.php file.
+
+~~~
+wp config has <name> [--type=<type>]
+~~~
+
+**OPTIONS**
+
+	<name>
+		Name of the wp-config.php constant or variable.
+
+	[--type=<type>]
+		Type of the config value to set. Defaults to 'all'.
+		---
+		default: all
+		options:
+		  - constant
+		  - variable
+		  - all
+		---
+
+**EXAMPLES**
+
+    # Check whether the DB_PASSWORD constant exists in the wp-config.php file.
+    $ wp config has DB_PASSWORD
+
+
+
 ### wp config list
 
 Lists variables, constants, and file includes defined in wp-config.php file.
@@ -148,7 +206,7 @@ wp config list [<filter>...] [--fields=<fields>] [--format=<format>] [--strict]
 **OPTIONS**
 
 	[<filter>...]
-		Key or partial key to filter the list by.
+		Name or partial name to filter the list by.
 
 	[--fields=<fields>]
 		Limit the output to specific fields. Defaults to all fields.
@@ -169,7 +227,7 @@ wp config list [<filter>...] [--fields=<fields>] [--format=<format>] [--strict]
 
 **EXAMPLES**
 
-    # List variables and constants defined in wp-config.php file.
+    # List constants and variables defined in wp-config.php file.
     $ wp config list
     +------------------+------------------------------------------------------------------+----------+
     | key              | value                                                            | type     |
@@ -217,6 +275,64 @@ wp config path
     # Get wp-config.php file path
     $ wp config path
     /home/person/htdocs/project/wp-config.php
+
+
+
+### wp config set
+
+Sets the value of a specific constant or variable defined in wp-config.php file.
+
+~~~
+wp config set <name> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<placement>] [--separator=<separator>] [--type=<type>]
+~~~
+
+**OPTIONS**
+
+	<name>
+		Name of the wp-config.php constant or variable.
+
+	<value>
+		Value to set the wp-config.php constant or variable to.
+
+	[--add]
+		Add the value if it doesn't exist yet.
+		This is the default behavior, override with --no-add.
+
+	[--raw]
+		Place the value into the wp-config.php file as is, instead of as a quoted string.
+
+	[--anchor=<anchor>]
+		Anchor string where additions of new values are anchored around.
+		Defaults to "/* That's all, stop editing!".
+
+	[--placement=<placement>]
+		Where to place the new values in relation to the anchor string.
+		---
+		default: 'before'
+		options:
+		  - before
+		  - after
+		---
+
+	[--separator=<separator>]
+		Separator string to put between an added value and its anchor string.
+		The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\r' => carriage return, '\t' => tab.
+		Defaults to a single EOL ("\n" on *nix and "\r\n" on Windows).
+
+	[--type=<type>]
+		Type of the config value to set. Defaults to 'all'.
+		---
+		default: all
+		options:
+		  - constant
+		  - variable
+		  - all
+		---
+
+**EXAMPLES**
+
+    # Set the WP_DEBUG constant to true.
+    $ wp config set WP_DEBUG true --raw
 
 ## Installing
 

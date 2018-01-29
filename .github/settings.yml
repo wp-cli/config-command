@@ -26,5 +26,11 @@ labels:
     color: c5def5
   - name: command:config-get
     color: c5def5
+  - name: command:config-has
+    color: c5def5
+  - name: command:config-list
+    color: c5def5
   - name: command:config-path
+    color: c5def5
+  - name: command:config-set
     color: c5def5

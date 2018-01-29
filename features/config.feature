@@ -10,7 +10,7 @@ Feature: Manage wp-config.php file
       Either create one manually or use `wp config create`.
       """
 
-    When I try `wp config get SOME_KEY`
+    When I try `wp config get SOME_NAME`
     Then STDERR should be:
       """
       Error: 'wp-config.php' not found.
@@ -26,9 +26,8 @@ Feature: Manage wp-config.php file
 
   Scenario: Get a wp-config.php file path
     Given a WP install
-    When I try `wp config path`
-    And STDOUT should contain:
+    When I run `wp config path`
+    Then STDOUT should contain:
       """
       wp-config.php
       """
-    And STDERR should be empty
