@@ -416,12 +416,12 @@ class Config_Command extends WP_CLI_Command {
 			'placement' => null,
 			'separator' => null,
 		);
-		
+
 		foreach ( $option_flags as $option => $default ) {
 			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
 			if ( null !== $option_value ) {
 				$options[ $option ] = $option_value;
-				if ( $option === 'separator' ) {
+				if ( 'separator' === $option ) {
 					$options['separator'] = $this->parse_separator( $options['separator'] );
 				}
 			}
