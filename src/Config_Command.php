@@ -414,9 +414,9 @@ class Config_Command extends WP_CLI_Command {
 			'add'       => true,
 			'anchor'    => null,
 			'placement' => null,
-			'separator'    => null,
+			'separator' => null,
 		);
-
+		
 		foreach ( $option_flags as $option => $default ) {
 			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
 			if ( null !== $option_value ) {
