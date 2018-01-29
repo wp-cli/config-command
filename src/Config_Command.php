@@ -183,7 +183,7 @@ class Config_Command extends WP_CLI_Command {
 	 * ## OPTIONS
 	 *
 	 * [<filter>...]
-	 * : Key or partial key to filter the list by.
+	 * : Name or partial name to filter the list by.
 	 *
 	 * [--fields=<fields>]
 	 * : Limit the output to specific fields. Defaults to all fields.
@@ -204,7 +204,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     # List variables and constants defined in wp-config.php file.
+	 *     # List constants and variables defined in wp-config.php file.
 	 *     $ wp config list
 	 *     +------------------+------------------------------------------------------------------+----------+
 	 *     | key              | value                                                            | type     |
@@ -249,7 +249,7 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		$default_fields = array(
-			'key',
+			'name',
 			'value',
 			'type',
 		);
@@ -268,20 +268,19 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		if ( empty( $values ) ) {
-			WP_CLI::error( "No matching keys found in 'wp-config.php'." );
+			WP_CLI::error( "No matching entries found in 'wp-config.php'." );
 		}
 
 		Utils\format_items( $assoc_args['format'], $values, $assoc_args['fields'] );
 	}
 
 	/**
-	 * Gets the value of a specific variable or constant defined in wp-config.php
-	 * file.
+	 * Gets the value of a specific constant or variable defined in wp-config.php file.
 	 *
 	 * ## OPTIONS
 	 *
-	 * <key>
-	 * : Key for the wp-config.php variable or constant.
+	 * <name>
+	 * : Name of the wp-config.php constant or variable.
 	 *
 	 * [--type=<type>]
 	 * : Type of config value to retrieve. Defaults to 'all'.
@@ -304,15 +303,15 @@ class Config_Command extends WP_CLI_Command {
 	public function get( $args, $assoc_args ) {
 		$path = $this->get_config_path();
 
-		list( $key ) = $args;
+		list( $name ) = $args;
 		$type = Utils\get_flag_value( $assoc_args, 'type' );
 
-		$value = $this->return_value( $key, $type, self::get_wp_config_vars() );
+		$value = $this->return_value( $name, $type, self::get_wp_config_vars() );
 		WP_CLI::log( $value );
 	}
 
 	/**
-	 * Get the array of wp-config.php variables and constants.
+	 * Get the array of wp-config.php constants and variables.
 	 *
 	 * @return array
 	 */
@@ -326,27 +325,278 @@ class Config_Command extends WP_CLI_Command {
 		$wp_config_vars      = self::get_wp_config_diff( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
 		$wp_config_constants = self::get_wp_config_diff( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
 
-		foreach ( $wp_config_vars as $key => $value ) {
-			if ( 'wp_cli_original_includes' === $value['key'] ) {
-				$key_backup = $key;
+		foreach ( $wp_config_vars as $name => $value ) {
+			if ( 'wp_cli_original_includes' === $value['name'] ) {
+				$name_backup = $name;
 				break;
 			}
 		}
 
-		unset( $wp_config_vars[ $key_backup ] );
+		unset( $wp_config_vars[ $name_backup ] );
 		$wp_config_vars           = array_values( $wp_config_vars );
 		$wp_config_includes       = array_diff( get_included_files(), $wp_cli_original_includes );
 		$wp_config_includes_array = array();
 
-		foreach ( $wp_config_includes as $key => $value ) {
+		foreach ( $wp_config_includes as $name => $value ) {
 			$wp_config_includes_array[] = array(
-				'key'   => basename( $value ),
+				'name'   => basename( $value ),
 				'value' => $value,
 				'type'  => 'includes',
 			);
 		}
 
 		return array_merge( $wp_config_vars, $wp_config_constants, $wp_config_includes_array );
+	}
+
+	/**
+	 * Sets the value of a specific constant or variable defined in wp-config.php file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <name>
+	 * : Name of the wp-config.php constant or variable.
+	 *
+	 * <value>
+	 * : Value to set the wp-config.php constant or variable to.
+	 *
+	 * [--add]
+	 * : Add the value if it doesn't exist yet.
+	 * This is the default behavior, override with --no-add.
+	 *
+	 * [--raw]
+	 * : Place the value into the wp-config.php file as is, instead of as a quoted string.
+	 *
+	 * [--anchor=<anchor>]
+	 * : Anchor string where additions of new values are anchored around.
+	 * Defaults to "/* That's all, stop editing!".
+	 *
+	 * [--placement=<placement>]
+	 * : Where to place the new values in relation to the anchor string.
+	 * ---
+	 * default: 'before'
+	 * options:
+	 *   - before
+	 *   - after
+	 * ---
+	 *
+	 * [--separator=<separator>]
+	 * : Separator string to put between an added value and its anchor string.
+	 * The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\r' => carriage return, '\t' => tab.
+	 * Defaults to a single EOL ("\n" on *nix and "\r\n" on Windows).
+	 *
+	 * [--type=<type>]
+	 * : Type of the config value to set. Defaults to 'all'.
+	 * ---
+	 * default: all
+	 * options:
+	 *   - constant
+	 *   - variable
+	 *   - all
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Set the WP_DEBUG constant to true.
+	 *     $ wp config set WP_DEBUG true --raw
+	 *
+	 * @when before_wp_load
+	 */
+	public function set( $args, $assoc_args ) {
+		$path = $this->get_config_path();
+
+		list( $name, $value ) = $args;
+		$type = Utils\get_flag_value( $assoc_args, 'type' );
+
+		$options = array();
+
+		$option_flags = array(
+			'raw'       => false,
+			'add'       => true,
+			'anchor'    => null,
+			'placement' => null,
+			'separator' => null,
+		);
+
+		foreach ( $option_flags as $option => $default ) {
+			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
+			if ( null !== $option_value ) {
+				$options[ $option ] = $option_value;
+				if ( 'separator' === $option ) {
+					$options['separator'] = $this->parse_separator( $options['separator'] );
+				}
+			}
+		}
+
+		$adding = false;
+		try {
+			$config_transformer = new WPConfigTransformer( $path );
+
+			switch ( $type ) {
+				case 'all':
+					$has_constant = $config_transformer->exists( 'constant', $name );
+					$has_variable = $config_transformer->exists( 'variable', $name );
+					if ( $has_constant && $has_variable ) {
+						WP_CLI::error( "Found both a constant and a variable '{$name}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
+					}
+					if ( ! $has_constant && ! $has_variable ) {
+						$message = "The constant or variable '{$name}' is not defined in the 'wp-config.php' file.";
+						if ( $options['add'] ) {
+							$message .= ' Specify an explicit --type=<type> to add.';
+						}
+						WP_CLI::error( $message );
+					} else {
+						$type = $has_constant ? 'constant' : 'variable';
+					}
+					break;
+				case 'constant':
+				case 'variable':
+					if ( ! $config_transformer->exists( $type, $name ) ) {
+						if ( ! $options['add'] ) {
+							WP_CLI::error( "The {$type} '{$name}' is not defined in the 'wp-config.php' file." );
+						}
+						$adding = true;
+					}
+			}
+
+			$config_transformer->update( $type, $name, $value, $options );
+
+		} catch ( Exception $exception ) {
+			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
+		}
+
+		$raw  = $options['raw'] ? 'raw ' : '';
+		if ( $adding ) {
+			$message = "Added the {$type} '{$name}' to the 'wp-config.php' file with the {$raw}value '{$value}'.";
+		} else {
+			$message = "Updated the {$type} '{$name}' in the 'wp-config.php' file with the {$raw}value '{$value}'.";
+		}
+
+		WP_CLI::success( $message );
+	}
+
+	/**
+	 * Deletes a specific constant or variable from the wp-config.php file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <name>
+	 * : Name of the wp-config.php constant or variable.
+	 *
+	 * [--type=<type>]
+	 * : Type of the config value to delete. Defaults to 'all'.
+	 * ---
+	 * default: all
+	 * options:
+	 *   - constant
+	 *   - variable
+	 *   - all
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Delete the COOKIE_DOMAIN constant from the wp-config.php file.
+	 *     $ wp config delete COOKIE_DOMAIN
+	 *
+	 * @when before_wp_load
+	 */
+	public function delete( $args, $assoc_args ) {
+		$path = $this->get_config_path();
+
+		list( $name ) = $args;
+		$type = Utils\get_flag_value( $assoc_args, 'type' );
+
+		try {
+			$config_transformer = new WPConfigTransformer( $path );
+
+			switch ( $type ) {
+				case 'all':
+					$has_constant = $config_transformer->exists( 'constant', $name );
+					$has_variable = $config_transformer->exists( 'variable', $name );
+					if ( $has_constant && $has_variable ) {
+						WP_CLI::error( "Found both a constant and a variable '{$name}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
+					}
+					if ( ! $has_constant && ! $has_variable ) {
+						WP_CLI::error( "The constant or variable '{$name}' is not defined in the 'wp-config.php' file." );
+					} else {
+						$type = $has_constant ? 'constant' : 'variable';
+					}
+					break;
+				case 'constant':
+				case 'variable':
+					if ( ! $config_transformer->exists( $type, $name ) ) {
+						WP_CLI::error( "The {$type} '{$name}' is not defined in the 'wp-config.php' file." );
+					}
+			}
+
+			$config_transformer->remove( $type, $name );
+
+		} catch ( Exception $exception ) {
+			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
+		}
+
+		WP_CLI::success( "Deleted the {$type} '{$name}' from the 'wp-config.php' file." );
+	}
+
+	/**
+	 * Checks whether a specific constant or variable exists in the wp-config.php file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <name>
+	 * : Name of the wp-config.php constant or variable.
+	 *
+	 * [--type=<type>]
+	 * : Type of the config value to set. Defaults to 'all'.
+	 * ---
+	 * default: all
+	 * options:
+	 *   - constant
+	 *   - variable
+	 *   - all
+	 * ---
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Check whether the DB_PASSWORD constant exists in the wp-config.php file.
+	 *     $ wp config has DB_PASSWORD
+	 *
+	 * @when before_wp_load
+	 */
+	public function has( $args, $assoc_args ) {
+		$path = $this->get_config_path();
+
+		list( $name ) = $args;
+		$type = Utils\get_flag_value( $assoc_args, 'type' );
+
+		try {
+			$config_transformer = new WPConfigTransformer( $path );
+
+			switch ( $type ) {
+				case 'all':
+					$has_constant = $config_transformer->exists( 'constant', $name );
+					$has_variable = $config_transformer->exists( 'variable', $name );
+					if ( $has_constant && $has_variable ) {
+						WP_CLI::error( "Found both a constant and a variable '{$name}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
+					}
+					if ( ! $has_constant && ! $has_variable ) {
+						WP_CLI::halt( 1 );
+					} else {
+						WP_CLI::halt( 0 );
+					}
+					break;
+				case 'constant':
+				case 'variable':
+					if ( ! $config_transformer->exists( $type, $name ) ) {
+						WP_CLI::halt( 1 );
+					}
+					WP_CLI::halt( 0 );
+			}
+
+			$config_transformer->remove( $type, $name );
+
+		} catch ( Exception $exception ) {
+			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
+		}
 	}
 
 	/**
@@ -360,12 +610,12 @@ class Config_Command extends WP_CLI_Command {
 	 */
 	private static function get_wp_config_diff( $list, $previous_list, $type, $exclude_list = array() ) {
 		$result = array();
-		foreach ( $list as $key => $val ) {
-			if ( array_key_exists( $key, $previous_list ) || in_array( $key, $exclude_list ) ) {
+		foreach ( $list as $name => $val ) {
+			if ( array_key_exists( $name, $previous_list ) || in_array( $name, $exclude_list ) ) {
 				continue;
 			}
 			$out = array();
-			$out['key'] = $key;
+			$out['name'] = $name;
 			$out['value'] = $val;
 			$out['type'] = $type;
 			$result[] = $out;
@@ -388,38 +638,38 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * If the constant or variable is not defined in the wp-config.php file then an error will be returned.
 	 *
-	 * @param string $key
+	 * @param string $name
 	 * @param string $type
 	 * @param array $values
 	 *
 	 * @return string The value of the requested constant or variable as defined in the wp-config.php file; if the
 	 *                requested constant or variable is not defined then the function will print an error and exit.
 	 */
-	private function return_value( $key, $type, $values ) {
+	private function return_value( $name, $type, $values ) {
 		$results = array();
 		foreach ( $values as $value ) {
-			if ( $key === $value['key'] && ( $type === 'all' || $type === $value['type'] ) ) {
+			if ( $name === $value['name'] && ( $type === 'all' || $type === $value['type'] ) ) {
 				$results[] = $value;
 			}
 		}
 
 		if ( count( $results ) > 1 ) {
-			WP_CLI::error( "Found multiple values for '{$key}' in the wp-config.php file. Use --type=<type> to disambiguate." );
+			WP_CLI::error( "Found both a constant and a variable '{$name}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
 		}
 
 		if ( ! empty( $results ) ) {
 			return $results[0]['value'];
 		}
 
-		$type = $type === 'all' ? 'variable or constant' : $type;
-		$keys = array_column( $values, 'key' );
-		$candidate = Utils\get_suggestion( $key, $keys );
+		$type = $type === 'all' ? 'constant or variable' : $type;
+		$names = array_column( $values, 'name' );
+		$candidate = Utils\get_suggestion( $name, $names );
 
-		if ( ! empty( $candidate ) && $candidate !== $key ) {
-			WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file.\nDid you mean '{$candidate}'?" );
+		if ( ! empty( $candidate ) && $candidate !== $name ) {
+			WP_CLI::error( "The {$type} '{$name}' is not defined in the 'wp-config.php' file.\nDid you mean '{$candidate}'?" );
 		}
 
-		WP_CLI::error( "The '{$key}' {$type} is not defined in the wp-config.php file." );
+		WP_CLI::error( "The {$type} '{$name}' is not defined in the 'wp-config.php' file." );
 	}
 
 	/**
@@ -458,11 +708,11 @@ class Config_Command extends WP_CLI_Command {
 
 		foreach ( $values as $value ) {
 			foreach ( $filters as $filter ) {
-				if ( $strict && $filter !== $value['key'] ) {
+				if ( $strict && $filter !== $value['name'] ) {
 					continue;
 				}
 
-				if ( false === strpos( $value['key'], $filter ) ) {
+				if ( false === strpos( $value['name'], $filter ) ) {
 					continue;
 				}
 
@@ -474,8 +724,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Gets the path to the wp-config.php file or gives a helpful error if none
-	 * found.
+	 * Gets the path to the wp-config.php file or gives a helpful error if none found.
 	 *
 	 * @return string Path to wp-config.php file.
 	 */
@@ -485,6 +734,28 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( "'wp-config.php' not found.\nEither create one manually or use `wp config create`." );
 		}
 		return $path;
+	}
+
+	/**
+	 * Parses the separator argument, to allow for special character handling.
+	 *
+	 * Does the following transformations:
+	 * - '\n' => "\n" (newline)
+	 * - '\r' => "\r" (carriage return)
+	 * - '\t' => "\t" (tab)
+	 *
+	 * @param string $separator Separator string to parse.
+	 *
+	 * @return mixed Parsed separator string.
+	 */
+	private function parse_separator( $separator ) {
+		$separator = str_replace(
+			array( '\n', '\r', '\t' ),
+			array( "\n", "\r", "\t" ),
+			$separator
+		);
+
+		return $separator;
 	}
 }
 
