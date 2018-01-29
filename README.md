@@ -303,7 +303,7 @@ wp config set <name> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<p
 
 	[--anchor=<anchor>]
 		Anchor string where additions of new values are anchored around.
-		Defaults to "/** Absolute path to the WordPress directory".
+		Defaults to "/* That's all, stop editing!".
 
 	[--placement=<placement>]
 		Where to place the new values in relation to the anchor string.
