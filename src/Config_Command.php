@@ -280,7 +280,7 @@ class Config_Command extends WP_CLI_Command {
 	 * ## OPTIONS
 	 *
 	 * <name>
-	 * : Name for the wp-config.php constant or variable.
+	 * : Name of the wp-config.php constant or variable.
 	 *
 	 * [--type=<type>]
 	 * : Type of config value to retrieve. Defaults to 'all'.
@@ -354,7 +354,7 @@ class Config_Command extends WP_CLI_Command {
 	 * ## OPTIONS
 	 *
 	 * <name>
-	 * : Name for the wp-config.php constant or variable.
+	 * : Name of the wp-config.php constant or variable.
 	 *
 	 * <value>
 	 * : Value to set the wp-config.php constant or variable to.
@@ -476,7 +476,7 @@ class Config_Command extends WP_CLI_Command {
 	 * ## OPTIONS
 	 *
 	 * <name>
-	 * : Name for the wp-config.php constant or variable.
+	 * : Name of the wp-config.php constant or variable.
 	 *
 	 * [--type=<type>]
 	 * : Type of the config value to delete. Defaults to 'all'.
@@ -539,7 +539,7 @@ class Config_Command extends WP_CLI_Command {
 	 * ## OPTIONS
 	 *
 	 * <name>
-	 * : Name for the wp-config.php constant or variable.
+	 * : Name of the wp-config.php constant or variable.
 	 *
 	 * [--type=<type>]
 	 * : Type of the config value to set. Defaults to 'all'.

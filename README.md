@@ -34,7 +34,7 @@ wp config delete <name> [--type=<type>]
 **OPTIONS**
 
 	<name>
-		Name for the wp-config.php constant or variable.
+		Name of the wp-config.php constant or variable.
 
 	[--type=<type>]
 		Type of the config value to delete. Defaults to 'all'.
@@ -145,7 +145,7 @@ wp config get <name> [--type=<type>]
 **OPTIONS**
 
 	<name>
-		Name for the wp-config.php constant or variable.
+		Name of the wp-config.php constant or variable.
 
 	[--type=<type>]
 		Type of config value to retrieve. Defaults to 'all'.
@@ -176,7 +176,7 @@ wp config has <name> [--type=<type>]
 **OPTIONS**
 
 	<name>
-		Name for the wp-config.php constant or variable.
+		Name of the wp-config.php constant or variable.
 
 	[--type=<type>]
 		Type of the config value to set. Defaults to 'all'.
@@ -289,7 +289,7 @@ wp config set <name> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<p
 **OPTIONS**
 
 	<name>
-		Name for the wp-config.php constant or variable.
+		Name of the wp-config.php constant or variable.
 
 	<value>
 		Value to set the wp-config.php constant or variable to.
