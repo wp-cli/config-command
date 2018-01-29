@@ -440,7 +440,7 @@ class Config_Command extends WP_CLI_Command {
 					}
 					if ( ! $has_constant && ! $has_variable ) {
 						$message = "The constant or variable '{$name}' is not defined in the 'wp-config.php' file.";
-						if ( $adding ) {
+						if ( $options['add'] ) {
 							$message .= ' Specify an explicit --type=<type> to add.';
 						}
 						WP_CLI::error( $message );

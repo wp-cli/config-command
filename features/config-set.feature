@@ -44,7 +44,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
     When I try `wp config set SOME_NAME some_value`
     Then STDERR should be:
       """
-      Error: The constant or variable 'SOME_NAME' is not defined in the 'wp-config.php' file.
+      Error: The constant or variable 'SOME_NAME' is not defined in the 'wp-config.php' file. Specify an explicit --type=<type> to add.
       """
 
     When I try `wp config get SOME_NAME`
