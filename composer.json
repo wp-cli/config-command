@@ -41,6 +41,7 @@
         "bundled": true,
         "commands": [
             "config",
+            "config edit",
             "config delete",
             "config create",
             "config get",
