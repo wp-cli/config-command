@@ -22,6 +22,10 @@ labels:
     color: c2e0c6
   - name: command:config
     color: c5def5
+  - name: command:config-edit
+    color: c5def5
+  - name: command:config-delete
+    color: c5def5
   - name: command:config-create
     color: c5def5
   - name: command:config-get
