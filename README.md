@@ -23,6 +23,24 @@ wp config
 
 
 
+### wp config edit
+
+Launches system editor to edit the wp-config.php file.
+
+~~~
+wp config edit 
+~~~
+
+**EXAMPLES**
+
+    # Launch system editor to edit wp-config.php file
+    $ wp config edit
+
+    # Edit wp-config.php file in a specific editor
+    $ EDITOR=vim wp config edit
+
+
+
 ### wp config delete
 
 Deletes a specific constant or variable from the wp-config.php file.
