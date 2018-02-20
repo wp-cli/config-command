@@ -163,6 +163,28 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
+	 * Launches system editor to edit the wp-config.php file.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Launch system editor to edit wp-config.php file
+	 *     $ wp config edit
+	 *
+	 *     # Edit wp-config.php file in a specific editor
+	 *     $ EDITOR=vim wp config edit
+	 */
+	public function edit() {
+		$config_path = $this->get_config_path();
+		$contents = file_get_contents( $config_path );
+		$r = Utils\launch_editor_for_input( $contents, 'wp-config.php', 'php' );
+		if ( $r === false ) {
+			WP_CLI::warning( 'No changes made to wp-config.php.', 'Aborted' );
+		} else {
+			file_put_contents( $path, $r );
+		}
+	}
+
+	/**
 	 * Gets the path to wp-config.php file.
 	 *
 	 * ## EXAMPLES
