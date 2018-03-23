@@ -549,9 +549,6 @@ class Config_Command extends WP_CLI_Command {
 						WP_CLI::error( "The {$type} '{$name}' is not defined in the 'wp-config.php' file." );
 					}
 			}
-
-			$config_transformer->remove( $type, $name );
-
 		} catch ( Exception $exception ) {
 			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
 		}
