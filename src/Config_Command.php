@@ -614,8 +614,6 @@ class Config_Command extends WP_CLI_Command {
 					WP_CLI::halt( 0 );
 			}
 
-			$config_transformer->remove( $type, $name );
-
 		} catch ( Exception $exception ) {
 			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
 		}
@@ -780,4 +778,3 @@ class Config_Command extends WP_CLI_Command {
 		return $separator;
 	}
 }
-
