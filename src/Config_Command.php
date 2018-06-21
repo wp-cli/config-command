@@ -138,6 +138,7 @@ class Config_Command extends WP_CLI_Command {
 				$assoc_args['secure-auth-salt'] = self::unique_key();
 				$assoc_args['logged-in-salt'] = self::unique_key();
 				$assoc_args['nonce-salt'] = self::unique_key();
+				$assoc_args['wp-cache-key-salt'] = self::unique_key();
 			} catch ( Exception $e ) {
 				$assoc_args['keys-and-salts'] = false;
 				$assoc_args['keys-and-salts-alt'] = self::_read(
