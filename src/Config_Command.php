@@ -620,6 +620,84 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
+	 * Refreshes the salts defined in the wp-config.php file
+	 *
+	 * ## OPTIONS
+	 * [--skip_api]
+	 * : Skips trying to connect to the WordPress API to retrieve the salts.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Get new salts for your wp-config.php file
+	 *     $ wp config shuffle-salts
+	 *
+	 *     # Get new salts without reaching out to the WordPress API
+	 *     $ wp config shuffle-salts --skip_api
+	 *
+	 * @subcommand shuffle-salts
+	 * @when before_wp_load
+	 */
+	public function shuffle_salts( $args, $assoc_args ) {
+
+		/**
+		 * Generate keys and salts using secure CSPRNG; fallback to API if enabled; further fallback to original wp_generate_password().
+		 * Functionality taken from WordPress core. wp-admin/setup-config.php
+		 */
+		try {
+			$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_ []{}<>~`+=,.;:/?|';
+			$max = strlen($chars) - 1;
+			for ( $i = 0; $i < 8; $i++ ) {
+				$key = '';
+				for ( $j = 0; $j < 64; $j++ ) {
+					$key .= substr( $chars, random_int( 0, $max ), 1 );
+				}
+				$secret_keys[] = $key;
+			}
+		} catch ( Exception $ex ) {
+			$no_api = Utils\get_flag_value( $assoc_args, 'skip_api' );
+
+			if ( ! $no_api ) {
+				$secret_keys = wp_remote_get( 'https://api.wordpress.org/secret-key/1.1/salt/' );
+			}
+
+			if ( $no_api || is_wp_error( $secret_keys ) ) {
+
+				$secret_keys = array();
+				for ( $i = 0; $i < 8; $i++ ) {
+					$secret_keys[] = wp_generate_password( 64, true, true );
+				}
+			} else {
+				$secret_keys = explode( "\n", wp_remote_retrieve_body( $secret_keys ) );
+				foreach ( $secret_keys as $k => $v ) {
+					$secret_keys[$k] = substr( $v, 28, 64 );
+				}
+			}
+		}
+
+		$constant_list = [ 'AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY', 'AUTH_SALT', 'SECURE_AUTH_SALT', 'LOGGED_IN_SALT', 'NONCE_SALT' ];
+		$key = 0;
+
+		$path = $this->get_config_path();
+
+		if ( false === $path ) {
+			WP_CLI::error( 'Could not locate wp-config.php file to modify' );
+		}
+
+		try {
+			$config_transformer = new WPConfigTransformer( $path );
+			foreach ( $constant_list as $constant ) {
+				$config_transformer->update( 'constant', $constant, $secret_keys[ $key ] );
+				$key++;
+			}
+		} catch ( Exception $exception ) {
+			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
+		}
+
+		WP_CLI::success( 'Shuffled the salt keys.' );
+
+	}
+
+	/**
 	 * Filters wp-config.php file configurations.
 	 *
 	 * @param array $list
