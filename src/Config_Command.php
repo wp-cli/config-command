@@ -653,10 +653,6 @@ class Config_Command extends WP_CLI_Command {
 
 		$path = $this->get_config_path();
 
-		if ( false === $path ) {
-			WP_CLI::error( 'Could not locate wp-config.php file to modify' );
-		}
-
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
 			foreach ( $constant_list as $constant ) {
