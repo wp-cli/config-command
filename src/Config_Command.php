@@ -634,9 +634,20 @@ class Config_Command extends WP_CLI_Command {
 	 */
 	public function shuffle_salts( $args, $assoc_args ) {
 
+		$constant_list = array(
+			'AUTH_KEY',
+			'SECURE_AUTH_KEY',
+			'LOGGED_IN_KEY',
+			'NONCE_KEY',
+			'AUTH_SALT',
+			'SECURE_AUTH_SALT',
+			'LOGGED_IN_SALT',
+			'NONCE_SALT'
+		);
+
 		try {
-			for ( $i = 0; $i < 8; $i++ ) {
-				$secret_keys[] = self::unique_key();
+			foreach ( $constant_list as $key ) {
+				$secret_keys[ $key ] = self::unique_key();
 			}
 		} catch ( Exception $ex ) {
 
@@ -648,16 +659,12 @@ class Config_Command extends WP_CLI_Command {
 
 		}
 
-		$constant_list = array( 'AUTH_KEY', 'SECURE_AUTH_KEY', 'LOGGED_IN_KEY', 'NONCE_KEY', 'AUTH_SALT', 'SECURE_AUTH_SALT', 'LOGGED_IN_SALT', 'NONCE_SALT' );
-		$key = 0;
-
 		$path = $this->get_config_path();
 
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
-			foreach ( $constant_list as $constant ) {
-				$config_transformer->update( 'constant', $constant, $secret_keys[ $key ] );
-				$key++;
+			foreach ( $secret_keys as $constant => $key ) {
+				$config_transformer->update( 'constant', $constant, $key );
 			}
 		} catch ( Exception $exception ) {
 			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
