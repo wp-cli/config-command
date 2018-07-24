@@ -181,7 +181,7 @@ class Config_Command extends WP_CLI_Command {
 		if ( $r === false ) {
 			WP_CLI::warning( 'No changes made to wp-config.php.', 'Aborted' );
 		} else {
-			file_put_contents( $path, $r );
+			file_put_contents( $config_path, $r );
 		}
 	}
 
