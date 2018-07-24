@@ -647,14 +647,18 @@ class Config_Command extends WP_CLI_Command {
 
 		try {
 			foreach ( $constant_list as $key ) {
-				$secret_keys[ $key ] = self::unique_key();
+				$secret_keys[ $key ] = trim( self::unique_key() );
 			}
+			throw new Exception( 'TEST' );
 		} catch ( Exception $ex ) {
 
-			$secret_keys = self::_read( 'https://api.wordpress.org/secret-key/1.1/salt/' );
-			$secret_keys = explode( "\n", $secret_keys );
-			foreach ( $secret_keys as $k => $v ) {
-				$secret_keys[$k] = substr( $v, 28, 64 );
+			$remote_salts = self::_read( 'https://api.wordpress.org/secret-key/1.1/salt/' );
+			$remote_salts = explode( "\n", $remote_salts );
+			foreach ( $remote_salts as $k => $salt ) {
+				if ( ! empty( $salt ) ) {
+					$key = $constant_list[ $k ];
+					$secret_keys[ $key ] = trim( substr( $salt, 28, 64 ) );
+				}
 			}
 
 		}
@@ -664,7 +668,7 @@ class Config_Command extends WP_CLI_Command {
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
 			foreach ( $secret_keys as $constant => $key ) {
-				$config_transformer->update( 'constant', $constant, $key );
+				$config_transformer->update( 'constant', $constant, (string) $key );
 			}
 		} catch ( Exception $exception ) {
 			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
