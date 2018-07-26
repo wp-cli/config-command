@@ -620,7 +620,7 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Refreshes the salts defined in the wp-config.php file
+	 * Refreshes the salts defined in the wp-config.php file.
 	 *
 	 * ## OPTIONS
 	 *
@@ -628,6 +628,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 *     # Get new salts for your wp-config.php file
 	 *     $ wp config shuffle-salts
+	 *     Success: Shuffled the salt keys.
 	 *
 	 * @subcommand shuffle-salts
 	 * @when before_wp_load

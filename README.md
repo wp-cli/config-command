@@ -356,7 +356,7 @@ wp config set <name> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<p
 
 ### wp config shuffle-salts
 
-Refreshes the salts defined in the wp-config.php file
+Refreshes the salts defined in the wp-config.php file.
 
 ~~~
 wp config shuffle-salts 
@@ -368,6 +368,7 @@ wp config shuffle-salts
 
     # Get new salts for your wp-config.php file
     $ wp config shuffle-salts
+    Success: Shuffled the salt keys.
 
 ## Installing
 
