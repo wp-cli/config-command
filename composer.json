@@ -48,7 +48,8 @@
             "config has",
             "config list",
             "config path",
-            "config set"
+            "config set",
+            "config shuffle-salts"
         ]
     }
 }
