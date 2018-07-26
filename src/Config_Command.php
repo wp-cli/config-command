@@ -649,7 +649,6 @@ class Config_Command extends WP_CLI_Command {
 			foreach ( $constant_list as $key ) {
 				$secret_keys[ $key ] = trim( self::unique_key() );
 			}
-			throw new Exception( 'TEST' );
 		} catch ( Exception $ex ) {
 
 			$remote_salts = self::_read( 'https://api.wordpress.org/secret-key/1.1/salt/' );
