@@ -352,16 +352,6 @@ wp config set <name> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<p
     # Set the WP_DEBUG constant to true.
     $ wp config set WP_DEBUG true --raw
 
-
-
-### wp config shuffle-salts
-
-Refreshes the salts in the wp-config.php file
-
-~~~
-wp config shuffle-salts
-~~~
-
 ## Installing
 
 This package is included with WP-CLI itself, no additional installation necessary.
