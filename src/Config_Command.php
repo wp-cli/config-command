@@ -621,6 +621,65 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
+	 * Refreshes the salts defined in the wp-config.php file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Get new salts for your wp-config.php file
+	 *     $ wp config shuffle-salts
+	 *     Success: Shuffled the salt keys.
+	 *
+	 * @subcommand shuffle-salts
+	 * @when before_wp_load
+	 */
+	public function shuffle_salts( $args, $assoc_args ) {
+
+		$constant_list = array(
+			'AUTH_KEY',
+			'SECURE_AUTH_KEY',
+			'LOGGED_IN_KEY',
+			'NONCE_KEY',
+			'AUTH_SALT',
+			'SECURE_AUTH_SALT',
+			'LOGGED_IN_SALT',
+			'NONCE_SALT'
+		);
+
+		try {
+			foreach ( $constant_list as $key ) {
+				$secret_keys[ $key ] = trim( self::unique_key() );
+			}
+		} catch ( Exception $ex ) {
+
+			$remote_salts = self::_read( 'https://api.wordpress.org/secret-key/1.1/salt/' );
+			$remote_salts = explode( "\n", $remote_salts );
+			foreach ( $remote_salts as $k => $salt ) {
+				if ( ! empty( $salt ) ) {
+					$key = $constant_list[ $k ];
+					$secret_keys[ $key ] = trim( substr( $salt, 28, 64 ) );
+				}
+			}
+
+		}
+
+		$path = $this->get_config_path();
+
+		try {
+			$config_transformer = new WPConfigTransformer( $path );
+			foreach ( $secret_keys as $constant => $key ) {
+				$config_transformer->update( 'constant', $constant, (string) $key );
+			}
+		} catch ( Exception $exception ) {
+			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
+		}
+
+		WP_CLI::success( 'Shuffled the salt keys.' );
+
+	}
+
+	/**
 	 * Filters wp-config.php file configurations.
 	 *
 	 * @param array $list
