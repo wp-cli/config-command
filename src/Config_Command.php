@@ -37,7 +37,7 @@ class Config_Command extends WP_CLI_Command {
 	 * [--dbhost=<dbhost>]
 	 * : Set the database host.
 	 * ---
-	 * default: localhost
+	 * default: 127.0.0.1
 	 * ---
 	 *
 	 * [--dbprefix=<dbprefix>]
@@ -101,7 +101,7 @@ class Config_Command extends WP_CLI_Command {
 		include $versions_path;
 
 		$defaults = array(
-			'dbhost' => 'localhost',
+			'dbhost' => '127.0.0.1',
 			'dbpass' => '',
 			'dbprefix' => 'wp_',
 			'dbcharset' => 'utf8',

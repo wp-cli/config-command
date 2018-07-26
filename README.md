@@ -96,7 +96,7 @@ the database constants are correct.
 	[--dbhost=<dbhost>]
 		Set the database host.
 		---
-		default: localhost
+		default: 127.0.0.1
 		---
 
 	[--dbprefix=<dbprefix>]
