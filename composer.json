@@ -1,11 +1,8 @@
 {
     "name": "wp-cli/config-command",
-    "description": "Generates and reads the wp-config.php file.",
     "type": "wp-cli-package",
+    "description": "Generates and reads the wp-config.php file.",
     "homepage": "https://github.com/wp-cli/config-command",
-    "support": {
-        "issues": "https://github.com/wp-cli/config-command/issues"
-    },
     "license": "MIT",
     "authors": [
         {
@@ -19,21 +16,16 @@
             "homepage": "https://www.alainschlesser.com"
         }
     ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "autoload": {
-        "psr-4": {
-            "": "src/"
-        },
-        "files": [ "config-command.php" ]
-    },
     "require": {
-        "wp-cli/wp-config-transformer": "^1.2.1",
-        "wp-cli/wp-cli": "^2"
+        "wp-cli/wp-cli": "^2",
+        "wp-cli/wp-config-transformer": "^1.2.1"
     },
     "require-dev": {
-        "wp-cli/wp-cli-tests": "^0",
-        "wp-cli/db-command": "^1.3"
+        "wp-cli/db-command": "^1.3",
+        "wp-cli/wp-cli-tests": "^0"
+    },
+    "config": {
+        "sort-packages": true
     },
     "extra": {
         "branch-alias": {
@@ -53,11 +45,21 @@
             "config shuffle-salts"
         ]
     },
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        },
+        "files": [
+            "config-command.php"
+        ]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "scripts": {
+        "behat": "run-behat-tests",
         "lint": "run-linter-tests",
         "phpcs": "run-phpcs-tests",
         "phpunit": "run-php-unit-tests",
-        "behat": "run-behat-tests",
         "prepare-tests": "install-package-tests",
         "test": [
             "@lint",
@@ -65,5 +67,8 @@
             "@phpunit",
             "@behat"
         ]
+    },
+    "support": {
+        "issues": "https://github.com/wp-cli/config-command/issues"
     }
 }
