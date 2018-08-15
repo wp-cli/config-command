@@ -173,6 +173,8 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 *     # Edit wp-config.php file in a specific editor
 	 *     $ EDITOR=vim wp config edit
+	 *
+	 * @when before_wp_load
 	 */
 	public function edit() {
 		$config_path = $this->get_config_path();
