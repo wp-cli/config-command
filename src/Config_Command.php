@@ -317,6 +317,16 @@ class Config_Command extends WP_CLI_Command {
 	 *   - all
 	 * ---
 	 *
+	 * [--format=<format>]
+	 * : Get value in a particular format.
+	 * ---
+	 * default: var_export
+	 * options:
+	 *   - var_export
+	 *   - json
+	 *   - yaml
+	 * ---
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Get the table_prefix as defined in wp-config.php file.
@@ -332,7 +342,7 @@ class Config_Command extends WP_CLI_Command {
 		$type = Utils\get_flag_value( $assoc_args, 'type' );
 
 		$value = $this->return_value( $name, $type, self::get_wp_config_vars() );
-		WP_CLI::log( $value );
+		WP_CLI::print_value( $value, $assoc_args );
 	}
 
 	/**

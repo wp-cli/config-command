@@ -161,3 +161,23 @@ Feature: Get the value of a constant or variable defined in wp-config.php file
       """
       value-b
       """
+
+    Scenario: Format returned values
+      When I run `wp config get DB_NAME`
+      Then STDOUT should be:
+        """
+        wp_cli_test
+        """
+
+      When I run `wp config get DB_NAME --format=json`
+      Then STDOUT should be:
+        """
+        "wp_cli_test"
+        """
+
+      When I run `wp config get DB_NAME --format=yaml`
+      Then STDOUT should be:
+        """
+        ---
+        - wp_cli_test
+        """
