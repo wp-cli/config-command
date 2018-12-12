@@ -41,16 +41,16 @@ Feature: Set the value of a constant or variable defined in wp-config.php file
       variable_value
       """
 
-    When I try `wp config set SOME_NAME some_value`
-    Then STDERR should be:
+    When I run `wp config set DEFAULT_TO_CONSTANT some_value`
+    Then STDOUT should be:
       """
-      Error: The constant or variable 'SOME_NAME' is not defined in the 'wp-config.php' file. Specify an explicit --type=<type> to add.
+      Success: Added the constant 'DEFAULT_TO_CONSTANT' to the 'wp-config.php' file with the value 'some_value'.
       """
 
-    When I try `wp config get SOME_NAME`
-    Then STDERR should be:
+    When I run `wp config get DEFAULT_TO_CONSTANT`
+    Then STDOUT should be:
       """
-      Error: The constant or variable 'SOME_NAME' is not defined in the 'wp-config.php' file.
+      some_value
       """
 
   Scenario: Updating a non-existent value without --add
