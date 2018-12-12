@@ -464,11 +464,12 @@ class Config_Command extends WP_CLI_Command {
 						WP_CLI::error( "Found both a constant and a variable '{$name}' in the 'wp-config.php' file. Use --type=<type> to disambiguate." );
 					}
 					if ( ! $has_constant && ! $has_variable ) {
-						$message = "The constant or variable '{$name}' is not defined in the 'wp-config.php' file.";
-						if ( $options['add'] ) {
-							$message .= ' Specify an explicit --type=<type> to add.';
+						if ( ! $options['add'] ) {
+							$message = "The constant or variable '{$name}' is not defined in the 'wp-config.php' file.";
+							WP_CLI::error( $message );
 						}
-						WP_CLI::error( $message );
+						$type   = 'constant';
+						$adding = true;
 					} else {
 						$type = $has_constant ? 'constant' : 'variable';
 					}
