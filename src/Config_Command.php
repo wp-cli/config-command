@@ -100,27 +100,30 @@ class Config_Command extends WP_CLI_Command {
 		$versions_path = ABSPATH . 'wp-includes/version.php';
 		include $versions_path;
 
-		$defaults = array(
-			'dbhost' => 'localhost',
-			'dbpass' => '',
-			'dbprefix' => 'wp_',
+		$defaults   = [
+			'dbhost'    => 'localhost',
+			'dbpass'    => '',
+			'dbprefix'  => 'wp_',
 			'dbcharset' => 'utf8',
 			'dbcollate' => '',
-			'locale' => self::get_initial_locale()
-		);
+			'locale'    => self::get_initial_locale(),
+		];
 		$assoc_args = array_merge( $defaults, $assoc_args );
 
-		if ( preg_match( '|[^a-z0-9_]|i', $assoc_args['dbprefix'] ) )
+		if ( preg_match( '|[^a-z0-9_]|i', $assoc_args['dbprefix'] ) ) {
 			WP_CLI::error( '--dbprefix can only contain numbers, letters, and underscores.' );
+		}
 
-		// Check DB connection
+		$mysql_db_connection_args = [
+			'execute' => ';',
+			'host'    => $assoc_args['dbhost'],
+			'user'    => $assoc_args['dbuser'],
+			'pass'    => $assoc_args['dbpass'],
+		];
+
+		// Check DB connection.
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
-			Utils\run_mysql_command( '/usr/bin/env mysql --no-defaults', array(
-				'execute' => ';',
-				'host' => $assoc_args['dbhost'],
-				'user' => $assoc_args['dbuser'],
-				'pass' => $assoc_args['dbpass'],
-			) );
+			Utils\run_mysql_command( '/usr/bin/env mysql --no-defaults', $mysql_db_connection_args );
 		}
 
 		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
@@ -129,20 +132,21 @@ class Config_Command extends WP_CLI_Command {
 
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
 			try {
-				$assoc_args['keys-and-salts'] = true;
-				$assoc_args['auth-key'] = self::unique_key();
-				$assoc_args['secure-auth-key'] = self::unique_key();
-				$assoc_args['logged-in-key'] = self::unique_key();
-				$assoc_args['nonce-key'] = self::unique_key();
-				$assoc_args['auth-salt'] = self::unique_key();
-				$assoc_args['secure-auth-salt'] = self::unique_key();
-				$assoc_args['logged-in-salt'] = self::unique_key();
-				$assoc_args['nonce-salt'] = self::unique_key();
+				$assoc_args['keys-and-salts']    = true;
+				$assoc_args['auth-key']          = self::unique_key();
+				$assoc_args['secure-auth-key']   = self::unique_key();
+				$assoc_args['logged-in-key']     = self::unique_key();
+				$assoc_args['nonce-key']         = self::unique_key();
+				$assoc_args['auth-salt']         = self::unique_key();
+				$assoc_args['secure-auth-salt']  = self::unique_key();
+				$assoc_args['logged-in-salt']    = self::unique_key();
+				$assoc_args['nonce-salt']        = self::unique_key();
 				$assoc_args['wp-cache-key-salt'] = self::unique_key();
 			} catch ( Exception $e ) {
-				$assoc_args['keys-and-salts'] = false;
-				$assoc_args['keys-and-salts-alt'] = self::_read(
-					'https://api.wordpress.org/secret-key/1.1/salt/' );
+				$assoc_args['keys-and-salts']     = false;
+				$assoc_args['keys-and-salts-alt'] = self::read_(
+					'https://api.wordpress.org/secret-key/1.1/salt/'
+				);
 			}
 		}
 
@@ -153,7 +157,7 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
-		$out = Utils\mustache_render( $command_root . '/templates/wp-config.mustache', $assoc_args );
+		$out          = Utils\mustache_render( $command_root . '/templates/wp-config.mustache', $assoc_args );
 
 		$bytes_written = file_put_contents( ABSPATH . 'wp-config.php', $out );
 		if ( ! $bytes_written ) {
@@ -178,9 +182,9 @@ class Config_Command extends WP_CLI_Command {
 	 */
 	public function edit() {
 		$config_path = $this->get_config_path();
-		$contents = file_get_contents( $config_path );
-		$r = Utils\launch_editor_for_input( $contents, 'wp-config.php', 'php' );
-		if ( $r === false ) {
+		$contents    = file_get_contents( $config_path );
+		$r           = Utils\launch_editor_for_input( $contents, 'wp-config.php', 'php' );
+		if ( false === $r ) {
 			WP_CLI::warning( 'No changes made to wp-config.php.', 'Aborted' );
 		} else {
 			file_put_contents( $config_path, $r );
@@ -339,7 +343,7 @@ class Config_Command extends WP_CLI_Command {
 		$path = $this->get_config_path();
 
 		list( $name ) = $args;
-		$type = Utils\get_flag_value( $assoc_args, 'type' );
+		$type         = Utils\get_flag_value( $assoc_args, 'type' );
 
 		$value = $this->return_value( $name, $type, self::get_wp_config_vars() );
 		WP_CLI::print_value( $value, $assoc_args );
@@ -355,6 +359,7 @@ class Config_Command extends WP_CLI_Command {
 		$wp_cli_original_defined_vars      = get_defined_vars();
 		$wp_cli_original_includes          = get_included_files();
 
+		// phpcs:ignore Squiz.PHP.Eval.Discouraged -- Don't have another way.
 		eval( WP_CLI::get_runner()->get_wp_config_code() );
 
 		$wp_config_vars      = self::get_wp_config_diff( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
@@ -370,14 +375,14 @@ class Config_Command extends WP_CLI_Command {
 		unset( $wp_config_vars[ $name_backup ] );
 		$wp_config_vars           = array_values( $wp_config_vars );
 		$wp_config_includes       = array_diff( get_included_files(), $wp_cli_original_includes );
-		$wp_config_includes_array = array();
+		$wp_config_includes_array = [];
 
 		foreach ( $wp_config_includes as $name => $value ) {
-			$wp_config_includes_array[] = array(
-				'name'   => basename( $value ),
+			$wp_config_includes_array[] = [
+				'name'  => basename( $value ),
 				'value' => $value,
 				'type'  => 'includes',
-			);
+			];
 		}
 
 		return array_merge( $wp_config_vars, $wp_config_constants, $wp_config_includes_array );
@@ -440,7 +445,7 @@ class Config_Command extends WP_CLI_Command {
 		$path = $this->get_config_path();
 
 		list( $name, $value ) = $args;
-		$type = Utils\get_flag_value( $assoc_args, 'type' );
+		$type                 = Utils\get_flag_value( $assoc_args, 'type' );
 
 		$options = array();
 
@@ -500,7 +505,7 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
 		}
 
-		$raw  = $options['raw'] ? 'raw ' : '';
+		$raw = $options['raw'] ? 'raw ' : '';
 		if ( $adding ) {
 			$message = "Added the {$type} '{$name}' to the 'wp-config.php' file with the {$raw}value '{$value}'.";
 		} else {
@@ -539,7 +544,7 @@ class Config_Command extends WP_CLI_Command {
 		$path = $this->get_config_path();
 
 		list( $name ) = $args;
-		$type = Utils\get_flag_value( $assoc_args, 'type' );
+		$type         = Utils\get_flag_value( $assoc_args, 'type' );
 
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
@@ -602,7 +607,7 @@ class Config_Command extends WP_CLI_Command {
 		$path = $this->get_config_path();
 
 		list( $name ) = $args;
-		$type = Utils\get_flag_value( $assoc_args, 'type' );
+		$type         = Utils\get_flag_value( $assoc_args, 'type' );
 
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
@@ -627,7 +632,6 @@ class Config_Command extends WP_CLI_Command {
 					}
 					WP_CLI::halt( 0 );
 			}
-
 		} catch ( Exception $exception ) {
 			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
 		}
@@ -657,7 +661,7 @@ class Config_Command extends WP_CLI_Command {
 			'AUTH_SALT',
 			'SECURE_AUTH_SALT',
 			'LOGGED_IN_SALT',
-			'NONCE_SALT'
+			'NONCE_SALT',
 		);
 
 		try {
@@ -666,15 +670,14 @@ class Config_Command extends WP_CLI_Command {
 			}
 		} catch ( Exception $ex ) {
 
-			$remote_salts = self::_read( 'https://api.wordpress.org/secret-key/1.1/salt/' );
+			$remote_salts = self::read_( 'https://api.wordpress.org/secret-key/1.1/salt/' );
 			$remote_salts = explode( "\n", $remote_salts );
 			foreach ( $remote_salts as $k => $salt ) {
 				if ( ! empty( $salt ) ) {
-					$key = $constant_list[ $k ];
+					$key                 = $constant_list[ $k ];
 					$secret_keys[ $key ] = trim( substr( $salt, 28, 64 ) );
 				}
 			}
-
 		}
 
 		$path = $this->get_config_path();
@@ -704,20 +707,20 @@ class Config_Command extends WP_CLI_Command {
 	private static function get_wp_config_diff( $list, $previous_list, $type, $exclude_list = array() ) {
 		$result = array();
 		foreach ( $list as $name => $val ) {
-			if ( array_key_exists( $name, $previous_list ) || in_array( $name, $exclude_list ) ) {
+			if ( array_key_exists( $name, $previous_list ) || in_array( $name, $exclude_list, true ) ) {
 				continue;
 			}
-			$out = array();
-			$out['name'] = $name;
+			$out          = [];
+			$out['name']  = $name;
 			$out['value'] = $val;
-			$out['type'] = $type;
-			$result[] = $out;
+			$out['type']  = $type;
+			$result[]     = $out;
 		}
 		return $result;
 	}
 
-	private static function _read( $url ) {
-		$headers = array('Accept' => 'application/json');
+	private static function read_( $url ) {
+		$headers  = array( 'Accept' => 'application/json' );
 		$response = Utils\http_request( 'GET', $url, null, $headers, array( 'timeout' => 30 ) );
 		if ( 200 === $response->status_code ) {
 			return $response->body;
@@ -741,7 +744,7 @@ class Config_Command extends WP_CLI_Command {
 	private function return_value( $name, $type, $values ) {
 		$results = array();
 		foreach ( $values as $value ) {
-			if ( $name === $value['name'] && ( $type === 'all' || $type === $value['type'] ) ) {
+			if ( $name === $value['name'] && ( 'all' === $type || $type === $value['type'] ) ) {
 				$results[] = $value;
 			}
 		}
@@ -754,8 +757,8 @@ class Config_Command extends WP_CLI_Command {
 			return $results[0]['value'];
 		}
 
-		$type = $type === 'all' ? 'constant or variable' : $type;
-		$names = array_column( $values, 'name' );
+		$type      = 'all' === $type ? 'constant or variable' : $type;
+		$names     = array_column( $values, 'name' );
 		$candidate = Utils\get_suggestion( $name, $names );
 
 		if ( ! empty( $candidate ) && $candidate !== $name ) {
@@ -778,9 +781,10 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_ []{}<>~`+=,.;:/?|';
-		$key = '';
+		$key   = '';
 
 		for ( $i = 0; $i < 64; $i++ ) {
+			// phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.random_intFound -- Will be called only if function exists.
 			$key .= substr( $chars, random_int( 0, strlen( $chars ) - 1 ), 1 );
 		}
 
