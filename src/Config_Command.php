@@ -6,13 +6,19 @@ use \WP_CLI\Utils;
  */
 class Config_Command extends WP_CLI_Command {
 
+	/**
+	 * Retrieve the initiale locale from the WordPress version file.
+	 *
+	 * @return string Initial locale if present, or an empty string if not.
+	 */
 	private static function get_initial_locale() {
+		global $wp_local_package;
+
 		include ABSPATH . '/wp-includes/version.php';
 
-		// @codingStandardsIgnoreStart
-		if ( isset( $wp_local_package ) )
+		if ( ! empty( $wp_local_package ) ) {
 			return $wp_local_package;
-		// @codingStandardsIgnoreEnd
+		}
 
 		return '';
 	}
