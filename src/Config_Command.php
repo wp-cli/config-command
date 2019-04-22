@@ -102,9 +102,6 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( "The 'wp-config.php' file already exists." );
 		}
 
-		$versions_path = ABSPATH . 'wp-includes/version.php';
-		include $versions_path;
-
 		$defaults   = [
 			'dbhost'    => 'localhost',
 			'dbpass'    => '',
