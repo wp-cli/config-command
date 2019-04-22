@@ -159,7 +159,7 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
-		$out          = Utils\mustache_render( $command_root . '/templates/wp-config.mustache', $assoc_args );
+		$out          = Utils\mustache_render( "{$command_root}/templates/wp-config.mustache", $assoc_args );
 
 		$bytes_written = file_put_contents( ABSPATH . 'wp-config.php', $out );
 		if ( ! $bytes_written ) {
@@ -504,7 +504,7 @@ class Config_Command extends WP_CLI_Command {
 			$config_transformer->update( $type, $name, $value, $options );
 
 		} catch ( Exception $exception ) {
-			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
+			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: {$exception->getMessage()}" );
 		}
 
 		$raw = $options['raw'] ? 'raw ' : '';
@@ -574,7 +574,7 @@ class Config_Command extends WP_CLI_Command {
 			$config_transformer->remove( $type, $name );
 
 		} catch ( Exception $exception ) {
-			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
+			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: {$exception->getMessage()}" );
 		}
 
 		WP_CLI::success( "Deleted the {$type} '{$name}' from the 'wp-config.php' file." );
@@ -635,7 +635,7 @@ class Config_Command extends WP_CLI_Command {
 					WP_CLI::halt( 0 );
 			}
 		} catch ( Exception $exception ) {
-			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
+			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: {$exception->getMessage()}" );
 		}
 	}
 
@@ -690,7 +690,7 @@ class Config_Command extends WP_CLI_Command {
 				$config_transformer->update( 'constant', $constant, (string) $key );
 			}
 		} catch ( Exception $exception ) {
-			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: " . $exception->getMessage() );
+			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: {$exception->getMessage()}" );
 		}
 
 		WP_CLI::success( 'Shuffled the salt keys.' );
