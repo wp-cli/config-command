@@ -157,7 +157,7 @@ the database constants are correct.
 Gets the value of a specific constant or variable defined in wp-config.php file.
 
 ~~~
-wp config get <name> [--type=<type>]
+wp config get <name> [--type=<type>] [--format=<format>]
 ~~~
 
 **OPTIONS**
@@ -173,6 +173,16 @@ wp config get <name> [--type=<type>]
 		  - constant
 		  - variable
 		  - all
+		---
+
+	[--format=<format>]
+		Get value in a particular format.
+		---
+		default: var_export
+		options:
+		  - var_export
+		  - json
+		  - yaml
 		---
 
 **EXAMPLES**
