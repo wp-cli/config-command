@@ -165,10 +165,6 @@ class Config_Command extends WP_CLI_Command {
 			Utils\run_mysql_command( '/usr/bin/env mysql --no-defaults', $mysql_db_connection_args );
 		}
 
-		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
-			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
-		}
-
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
 			try {
 				$assoc_args['keys-and-salts']    = true;
@@ -193,6 +189,13 @@ class Config_Command extends WP_CLI_Command {
 			$assoc_args['add-wplang'] = true;
 		} else {
 			$assoc_args['add-wplang'] = false;
+		}
+
+		$assoc_args = array_map( [ $this, 'escape_config_value' ], $assoc_args );
+
+		// 'extra-php' is retrieved after escaping to avoid breaking the PHP code.
+		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
+			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
 		}
 
 		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
@@ -1020,5 +1023,19 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		WP_CLI::line( "{$name}={$variable_value}" );
+	}
+
+	/**
+	 * Escape a config value so it can be safely used within single quotes.
+	 *
+	 * @param mixed $value Value to escape.
+	 * @return mixed Escaped value.
+	 */
+	private function escape_config_value( $value ) {
+		if ( is_string( $value ) ) {
+			return addslashes( $value );
+		}
+
+		return $value;
 	}
 }
