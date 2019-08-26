@@ -191,9 +191,23 @@ class Config_Command extends WP_CLI_Command {
 			$assoc_args['add-wplang'] = false;
 		}
 
-		$assoc_args = array_map( [ $this, 'escape_config_value' ], $assoc_args );
+		// Store 'extra-php' and reinsert later, it mustn't be escaped.
+		if ( array_key_exists( 'extra-php', $assoc_args ) ) {
+			$unescaped_extra_php = $assoc_args['extra-php'];
+			unset( $assoc_args['extra-php'] );
+		}
 
-		// 'extra-php' is retrieved after escaping to avoid breaking the PHP code.
+		$assoc_args = array_map(
+			[ $this, 'escape_config_value' ],
+			$assoc_args
+		);
+
+		if ( isset( $unescaped_extra_php ) ) {
+			$assoc_args['extra-php'] = $unescaped_extra_php;
+		}
+
+		// 'extra-php' from STDIN is retrieved after escaping to avoid breaking
+		// the PHP code.
 		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
 			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
 		}
