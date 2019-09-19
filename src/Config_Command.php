@@ -221,6 +221,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * [--format=<format>]
 	 * : Render output in a particular format.
+     * Dotenv is limited to non-object values.
 	 * ---
 	 * default: table
 	 * options:
@@ -228,6 +229,7 @@ class Config_Command extends WP_CLI_Command {
 	 *   - csv
 	 *   - json
 	 *   - yaml
+     *   - dotenv
 	 * ---
 	 *
 	 * [--strict]
@@ -325,12 +327,14 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * [--format=<format>]
 	 * : Get value in a particular format.
+     * Dotenv is limited to non-object values.
 	 * ---
 	 * default: var_export
 	 * options:
 	 *   - var_export
 	 *   - json
 	 *   - yaml
+     *   - dotenv
 	 * ---
 	 *
 	 * ## EXAMPLES

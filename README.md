@@ -177,12 +177,14 @@ wp config get <name> [--type=<type>] [--format=<format>]
 
 	[--format=<format>]
 		Get value in a particular format.
+		Dotenv is limited to non-object values.
 		---
 		default: var_export
 		options:
 		  - var_export
 		  - json
 		  - yaml
+		  - dotenv
 		---
 
 **EXAMPLES**
@@ -241,6 +243,7 @@ wp config list [<filter>...] [--fields=<fields>] [--format=<format>] [--strict]
 
 	[--format=<format>]
 		Render output in a particular format.
+		Dotenv is limited to non-object values.
 		---
 		default: table
 		options:
@@ -248,6 +251,7 @@ wp config list [<filter>...] [--fields=<fields>] [--format=<format>] [--strict]
 		  - csv
 		  - json
 		  - yaml
+		  - dotenv
 		---
 
 	[--strict]
