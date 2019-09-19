@@ -250,6 +250,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * [--format=<format>]
 	 * : Render output in a particular format.
+	 * Dotenv is limited to non-object values.
 	 * ---
 	 * default: table
 	 * options:
@@ -257,6 +258,7 @@ class Config_Command extends WP_CLI_Command {
 	 *   - csv
 	 *   - json
 	 *   - yaml
+	 *   - dotenv
 	 * ---
 	 *
 	 * [--strict]
@@ -331,6 +333,10 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( "No matching entries found in 'wp-config.php'." );
 		}
 
+		if ( 'dotenv' === $assoc_args['format'] ) {
+			return array_walk( $values, array( $this, 'print_dotenv' ) );
+		}
+
 		Utils\format_items( $assoc_args['format'], $values, $assoc_args['fields'] );
 	}
 
@@ -354,12 +360,14 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * [--format=<format>]
 	 * : Get value in a particular format.
+	 * Dotenv is limited to non-object values.
 	 * ---
 	 * default: var_export
 	 * options:
 	 *   - var_export
 	 *   - json
 	 *   - yaml
+	 *   - dotenv
 	 * ---
 	 *
 	 * ## EXAMPLES
@@ -916,5 +924,20 @@ class Config_Command extends WP_CLI_Command {
 		);
 
 		return $separator;
+	}
+
+	/**
+	 * Writes a provided variable's key and value to stdout, in dotenv format.
+	 *
+	 * @param array $value
+	 */
+	private function print_dotenv( array $value ) {
+		if ( ! isset( $value['name'] ) || ! isset( $value['type'] ) || 'constant' !== $value['type'] ) {
+			return;
+		}
+
+		$variable_value = isset( $value['value'] ) ? $value['value'] : '';
+
+		echo strtoupper( $value['name'] ) . '\"' . addslashes( $variable_value ) . '\"' . PHP_EOL;
 	}
 }
