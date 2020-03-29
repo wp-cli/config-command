@@ -37,6 +37,23 @@ Feature: Create a wp-config file
     Then the return code should be 1
     And STDERR should not be empty
 
+    Given a wp-config-extra.php file:
+      """
+      define( 'WP_DEBUG_LOG', true );
+      """
+    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file=wp-custom-config.php --extra-php < wp-config-extra.php`
+    Then the wp-custom-config.php file should contain:
+      """
+      'AUTH_SALT',
+      """
+    And the wp-custom-config.php file should contain:
+      """
+      define( 'WP_DEBUG_LOG', true );
+      """
+  When I try the previous command again
+    Then the return code should be 1
+    And STDERR should not be empty
+
     When I run `wp db create`
     Then STDOUT should not be empty
 
@@ -120,6 +137,17 @@ Feature: Create a wp-config file
       Success: Generated 'wp-config.php' file.
       """
     And the wp-config.php file should contain:
+      """
+      define( 'WPLANG', 'ja' );
+      """
+
+    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file=wp-custom-confog.php --locale=ja --force`
+    Then the return code should be 0
+    And STDOUT should contain:
+      """
+      Success: Generated 'wp-custom-confog.php' file.
+      """
+    And the wp-custom-confog.php file should contain:
       """
       define( 'WPLANG', 'ja' );
       """
