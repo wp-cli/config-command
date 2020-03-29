@@ -200,11 +200,14 @@ class Config_Command extends WP_CLI_Command {
 		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
 		$out          = Utils\mustache_render( "{$command_root}/templates/wp-config.mustache", $assoc_args );
 
-		$bytes_written = file_put_contents( $assoc_args['config-file'], $out );
+		$wp_config_file = isset( $assoc_args['config-file'] )
+							? basename( $assoc_args['config-file'] )
+							: 'wp-config.php';
+		$bytes_written  = file_put_contents( $assoc_args['config-file'], $out );
 		if ( ! $bytes_written ) {
-			WP_CLI::error( "Could not create new 'wp-config.php' file." );
+			WP_CLI::error( "Could not create new '{$wp_config_file}' file." );
 		} else {
-			WP_CLI::success( "Generated 'wp-config.php' file." );
+			WP_CLI::success( "Generated '{$wp_config_file}' file." );
 		}
 	}
 
@@ -229,14 +232,17 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function edit( $_, $assoc_args ) {
-		$defaults   = [
+		$defaults       = [
 			'config-file' => $this->get_config_path(),
 		];
-		$assoc_args = array_merge( $defaults, $assoc_args );
-		$contents   = file_get_contents( $assoc_args['config-file'] );
-		$r          = Utils\launch_editor_for_input( $contents, basename( $assoc_args['config-file'] ), 'php' );
+		$assoc_args     = array_merge( $defaults, $assoc_args );
+		$contents       = file_get_contents( $assoc_args['config-file'] );
+		$wp_config_file = isset( $assoc_args['config-file'] )
+							? basename( $assoc_args['config-file'] )
+							: 'wp-config.php';
+		$r              = Utils\launch_editor_for_input( $contents, $wp_config_file, 'php' );
 		if ( false === $r ) {
-			WP_CLI::warning( 'No changes made to wp-config.php, aborted.' );
+			WP_CLI::warning( 'No changes made to ' . $wp_config_file . ', aborted.' );
 		} else {
 			file_put_contents( $config_path, $r );
 		}
