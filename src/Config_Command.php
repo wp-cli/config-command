@@ -232,17 +232,23 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function edit( $_, $assoc_args ) {
-		$defaults            = [
-			'config-file' => $this->get_config_path(),
-		];
-		$assoc_args          = array_merge( $defaults, $assoc_args );
-		$contents            = file_get_contents( $assoc_args['config-file'] );
-		$wp_config_file_name = basename( $assoc_args['config-file'] );
-		$r                   = Utils\launch_editor_for_input( $contents, $wp_config_file, 'php' );
+		if ( isset( $assoc_args['config-file'] ) ) {
+            $path                = $assoc_args['config-file'];
+            $wp_config_file_name = basename( $assoc_args['config-file'] );
+            if ( ! file_exists( $path ) ) {
+                WP_CLI::error( "'{$wp_config_file_name}' not found.\nEither create one manually or use `wp config create`." );
+            }
+        } else {
+            $path                = $this->get_config_path();
+            $wp_config_file_name = 'wp-config.php';
+		}
+
+		$contents            = file_get_contents( $path );
+		$r                   = Utils\launch_editor_for_input( $contents, $wp_config_file_name, 'php' );
 		if ( false === $r ) {
 			WP_CLI::warning( 'No changes made to ' . $wp_config_file_name . ', aborted.' );
 		} else {
-			file_put_contents( $config_path, $r );
+			file_put_contents( $path, $r );
 		}
 	}
 

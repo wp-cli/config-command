@@ -404,7 +404,7 @@ Scenario: Update raw values in wp-config.php
     When I run `wp config set ANOTHER_NAME another_value --type=constant --anchor="/** ANCHOR */" --placement=after --separator="\n" --config-file="wp-custom-config.php"`
     Then STDOUT should be:
       """
-      Success: Added the constant 'ANOTHER_NAME' to the 'wp-config.php' file with the value 'another_value'.
+      Success: Added the constant 'ANOTHER_NAME' to the 'wp-custom-config.php' file with the value 'another_value'.
       """
     And the wp-custom-config.php file should be:
       """
