@@ -3,11 +3,12 @@ Feature: Edit a wp-config file
   Scenario: Edit a wp-config.php file
     Given a WP install
 
-    When I run `EDITOR='ex -i NONE -c q!' wp config edit`
+    When I try `EDITOR='ex -i NONE -c q!' wp config edit;`
     Then STDERR should contain:
       """
-      No changes made to wp-config.php.
+      Warning: No changes made to wp-config.php.
       """
+    And the return code should be 0
 
   @custom-config-file
   Scenario: Edit a wp-custom-config.php file
@@ -20,8 +21,9 @@ Feature: Edit a wp-config file
       Generated 'wp-custom-config.php' file.
       """
 
-    When I run `EDITOR='ex -i NONE -c q!' wp config edit  --config-file=wp-custom-config.php`
+    When I try `EDITOR='ex -i NONE -c q!' wp config edit --config-file=wp-custom-config.php`
     Then STDERR should contain:
       """
       No changes made to wp-custom-config.php.
       """
+    And the return code should be 0
