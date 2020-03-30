@@ -387,7 +387,7 @@ Scenario: Update raw values in wp-config.php
       require_once( ABSPATH . 'wp-settings.php' );
       """
 
-    When I run `wp config set SOME_NAME some_value --type=constant --anchor="/** ANCHOR */" --placement=before --separator="\n"`
+    When I run `wp config set SOME_NAME some_value --type=constant --anchor="/** ANCHOR */" --placement=before --separator="\n" --config-file="wp-custom-config.php"`
     Then STDOUT should be:
       """
       Success: Added the constant 'SOME_NAME' to the 'wp-custom-config.php' file with the value 'some_value'.
@@ -401,7 +401,7 @@ Scenario: Update raw values in wp-config.php
       require_once( ABSPATH . 'wp-settings.php' );
       """
 
-    When I run `wp config set ANOTHER_NAME another_value --type=constant --anchor="/** ANCHOR */" --placement=after --separator="\n"`
+    When I run `wp config set ANOTHER_NAME another_value --type=constant --anchor="/** ANCHOR */" --placement=after --separator="\n" --config-file="wp-custom-config.php"`
     Then STDOUT should be:
       """
       Success: Added the constant 'ANOTHER_NAME' to the 'wp-config.php' file with the value 'another_value'.
