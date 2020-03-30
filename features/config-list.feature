@@ -11,6 +11,7 @@ Feature: List the values of a wp-config.php file
       """
       <?php // This won't work without this file being empty. ?>
       """
+
     When I run `wp core config {CORE_CONFIG_SETTINGS} --extra-php < wp-config-extra.php`
     Then STDOUT should contain:
       """
@@ -41,13 +42,14 @@ Feature: List the values of a wp-config.php file
       """
       <?php // This won't work without this file being empty. ?>
       """
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file=wp-custom-config.php --extra-php < wp-config-extra.php`
+
+    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
       """
 
-    When I run `wp config list --fields=name,type --config-file=wp-custom-config.php`
+    When I run `wp config list --fields=name,type --config-file='wp-custom-config.php'`
     Then STDOUT should be a table containing rows:
       | name               | type     |
       | DB_NAME            | constant |
@@ -56,13 +58,14 @@ Feature: List the values of a wp-config.php file
       | DB_HOST            | constant |
       | custom-include.php | includes |
 
-    When I try `wp config list --config-file=wp-custom-config.php`
+    When I try `wp config list --config-file='wp-custom-config.php'`
     Then STDOUT should be a table containing rows:
       | name | value | type |
 
   Scenario: Filter the list of values of a wp-config.php file
     Given an empty directory
     And WP files
+
     When I run `wp core config {CORE_CONFIG_SETTINGS}`
     Then STDOUT should contain:
       """
@@ -194,13 +197,13 @@ Feature: List the values of a wp-config.php file
   Scenario: Filter the list of values of a wp-custom-config.php file
     Given an empty directory
     And WP files
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file=wp-custom-config.php`
+    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
       """
 
-    When I run `wp config list --fields=name  --config-file=wp-custom-config.php`
+    When I run `wp config list --fields=name  --config-file='wp-custom-config.php'`
     Then STDOUT should be a table containing rows:
       | name             |
       | table_prefix     |
@@ -219,7 +222,7 @@ Feature: List the values of a wp-config.php file
       | LOGGED_IN_SALT   |
       | NONCE_SALT       |
 
-    When I run `wp config list --fields=name DB_ --config-file=wp-custom-config.php`
+    When I run `wp config list --fields=name DB_ --config-file='wp-custom-config.php'`
     Then STDOUT should be a table containing rows:
       | name        |
       | DB_NAME     |
@@ -237,7 +240,7 @@ Feature: List the values of a wp-config.php file
       AUTH_KEY
       """
 
-    When I run `wp config list --fields=name DB_HOST --config-file=wp-custom-config.php`
+    When I run `wp config list --fields=name DB_HOST --config-file='wp-custom-config.php'`
     Then STDOUT should be a table containing rows:
       | name    |
       | DB_HOST |
@@ -254,19 +257,19 @@ Feature: List the values of a wp-config.php file
       DB_NAME
       """
 
-    When I try `wp config list --fields=name --strict --config-file=wp-custom-config.php`
+    When I try `wp config list --fields=name --strict --config-file='wp-custom-config.php'`
     Then STDERR should be:
       """
       Error: The --strict option can only be used in combination with a filter.
       """
 
-    When I try `wp config list --fields=name DB_ --strict --config-file=wp-custom-config.php`
+    When I try `wp config list --fields=name DB_ --strict --config-file='wp-custom-config.php'`
     Then STDERR should be:
       """
       Error: No matching entries found in 'wp-custom-config.php'.
       """
 
-    When I run `wp config list --fields=name DB_USER DB_PASSWORD --config-file=wp-custom-config.php`
+    When I run `wp config list --fields=name DB_USER DB_PASSWORD --config-file='wp-custom-config.php'`
     Then STDOUT should be a table containing rows:
       | name        |
       | DB_USER     |
@@ -284,7 +287,7 @@ Feature: List the values of a wp-config.php file
       DB_HOST
       """
 
-    When I run `wp config list --fields=name DB_USER DB_PASSWORD --strict --config-file=wp-custom-config.php`
+    When I run `wp config list --fields=name DB_USER DB_PASSWORD --strict --config-file='wp-custom-config.php'`
     Then STDOUT should be a table containing rows:
       | name        |
       | DB_USER     |
@@ -302,7 +305,7 @@ Feature: List the values of a wp-config.php file
       DB_HOST
       """
 
-    When I run `wp config list --fields=name _KEY _SALT --config-file=wp-custom-config.php`
+    When I run `wp config list --fields=name _KEY _SALT --config-file='wp-custom-config.php'`
     Then STDOUT should be a table containing rows:
       | name             |
       | AUTH_KEY         |
