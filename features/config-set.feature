@@ -2,6 +2,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
 
   Scenario: Update the value of an existing wp-config.php constant
     Given a WP install
+
     When I run `wp config set DB_HOST db.example.com`
     Then STDOUT should be:
       """
@@ -18,6 +19,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
   Scenario: Update the value of an existing wp-custom-config.php constant
     Given an empty directory
     And WP files
+
     When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
@@ -77,6 +79,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
   Scenario: Add a new value to wp-custom-config.php
     Given an empty directory
     And WP files
+
     When I run `wp core config {CORE_CONFIG_SETTINGS}  --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
@@ -121,6 +124,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
 
   Scenario: Updating a non-existent value  in wp-config.php without --add
     Given a WP install
+
     When I try `wp config set NEW_CONSTANT constant_value --no-add`
     Then STDERR should be:
       """
@@ -167,6 +171,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
   Scenario: Updating a non-existent value  in wp-custom-config.php without --add
     Given an empty directory
     And WP files
+
     When I run `wp core config {CORE_CONFIG_SETTINGS}  --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
@@ -217,6 +222,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
 
   Scenario: Update raw values in wp-config.php
     Given a WP install
+
     When I run `wp config set WP_DEBUG true --type=constant`
     Then STDOUT should be:
       """
@@ -242,9 +248,10 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
       """
 
   @custom-config-file
-Scenario: Update raw values in wp-config.php
+  Scenario: Update raw values in wp-config.php
     Given an empty directory
     And WP files
+
     When I run `wp core config {CORE_CONFIG_SETTINGS}  --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
@@ -306,6 +313,7 @@ Scenario: Update raw values in wp-config.php
   Scenario: Ambiguous change requests for wp-custom-config.php throw errors
     Given an empty directory
     And WP files
+
     When I run `wp core config {CORE_CONFIG_SETTINGS}  --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
@@ -338,7 +346,6 @@ Scenario: Update raw values in wp-config.php
 
   Scenario: Additions can be properly placed in wp-config.php
     Given a WP install
-
     And a wp-config.php file:
       """
       define( 'CONST_A', 'val-a' );
@@ -378,7 +385,6 @@ Scenario: Update raw values in wp-config.php
 
     Scenario: Additions can be properly placed in wp-custom-config.php
     Given a WP install
-
     And a wp-custom-config.php file:
       """
       define( 'CONST_A', 'val-a' );

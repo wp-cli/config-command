@@ -40,6 +40,7 @@ Feature: Manage wp-config.php file
 
   Scenario: Get a wp-config.php file path
     Given a WP install
+
     When I run `wp config path`
     Then STDOUT should contain:
       """

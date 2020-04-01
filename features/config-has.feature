@@ -131,8 +131,8 @@ Feature: Check whether the wp-config.php file or the wp-custom-config.php file h
   @custom-config-file
   Scenario: Ambiguous check for wp-custom-config.php throw errors
     Given an empty directory
-
     And WP files
+
     When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
