@@ -198,9 +198,7 @@ class Config_Command extends WP_CLI_Command {
 		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
 		$out          = Utils\mustache_render( "{$command_root}/templates/wp-config.mustache", $assoc_args );
 
-		$wp_config_file_name = isset( $assoc_args['config-file'] )
-								? basename( $assoc_args['config-file'] )
-								: 'wp-config.php';
+		$wp_config_file_name = basename( $assoc_args['config-file'];
 		$bytes_written       = file_put_contents( $assoc_args['config-file'], $out );
 		if ( ! $bytes_written ) {
 			WP_CLI::error( "Could not create new '{$wp_config_file_name}' file." );
