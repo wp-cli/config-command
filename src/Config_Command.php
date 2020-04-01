@@ -148,7 +148,7 @@ class Config_Command extends WP_CLI_Command {
 			'locale'      => self::get_initial_locale(),
 			'config-file' => rtrim( ABSPATH, '/\\' ) . '/wp-config.php',
 		];
-		$assoc_args          = array_merge( $defaults, $assoc_args );
+		$assoc_args = array_merge( $defaults, $assoc_args );
 		if ( preg_match( '|[^a-z0-9_]|i', $assoc_args['dbprefix'] ) ) {
 			WP_CLI::error( '--dbprefix can only contain numbers, letters, and underscores.' );
 		}
@@ -201,7 +201,7 @@ class Config_Command extends WP_CLI_Command {
 		$wp_config_file_name = isset( $assoc_args['config-file'] )
 								? basename( $assoc_args['config-file'] )
 								: 'wp-config.php';
-		$bytes_written = file_put_contents( $assoc_args['config-file'], $out );
+		$bytes_written       = file_put_contents( $assoc_args['config-file'], $out );
 		if ( ! $bytes_written ) {
 			WP_CLI::error( "Could not create new '{$wp_config_file_name}' file." );
 		} else {
@@ -231,7 +231,7 @@ class Config_Command extends WP_CLI_Command {
 	public function edit( $_, $assoc_args ) {
 		$path                = $this->get_config_path( $assoc_args );
 		$wp_config_file_name = basename( $path );
-		$contents = file_get_contents( $path );
+		$contents            = file_get_contents( $path );
 		$r                   = Utils\launch_editor_for_input( $contents, $wp_config_file_name, 'php' );
 		if ( false === $r ) {
 			WP_CLI::warning( "No changes made to {$wp_config_file_name}, aborted.' );
