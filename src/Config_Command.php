@@ -106,9 +106,8 @@ class Config_Command extends WP_CLI_Command {
 	 * : Overwrites existing files, if present.
 	 *
 	 * [--config-file=<path>]
-	 * : Specify the path including file name in which wp-config.php file created. Defaults to
-	 * root of the WordPress installation with the file name
-	 * wp-config.php
+	 * : Specify the file path to the config file to be created. Defaults to the root of the
+	 * WordPress installation and the filename "wp-config.php".
 	 *
 	 * [--insecure]
 	 * : Retry API download without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
@@ -147,10 +146,9 @@ class Config_Command extends WP_CLI_Command {
 			'dbcharset'   => 'utf8',
 			'dbcollate'   => '',
 			'locale'      => self::get_initial_locale(),
-			'config-file' => ABSPATH . 'wp-config.php',
+			'config-file' => rtrim( ABSPATH, '/\\' ) . '/wp-config.php',
 		];
-		$assoc_args = array_merge( $defaults, $assoc_args );
-
+		$assoc_args          = array_merge( $defaults, $assoc_args );
 		if ( preg_match( '|[^a-z0-9_]|i', $assoc_args['dbprefix'] ) ) {
 			WP_CLI::error( '--dbprefix can only contain numbers, letters, and underscores.' );
 		}
@@ -201,9 +199,9 @@ class Config_Command extends WP_CLI_Command {
 		$out          = Utils\mustache_render( "{$command_root}/templates/wp-config.mustache", $assoc_args );
 
 		$wp_config_file_name = isset( $assoc_args['config-file'] )
-							? basename( $assoc_args['config-file'] )
-							: 'wp-config.php';
-		$bytes_written       = file_put_contents( $assoc_args['config-file'], $out );
+								? basename( $assoc_args['config-file'] )
+								: 'wp-config.php';
+		$bytes_written = file_put_contents( $assoc_args['config-file'], $out );
 		if ( ! $bytes_written ) {
 			WP_CLI::error( "Could not create new '{$wp_config_file_name}' file." );
 		} else {
@@ -217,9 +215,8 @@ class Config_Command extends WP_CLI_Command {
 	 * ## OPTIONS
 	 *
 	 * [--config-file=<path>]
-	 * : Specify the path including file name in which wp-config.php file created. Defaults to
-	 * root of the WordPress installation with the file name
-	 * wp-config.php
+	 * : Specify the file path to the config file to be edited. Defaults to the root of the
+	 * WordPress installation and the filename "wp-config.php".
 	 *
 	 * ## EXAMPLES
 	 *
@@ -232,21 +229,12 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function edit( $_, $assoc_args ) {
-		if ( isset( $assoc_args['config-file'] ) ) {
-            $path                = $assoc_args['config-file'];
-            $wp_config_file_name = basename( $assoc_args['config-file'] );
-            if ( ! file_exists( $path ) ) {
-                WP_CLI::error( "'{$wp_config_file_name}' not found.\nEither create one manually or use `wp config create`." );
-            }
-        } else {
-            $path                = $this->get_config_path();
-            $wp_config_file_name = 'wp-config.php';
-		}
-
-		$contents            = file_get_contents( $path );
+		$path                = $this->get_config_path( $assoc_args );
+		$wp_config_file_name = basename( $path );
+		$contents = file_get_contents( $path );
 		$r                   = Utils\launch_editor_for_input( $contents, $wp_config_file_name, 'php' );
 		if ( false === $r ) {
-			WP_CLI::warning( 'No changes made to ' . $wp_config_file_name . ', aborted.' );
+			WP_CLI::warning( "No changes made to {$wp_config_file_name}, aborted.' );
 		} else {
 			file_put_contents( $path, $r );
 		}
@@ -295,9 +283,8 @@ class Config_Command extends WP_CLI_Command {
 	 * : Enforce strict matching when a filter is provided.
 	 *
 	 * [--config-file=<path>]
-	 * : Specify the path including file name in which wp-config.php file created. Defaults to
-	 * root of the WordPress installation with the file name
-	 * wp-config.php
+	 * : Specify the file path to the config file to be read. Defaults to the root of the
+	 * WordPress installation and the filename "wp-config.php".
 	 *
 	 * ## EXAMPLES
 	 *
@@ -338,18 +325,9 @@ class Config_Command extends WP_CLI_Command {
 	 * @subcommand list
 	 */
 	public function list_( $args, $assoc_args ) {
-		if ( isset( $assoc_args['config-file'] ) ) {
-			$path                = $assoc_args['config-file'];
-			$wp_config_file_name = basename( $assoc_args['config-file'] );
-			if ( ! file_exists( $path ) ) {
-				WP_CLI::error( "'{$wp_config_file_name}' not found.\nEither create one manually or use `wp config create`." );
-			}
-		} else {
-			$path                = $this->get_config_path();
-			$wp_config_file_name = 'wp-config.php';
-		}
-
-		$strict = Utils\get_flag_value( $assoc_args, 'strict' );
+		$path                = $this->get_config_path( $assoc_args );
+		$wp_config_file_name = basename( $path );
+		$strict              = Utils\get_flag_value( $assoc_args, 'strict' );
 		if ( $strict && empty( $args ) ) {
 			WP_CLI::error( 'The --strict option can only be used in combination with a filter.' );
 		}
@@ -415,10 +393,8 @@ class Config_Command extends WP_CLI_Command {
 	 * ---
 	 *
 	 * [--config-file=<path>]
-	 * : Specify the path including file name where
-	 * wp-config.php file exists. Defaults to
-	 * root of the WordPress installation with the file name
-	 * wp-config.php
+	 * : Specify the file path to the config file to be read. Defaults to the root of the
+	 * WordPress installation and the filename "wp-config.php".
 	 *
 	 * ## EXAMPLES
 	 *
@@ -429,19 +405,10 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function get( $args, $assoc_args ) {
-		if ( isset( $assoc_args['config-file'] ) ) {
-			$path                = $assoc_args['config-file'];
-			$wp_config_file_name = basename( $assoc_args['config-file'] );
-			if ( ! file_exists( $path ) ) {
-				WP_CLI::error( "'{$wp_config_file_name}' not found.\nEither create one manually or use `wp config create`." );
-			}
-		} else {
-			$path                = $this->get_config_path();
-			$wp_config_file_name = 'wp-config.php';
-		}
-
-		list( $name ) = $args;
-		$type         = Utils\get_flag_value( $assoc_args, 'type' );
+		$path                = $this->get_config_path( $assoc_args );
+		$wp_config_file_name = basename( $path );
+		list( $name )        = $args;
+		$type                = Utils\get_flag_value( $assoc_args, 'type' );
 
 		$value = $this->return_value( $name, $type, self::get_wp_config_vars( $path ), $wp_config_file_name );
 		WP_CLI::print_value( $value, $assoc_args );
@@ -450,7 +417,7 @@ class Config_Command extends WP_CLI_Command {
 	/**
 	 * Get the array of wp-config.php constants and variables.
 	 *
-	 * @param string $wp_config_path config file path
+	 * @param string $wp_config_path Config file path
 	 *
 	 * @return array
 	 */
@@ -536,10 +503,8 @@ class Config_Command extends WP_CLI_Command {
 	 * ---
 	 *
 	 * [--config-file=<path>]
-	 * : Specify the path including file name where
-	 * wp-config.php file exists. Defaults to
-	 * root of the WordPress installation with the file name
-	 * wp-config.php
+	 * : Specify the file path to the config file to be modified. Defaults to the root of the
+	 * WordPress installation and the filename "wp-config.php".
 	 *
 	 * ## EXAMPLES
 	 *
@@ -549,16 +514,8 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function set( $args, $assoc_args ) {
-		if ( isset( $assoc_args['config-file'] ) ) {
-			$path                = $assoc_args['config-file'];
-			$wp_config_file_name = basename( $assoc_args['config-file'] );
-			if ( ! file_exists( $path ) ) {
-				WP_CLI::error( "'{$wp_config_file_name}' not found.\nEither create one manually or use `wp config create`." );
-			}
-		} else {
-			$path                = $this->get_config_path();
-			$wp_config_file_name = 'wp-config.php';
-		}
+		$path                 = $this->get_config_path( $assoc_args );
+		$wp_config_file_name  = basename( $path );
 		list( $name, $value ) = $args;
 		$type                 = Utils\get_flag_value( $assoc_args, 'type' );
 
@@ -649,10 +606,8 @@ class Config_Command extends WP_CLI_Command {
 	 * ---
 	 *
 	 * [--config-file=<path>]
-	 * : Specify the path including file name where
-	 * wp-config.php file exists. Defaults to
-	 * root of the WordPress installation with the file name
-	 * wp-config.php
+	 * : Specify the file path to the config file to be modified. Defaults to the root of the
+	 * WordPress installation and the filename "wp-config.php".
 	 *
 	 * ## EXAMPLES
 	 *
@@ -662,19 +617,10 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function delete( $args, $assoc_args ) {
-		if ( isset( $assoc_args['config-file'] ) ) {
-			$path                = $assoc_args['config-file'];
-			$wp_config_file_name = basename( $assoc_args['config-file'] );
-			if ( ! file_exists( $path ) ) {
-				WP_CLI::error( "'{$wp_config_file_name}' not found.\nEither create one manually or use `wp config create`." );
-			}
-		} else {
-			$path                = $this->get_config_path();
-			$wp_config_file_name = 'wp-config.php';
-		}
-
-		list( $name ) = $args;
-		$type         = Utils\get_flag_value( $assoc_args, 'type' );
+		$path                = $this->get_config_path( $assoc_args );
+		$wp_config_file_name = basename( $path );
+		list( $name )        = $args;
+		$type                = Utils\get_flag_value( $assoc_args, 'type' );
 
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
@@ -727,10 +673,8 @@ class Config_Command extends WP_CLI_Command {
 	 * ---
 	 *
 	 * [--config-file=<path>]
-	 * : Specify the path including file name where
-	 * wp-config.php file exists. Defaults to
-	 * root of the WordPress installation with the file name
-	 * wp-config.php
+	 * : Specify the file path to the config file to be checked. Defaults to the root of the
+	 * WordPress installation and the filename "wp-config.php".
 	 *
 	 * ## EXAMPLES
 	 *
@@ -740,19 +684,10 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function has( $args, $assoc_args ) {
-		if ( isset( $assoc_args['config-file'] ) ) {
-			$path                = $assoc_args['config-file'];
-			$wp_config_file_name = basename( $assoc_args['config-file'] );
-			if ( ! file_exists( $path ) ) {
-				WP_CLI::error( "'{$wp_config_file_name}' not found.\nEither create one manually or use `wp config create`." );
-			}
-		} else {
-			$path                = $this->get_config_path();
-			$wp_config_file_name = 'wp-config.php';
-		}
-
-		list( $name ) = $args;
-		$type         = Utils\get_flag_value( $assoc_args, 'type' );
+		$path                = $this->get_config_path( $assoc_args );
+		$wp_config_file_name = basename( $path );
+		list( $name )        = $args;
+		$type                = Utils\get_flag_value( $assoc_args, 'type' );
 
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
@@ -794,10 +729,8 @@ class Config_Command extends WP_CLI_Command {
 	 * : If an unknown key is requested to be shuffled, add it instead of throwing a warning.
 	 *
 	 * [--config-file=<path>]
-	 * : Specify the path including file name where
-	 * wp-config.php file exists. Defaults to
-	 * root of the WordPress installation with the file name
-	 * wp-config.php
+	 * : Specify the file path to the config file to be modified. Defaults to the root of the
+	 * WordPress installation and the filename "wp-config.php".
 	 *
 	 * [--insecure]
 	 * : Retry API download without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
@@ -856,9 +789,7 @@ class Config_Command extends WP_CLI_Command {
 			}
 		}
 
-		$path = isset( $assoc_args['config-file'] )
-					? $assoc_args['config-file']
-					: $this->get_config_path();
+		$path = $this->get_config_path();
 
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
@@ -866,7 +797,8 @@ class Config_Command extends WP_CLI_Command {
 				$config_transformer->update( 'constant', $key, (string) $value );
 			}
 		} catch ( Exception $exception ) {
-			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: {$exception->getMessage()}" );
+			$wp_config_file_name = basename( $path );
+			WP_CLI::error( "Could not process the '{$wp_config_file_name}' transformation.\nReason: {$exception->getMessage()}" );
 		}
 
 		WP_CLI::success( 'Shuffled the salt keys.' );
@@ -922,7 +854,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @param string $name
 	 * @param string $type
 	 * @param string $type
-	 * @param string $wp_config_file_name
+	 * @param string $wp_config_file_name Config file name
 	 * @return string The value of the requested constant or variable as defined in the wp-config.php file; if the
 	 *                requested constant or variable is not defined then the function will print an error and exit.
 	 */
@@ -1008,12 +940,21 @@ class Config_Command extends WP_CLI_Command {
 	/**
 	 * Gets the path to the wp-config.php file or gives a helpful error if none found.
 	 *
+	 * @param array $assoc_args associative arguments given while calling wp config subcommand
 	 * @return string Path to wp-config.php file.
 	 */
-	private function get_config_path() {
-		$path = Utils\locate_wp_config();
-		if ( ! $path ) {
-			WP_CLI::error( "'wp-config.php' not found.\nEither create one manually or use `wp config create`." );
+	private function get_config_path( $assoc_args ) {
+		if ( isset( $assoc_args['config-file'] ) ) {
+			$path = $assoc_args['config-file'];
+			if ( ! file_exists( $path ) ) {
+				$wp_config_file_name = basename( $assoc_args['config-file'] );
+				WP_CLI::error( "'{$wp_config_file_name}' not found.\nEither create one manually or use `wp config create`." );
+			}
+		} else {
+			$path = Utils\locate_wp_config();
+			if ( ! $path ) {
+				WP_CLI::error( "'wp-config.php' not found.\nEither create one manually or use `wp config create`." );
+			}
 		}
 		return $path;
 	}

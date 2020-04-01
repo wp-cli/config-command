@@ -2,6 +2,7 @@ Feature: Delete a constant or variable from the wp-config.php file
 
   Scenario: Delete an existing wp-config.php constant
     Given a WP install
+
     When I run `wp config delete DB_PASSWORD`
     Then STDOUT should be:
       """
@@ -43,9 +44,10 @@ Feature: Delete a constant or variable from the wp-config.php file
 
   @custom-config-file
   Scenario: Delete an existing wp-custom-config.php constant
-     Given an empty directory
+    Given an empty directory
     And WP files
-    When I run `wp core config {CORE_CONFIG_SETTINGS}  --config-file='wp-custom-config.php'`
+
+    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
@@ -141,6 +143,7 @@ Feature: Delete a constant or variable from the wp-config.php file
 
   Scenario: Ambiguous delete requests for wp-config.php throw errors
     Given a WP install
+
     When I run `wp config set SOME_NAME some_value --type=constant`
     Then STDOUT should be:
       """
@@ -169,6 +172,7 @@ Feature: Delete a constant or variable from the wp-config.php file
   Scenario: Ambiguous delete requests for wp-custom-config.php throw errors
     Given an empty directory
     And WP files
+
     When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """

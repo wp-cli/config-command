@@ -2,8 +2,8 @@ Feature: Refresh the salts in the wp-config.php file
 
   Scenario: Salts are created properly in wp-config.php when none initially exist
     Given a WP install
-    When I try `wp config get AUTH_KEY --type=constant`
 
+    When I try `wp config get AUTH_KEY --type=constant`
     Then STDERR should contain:
     """
     The constant 'AUTH_KEY' is not defined in the 'wp-config.php' file.
@@ -18,6 +18,7 @@ Feature: Refresh the salts in the wp-config.php file
     """
     define( 'AUTH_KEY'
     """
+
   @custom-config-file
   Scenario: Salts are created properly in wp-custom-config.php when none initially exist
     Given an empty directory
@@ -46,8 +47,8 @@ Feature: Refresh the salts in the wp-config.php file
 
   Scenario: Shuffle the salts
     Given a WP install
-    When I run `wp config shuffle-salts`
 
+    When I run `wp config shuffle-salts`\
     Then STDOUT should contain:
     """
     Shuffled the salt keys.

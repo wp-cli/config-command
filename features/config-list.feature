@@ -197,6 +197,7 @@ Feature: List the values of a wp-config.php file
   Scenario: Filter the list of values of a wp-custom-config.php file
     Given an empty directory
     And WP files
+
     When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """

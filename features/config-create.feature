@@ -23,6 +23,7 @@ Feature: Create a wp-config file
       """
       define( 'WP_DEBUG_LOG', true );
       """
+
     When I run `wp core config {CORE_CONFIG_SETTINGS} --extra-php < wp-config-extra.php`
     Then the wp-config.php file should contain:
       """
@@ -51,7 +52,8 @@ Feature: Create a wp-config file
       """
       define( 'WP_DEBUG_LOG', true );
       """
-  When I try the previous command again
+
+    When I try the previous command again
     Then the return code should be 1
     And STDERR should not be empty
 
@@ -68,10 +70,11 @@ Feature: Create a wp-config file
   Scenario: No wp-config.php and WPLANG
     Given an empty directory
     And WP files
-    Given a wp-config-extra.php file:
+    And a wp-config-extra.php file:
       """
       define( 'WP_DEBUG_LOG', true );
       """
+
     When I run `wp core config {CORE_CONFIG_SETTINGS} --extra-php < wp-config-extra.php`
     Then the wp-config.php file should not contain:
       """
@@ -142,13 +145,13 @@ Feature: Create a wp-config file
       define( 'WPLANG', 'ja' );
       """
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file=wp-custom-confog.php --locale=ja --force`
+    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file=wp-custom-config.php --locale=ja --force`
     Then the return code should be 0
     And STDOUT should contain:
       """
-      Success: Generated 'wp-custom-confog.php' file.
+      Success: Generated 'wp-custom-config.php' file.
       """
-    And the wp-custom-confog.php file should contain:
+    And the wp-custom-config.php file should contain:
       """
       define( 'WPLANG', 'ja' );
       """
