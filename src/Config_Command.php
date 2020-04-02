@@ -242,7 +242,7 @@ class Config_Command extends WP_CLI_Command {
 		$contents            = file_get_contents( $path );
 		$r                   = Utils\launch_editor_for_input( $contents, $wp_config_file_name, 'php' );
 		if ( false === $r ) {
-			WP_CLI::warning( "No changes made to {$wp_config_file_name}, aborted.' );
+			WP_CLI::warning( "No changes made to {$wp_config_file_name}, aborted." );
 		} else {
 			file_put_contents( $path, $r );
 		}

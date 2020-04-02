@@ -48,7 +48,7 @@ Feature: Refresh the salts in the wp-config.php file
   Scenario: Shuffle the salts
     Given a WP install
 
-    When I run `wp config shuffle-salts`\
+    When I run `wp config shuffle-salts`
     Then STDOUT should contain:
     """
     Shuffled the salt keys.
