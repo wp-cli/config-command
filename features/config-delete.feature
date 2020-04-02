@@ -178,6 +178,7 @@ Feature: Delete a constant or variable from the wp-config.php file
       """
       Generated 'wp-custom-config.php' file.
       """
+
     When I run `wp config set SOME_NAME some_value --type=constant --config-file='wp-custom-config.php'`
     Then STDOUT should be:
       """
