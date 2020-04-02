@@ -133,9 +133,9 @@ class Config_Command extends WP_CLI_Command {
 	public function create( $_, $assoc_args ) {
 		if ( ! Utils\get_flag_value( $assoc_args, 'force' ) ) {
 			if ( isset( $assoc_args['config-file'] ) && file_exists( $assoc_args['config-file'] ) ) {
-				WP_CLI::error( "The '" . $assoc_args['config-file'] . "' file already exists." );
+				$this->config_file_already_exist_error( basename( $assoc_args['config-file'] ) );
 			} elseif ( ! isset( $assoc_args['config-file'] ) && Utils\locate_wp_config() ) {
-				WP_CLI::error( "The 'wp-config.php' file already exists." );
+				$this->config_file_already_exist_error( 'wp-config.php' );
 			}
 		}
 
@@ -198,13 +198,23 @@ class Config_Command extends WP_CLI_Command {
 		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
 		$out          = Utils\mustache_render( "{$command_root}/templates/wp-config.mustache", $assoc_args );
 
-		$wp_config_file_name = basename( $assoc_args['config-file'];
+		$wp_config_file_name = basename( $assoc_args['config-file'] );
 		$bytes_written       = file_put_contents( $assoc_args['config-file'], $out );
 		if ( ! $bytes_written ) {
 			WP_CLI::error( "Could not create new '{$wp_config_file_name}' file." );
 		} else {
 			WP_CLI::success( "Generated '{$wp_config_file_name}' file." );
 		}
+	}
+
+	/**
+	 * Gives error when wp-config already exist and try to create it.
+	 *
+	 * @param string $wp_config_file_name Config file name.
+	 * @return void
+	 */
+	private function config_file_already_exist_error( $wp_config_file_name ) {
+		WP_CLI::error( "The '{$wp_config_file_name}' file already exists." );
 	}
 
 	/**
@@ -250,7 +260,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function path() {
-		WP_CLI::line( $this->get_config_path() );
+		WP_CLI::line( $this->get_config_path( array() ) );
 	}
 
 	/**
@@ -787,7 +797,7 @@ class Config_Command extends WP_CLI_Command {
 			}
 		}
 
-		$path = $this->get_config_path();
+		$path = $this->get_config_path( $assoc_args );
 
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
@@ -945,18 +955,26 @@ class Config_Command extends WP_CLI_Command {
 		if ( isset( $assoc_args['config-file'] ) ) {
 			$path = $assoc_args['config-file'];
 			if ( ! file_exists( $path ) ) {
-				$wp_config_file_name = basename( $assoc_args['config-file'] );
-				WP_CLI::error( "'{$wp_config_file_name}' not found.\nEither create one manually or use `wp config create`." );
+				$this->config_file_not_found_error( basename( $assoc_args['config-file'] ) );
 			}
 		} else {
 			$path = Utils\locate_wp_config();
 			if ( ! $path ) {
-				WP_CLI::error( "'wp-config.php' not found.\nEither create one manually or use `wp config create`." );
+				$this->config_file_not_found_error( 'wp-config.php' );
 			}
 		}
 		return $path;
 	}
 
+	/**
+	 * Gives error the wp-config file not found
+	 *
+	 * @param string $wp_config_file_name Config file name.
+	 * @return void
+	 */
+	private function config_file_not_found_error( $wp_config_file_name ) {
+		WP_CLI::error( "'{$wp_config_file_name}' not found.\nEither create one manually or use `wp config create`." );
+	}
 	/**
 	 * Parses the separator argument, to allow for special character handling.
 	 *
