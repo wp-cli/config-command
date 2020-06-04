@@ -410,7 +410,9 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * [--anchor=<anchor>]
 	 * : Anchor string where additions of new values are anchored around.
-	 * Defaults to "/* That's all, stop editing!".
+	 * default: "/* That's all, stop editing!".
+	 * option:
+	 *   - EOF
 	 *
 	 * [--placement=<placement>]
 	 * : Where to place the new values in relation to the anchor string.
