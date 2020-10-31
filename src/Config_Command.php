@@ -37,7 +37,7 @@ class Config_Command extends WP_CLI_Command {
 	];
 
 	/**
-	 * Retrieve the initiale locale from the WordPress version file.
+	 * Retrieve the initial locale from the WordPress version file.
 	 *
 	 * @return string Initial locale if present, or an empty string if not.
 	 */
@@ -685,6 +685,9 @@ class Config_Command extends WP_CLI_Command {
 	 *     # Get new salts for your wp-config.php file
 	 *     $ wp config shuffle-salts
 	 *     Success: Shuffled the salt keys.
+	 *
+	 *     # Add a cache key salt to the wp-config.php file
+	 *     $ wp config shuffle-salts WP_CACHE_KEY_SALT --force
 	 *
 	 * @subcommand shuffle-salts
 	 * @when before_wp_load
