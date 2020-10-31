@@ -6,6 +6,20 @@ use \WP_CLI\Utils;
  */
 class Config_Command extends WP_CLI_Command {
 
+	const WORDPRESS_ORG_API_SALT_ENDPOINT = 'https://api.wordpress.org/secret-key/1.1/salt/';
+	const VALID_KEY_CHARACTERS                        = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_ []{}<>~`+=,.;:/?|';
+
+	const DEFAULT_SALT_CONSTANTS                                           = [
+		'AUTH_KEY',
+		'SECURE_AUTH_KEY',
+		'LOGGED_IN_KEY',
+		'NONCE_KEY',
+		'AUTH_SALT',
+		'SECURE_AUTH_SALT',
+		'LOGGED_IN_SALT',
+		'NONCE_SALT',
+	];
+
 	/**
 	 * Retrieve the initiale locale from the WordPress version file.
 	 *
@@ -147,7 +161,7 @@ class Config_Command extends WP_CLI_Command {
 			} catch ( Exception $e ) {
 				$assoc_args['keys-and-salts']     = false;
 				$assoc_args['keys-and-salts-alt'] = self::read_(
-					'https://api.wordpress.org/secret-key/1.1/salt/'
+					self::WORDPRESS_ORG_API_SALT_ENDPOINT
 				);
 			}
 		}
@@ -279,16 +293,16 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( 'The --strict option can only be used in combination with a filter.' );
 		}
 
-		$default_fields = array(
+		$default_fields = [
 			'name',
 			'value',
 			'type',
-		);
+		];
 
-		$defaults = array(
+		$defaults = [
 			'fields' => implode( ',', $default_fields ),
 			'format' => 'table',
-		);
+		];
 
 		$assoc_args = array_merge( $defaults, $assoc_args );
 
@@ -364,7 +378,7 @@ class Config_Command extends WP_CLI_Command {
 		// phpcs:ignore Squiz.PHP.Eval.Discouraged -- Don't have another way.
 		eval( WP_CLI::get_runner()->get_wp_config_code() );
 
-		$wp_config_vars      = self::get_wp_config_diff( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', array( 'wp_cli_original_defined_vars' ) );
+		$wp_config_vars      = self::get_wp_config_diff( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', [ 'wp_cli_original_defined_vars' ] );
 		$wp_config_constants = self::get_wp_config_diff( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
 
 		foreach ( $wp_config_vars as $name => $value ) {
@@ -449,15 +463,15 @@ class Config_Command extends WP_CLI_Command {
 		list( $name, $value ) = $args;
 		$type                 = Utils\get_flag_value( $assoc_args, 'type' );
 
-		$options = array();
+		$options = [];
 
-		$option_flags = array(
+		$option_flags = [
 			'raw'       => false,
 			'add'       => true,
 			'anchor'    => null,
 			'placement' => null,
 			'separator' => null,
-		);
+		];
 
 		foreach ( $option_flags as $option => $default ) {
 			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
@@ -644,6 +658,12 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * ## OPTIONS
 	 *
+	 * [<keys>...]
+	 * : One ore more keys to shuffle. If none are provided, this falls back to the default WordPress Core salt keys.
+	 *
+	 * [--force]
+	 * : If an unknown key is requested to be shuffled, add it instead of throwing a warning.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Get new salts for your wp-config.php file
@@ -655,29 +675,42 @@ class Config_Command extends WP_CLI_Command {
 	 */
 	public function shuffle_salts( $args, $assoc_args ) {
 
-		$constant_list = array(
-			'AUTH_KEY',
-			'SECURE_AUTH_KEY',
-			'LOGGED_IN_KEY',
-			'NONCE_KEY',
-			'AUTH_SALT',
-			'SECURE_AUTH_SALT',
-			'LOGGED_IN_SALT',
-			'NONCE_SALT',
-		);
+		$keys  = $args;
+		$force = Utils\get_flag_value( $assoc_args, 'force', false );
+
+		if ( empty( $keys ) ) {
+			$keys = self::DEFAULT_SALT_CONSTANTS;
+		}
+
+		$secret_keys = [];
 
 		try {
-			foreach ( $constant_list as $key ) {
+			foreach ( $keys as $key ) {
+				if ( ! $force && ! in_array( $key, self::DEFAULT_SALT_CONSTANTS, true ) ) {
+					WP_CLI::warning( "Could not shuffle the unknown key '{$key}'." );
+					continue;
+				}
 				$secret_keys[ $key ] = trim( self::unique_key() );
 			}
 		} catch ( Exception $ex ) {
+			foreach ( $keys as $key ) {
+				if ( ! in_array( $key, self::DEFAULT_SALT_CONSTANTS, true ) ) {
+					if ( $force ) {
+						WP_CLI::warning( "Could not add the key '{$key}' because 'random_int()' is not supported." );
+					} else {
+						WP_CLI::warning( "Could not shuffle the unknown key '{$key}'." );
+					}
+				}
+			}
 
-			$remote_salts = self::read_( 'https://api.wordpress.org/secret-key/1.1/salt/' );
+			$remote_salts = self::read_( self::WORDPRESS_ORG_API_SALT_ENDPOINT );
 			$remote_salts = explode( "\n", $remote_salts );
 			foreach ( $remote_salts as $k => $salt ) {
 				if ( ! empty( $salt ) ) {
-					$key                 = $constant_list[ $k ];
-					$secret_keys[ $key ] = trim( substr( $salt, 28, 64 ) );
+					$key                 = self::DEFAULT_SALT_CONSTANTS[ $k ];
+					if ( array_key_exists( $key, $keys ) ) {
+						$secret_keys[ $key ] = trim( substr( $salt, 28, 64 ) );
+					}
 				}
 			}
 		}
@@ -706,8 +739,8 @@ class Config_Command extends WP_CLI_Command {
 	 * @param array $exclude_list
 	 * @return array
 	 */
-	private static function get_wp_config_diff( $list, $previous_list, $type, $exclude_list = array() ) {
-		$result = array();
+	private static function get_wp_config_diff( $list, $previous_list, $type, $exclude_list = [] ) {
+		$result = [];
 		foreach ( $list as $name => $val ) {
 			if ( array_key_exists( $name, $previous_list ) || in_array( $name, $exclude_list, true ) ) {
 				continue;
@@ -722,8 +755,8 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	private static function read_( $url ) {
-		$headers  = array( 'Accept' => 'application/json' );
-		$response = Utils\http_request( 'GET', $url, null, $headers, array( 'timeout' => 30 ) );
+		$headers  = [ 'Accept' => 'application/json' ];
+		$response = Utils\http_request( 'GET', $url, null, $headers, [ 'timeout' => 30 ] );
 		if ( 200 === $response->status_code ) {
 			return $response->body;
 		} else {
@@ -744,7 +777,7 @@ class Config_Command extends WP_CLI_Command {
 	 *                requested constant or variable is not defined then the function will print an error and exit.
 	 */
 	private function return_value( $name, $type, $values ) {
-		$results = array();
+		$results = [];
 		foreach ( $values as $value ) {
 			if ( $name === $value['name'] && ( 'all' === $type || $type === $value['type'] ) ) {
 				$results[] = $value;
@@ -782,7 +815,7 @@ class Config_Command extends WP_CLI_Command {
 			throw new Exception( "'random_int' does not exist" );
 		}
 
-		$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_ []{}<>~`+=,.;:/?|';
+		$chars = self::VALID_KEY_CHARACTERS;
 		$key   = '';
 
 		for ( $i = 0; $i < 64; $i++ ) {
@@ -803,7 +836,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @return array
 	 */
 	private function filter_values( $values, $filters, $strict ) {
-		$result = array();
+		$result = [];
 
 		foreach ( $values as $value ) {
 			foreach ( $filters as $filter ) {
@@ -849,8 +882,8 @@ class Config_Command extends WP_CLI_Command {
 	 */
 	private function parse_separator( $separator ) {
 		$separator = str_replace(
-			array( '\n', '\r', '\t' ),
-			array( "\n", "\r", "\t" ),
+			[ '\n', '\r', '\t' ],
+			[ "\n", "\r", "\t" ],
 			$separator
 		);
 
