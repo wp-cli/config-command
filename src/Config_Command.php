@@ -726,7 +726,7 @@ class Config_Command extends WP_CLI_Command {
 			$remote_salts = explode( "\n", $remote_salts );
 			foreach ( $remote_salts as $k => $salt ) {
 				if ( ! empty( $salt ) ) {
-					$key                 = self::DEFAULT_SALT_CONSTANTS[ $k ];
+					$key = self::DEFAULT_SALT_CONSTANTS[ $k ];
 					if ( array_key_exists( $key, $keys ) ) {
 						$secret_keys[ $key ] = trim( substr( $salt, 28, 64 ) );
 					}
