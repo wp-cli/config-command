@@ -727,7 +727,7 @@ class Config_Command extends WP_CLI_Command {
 			foreach ( $remote_salts as $k => $salt ) {
 				if ( ! empty( $salt ) ) {
 					$key = self::DEFAULT_SALT_CONSTANTS[ $k ];
-					if ( array_key_exists( $key, $keys ) ) {
+					if ( in_array( $key, $keys, true ) ) {
 						$secret_keys[ $key ] = trim( substr( $salt, 28, 64 ) );
 					}
 				}
@@ -738,8 +738,8 @@ class Config_Command extends WP_CLI_Command {
 
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
-			foreach ( $secret_keys as $constant => $key ) {
-				$config_transformer->update( 'constant', $constant, (string) $key );
+			foreach ( $secret_keys as $key => $value ) {
+				$config_transformer->update( 'constant', $key, (string) $value );
 			}
 		} catch ( Exception $exception ) {
 			WP_CLI::error( "Could not process the 'wp-config.php' transformation.\nReason: {$exception->getMessage()}" );
