@@ -80,7 +80,7 @@ Feature: Refresh the salts in the wp-config.php file
     When I run `wp config get NONCE_KEY --type=constant`
     Then save STDOUT as {NONCE_KEY_ORIG}
 
-    When I run `wp config shuffle-salts --key=AUTH_KEY,NONCE_KEY`
+    When I run `wp config shuffle-salts AUTH_KEY NONCE_KEY`
     Then STDOUT should contain:
     """
     Shuffled the salt keys.
@@ -123,7 +123,7 @@ Feature: Refresh the salts in the wp-config.php file
     When I run `wp config get LOGGED_IN_SALT --type=constant`
     Then save STDOUT as {LOGGED_IN_SALT_ORIG}
 
-    When I try `wp config shuffle-salts --key=AUTH_KEY,NEW_KEY`
+    When I try `wp config shuffle-salts AUTH_KEY NEW_KEY`
     Then STDOUT should contain:
     """
     Shuffled the salt keys.
@@ -148,7 +148,7 @@ Feature: Refresh the salts in the wp-config.php file
     When I run `wp config get AUTH_KEY --type=constant`
     Then save STDOUT as {AUTH_KEY_ORIG}
 
-    When I run `wp config shuffle-salts --key=AUTH_KEY,NEW_KEY --force`
+    When I run `wp config shuffle-salts AUTH_KEY NEW_KEY --force`
     Then STDOUT should contain:
     """
     Shuffled the salt keys.
@@ -171,7 +171,7 @@ Feature: Refresh the salts in the wp-config.php file
     When I run `wp config get NEW_KEY --type=constant`
     Then save STDOUT as {NEW_KEY_ORIG}
 
-    When I run `wp config shuffle-salts --key=AUTH_KEY,NEW_KEY --force`
+    When I run `wp config shuffle-salts AUTH_KEY NEW_KEY --force`
     Then STDOUT should contain:
     """
     Shuffled the salt keys.
