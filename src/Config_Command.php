@@ -799,12 +799,14 @@ class Config_Command extends WP_CLI_Command {
 			'timeout'  => 30,
 			'insecure' => $insecure,
 		];
+
 		$response = Utils\http_request( 'GET', $url, null, $headers, $options );
-		if ( 200 === $response->status_code ) {
-			return $response->body;
-		} else {
+
+		if ( 200 !== $response->status_code ) {
 			WP_CLI::error( "Couldn't fetch response from {$url} (HTTP code {$response->status_code})." );
 		}
+
+		return $response->body;
 	}
 
 	/**
