@@ -1,4 +1,6 @@
 <?php
+
+use WP_CLI\ExitException;
 use \WP_CLI\Utils;
 
 /**
@@ -109,6 +111,9 @@ class Config_Command extends WP_CLI_Command {
 	 * [--force]
 	 * : Overwrites existing files, if present.
 	 *
+	 * [--insecure]
+	 * : Retry API download without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Standard wp-config.php file
@@ -177,7 +182,8 @@ class Config_Command extends WP_CLI_Command {
 			} catch ( Exception $e ) {
 				$assoc_args['keys-and-salts']     = false;
 				$assoc_args['keys-and-salts-alt'] = self::read_(
-					self::WORDPRESS_ORG_API_SALT_ENDPOINT
+					self::WORDPRESS_ORG_API_SALT_ENDPOINT,
+					(bool) Utils\get_flag_value( $assoc_args, 'insecure', false )
 				);
 			}
 		}
@@ -680,6 +686,9 @@ class Config_Command extends WP_CLI_Command {
 	 * [--force]
 	 * : If an unknown key is requested to be shuffled, add it instead of throwing a warning.
 	 *
+	 * [--insecure]
+	 * : Retry API download without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Get new salts for your wp-config.php file
@@ -722,7 +731,10 @@ class Config_Command extends WP_CLI_Command {
 				}
 			}
 
-			$remote_salts = self::read_( self::WORDPRESS_ORG_API_SALT_ENDPOINT );
+			$remote_salts = self::read_(
+				self::WORDPRESS_ORG_API_SALT_ENDPOINT,
+				(bool) Utils\get_flag_value( $assoc_args, 'insecure', false )
+			);
 			$remote_salts = explode( "\n", $remote_salts );
 			foreach ( $remote_salts as $k => $salt ) {
 				if ( ! empty( $salt ) ) {
@@ -773,9 +785,17 @@ class Config_Command extends WP_CLI_Command {
 		return $result;
 	}
 
-	private static function read_( $url ) {
+	/**
+	 * Read the salts from the WordPress.org API.
+	 *
+	 * @param string $url      URL of the WordPress.org API endpoint to use.
+	 * @param bool   $insecure Whether to retry without certificate validation on TLS handshake failure.
+	 * @return string String with a set of PHP define() statements to define the salts.
+	 * @throws ExitException If the remote request failed.
+	 */
+	private static function read_( $url, $insecure ) {
 		$headers  = [ 'Accept' => 'application/json' ];
-		$response = Utils\http_request( 'GET', $url, null, $headers, [ 'timeout' => 30 ] );
+		$response = Utils\http_request( 'GET', $url, null, $headers, [ 'timeout' => 30, 'insecure' => $insecure ] );
 		if ( 200 === $response->status_code ) {
 			return $response->body;
 		} else {
