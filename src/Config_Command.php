@@ -794,8 +794,8 @@ class Config_Command extends WP_CLI_Command {
 	 * @throws ExitException If the remote request failed.
 	 */
 	private static function read_( $url, $insecure ) {
-		$headers  = [ 'Accept' => 'application/json' ];
-		$options  = [
+		$headers = [ 'Accept' => 'application/json' ];
+		$options = [
 			'timeout'  => 30,
 			'insecure' => $insecure,
 		];
