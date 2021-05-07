@@ -1,7 +1,7 @@
 <?php
 
 use WP_CLI\ExitException;
-use \WP_CLI\Utils;
+use WP_CLI\Utils;
 
 /**
  * Generates and reads the wp-config.php file.
@@ -133,7 +133,7 @@ class Config_Command extends WP_CLI_Command {
 	 *     Success: Generated 'wp-config.php' file.
 	 */
 	public function create( $_, $assoc_args ) {
-		if ( ! \WP_CLI\Utils\get_flag_value( $assoc_args, 'force' ) && Utils\locate_wp_config() ) {
+		if ( ! Utils\get_flag_value( $assoc_args, 'force' ) && Utils\locate_wp_config() ) {
 			WP_CLI::error( "The 'wp-config.php' file already exists." );
 		}
 
@@ -223,7 +223,7 @@ class Config_Command extends WP_CLI_Command {
 		$contents    = file_get_contents( $config_path );
 		$r           = Utils\launch_editor_for_input( $contents, 'wp-config.php', 'php' );
 		if ( false === $r ) {
-			WP_CLI::warning( 'No changes made to wp-config.php.', 'Aborted' );
+			WP_CLI::warning( 'No changes made to wp-config.php, aborted.' );
 		} else {
 			file_put_contents( $config_path, $r );
 		}
@@ -795,7 +795,11 @@ class Config_Command extends WP_CLI_Command {
 	 */
 	private static function read_( $url, $insecure ) {
 		$headers  = [ 'Accept' => 'application/json' ];
-		$response = Utils\http_request( 'GET', $url, null, $headers, [ 'timeout' => 30, 'insecure' => $insecure ] );
+		$options  = [
+			'timeout'  => 30,
+			'insecure' => $insecure,
+		];
+		$response = Utils\http_request( 'GET', $url, null, $headers, $options );
 		if ( 200 === $response->status_code ) {
 			return $response->body;
 		} else {
