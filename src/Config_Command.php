@@ -2,18 +2,12 @@
 
 use WP_CLI\ExitException;
 use WP_CLI\Utils;
+use WP_CLI\WpOrgApi;
 
 /**
  * Generates and reads the wp-config.php file.
  */
 class Config_Command extends WP_CLI_Command {
-
-	/**
-	 * WordPress.org API endpoint to fall back to if salts cannot be generated.
-	 *
-	 * @var string
-	 */
-	const WORDPRESS_ORG_API_SALT_ENDPOINT = 'https://api.wordpress.org/secret-key/1.1/salt/';
 
 	/**
 	 * List of characters that are valid for a key name.
@@ -181,8 +175,7 @@ class Config_Command extends WP_CLI_Command {
 				$assoc_args['wp-cache-key-salt'] = self::unique_key();
 			} catch ( Exception $e ) {
 				$assoc_args['keys-and-salts']     = false;
-				$assoc_args['keys-and-salts-alt'] = self::read_(
-					self::WORDPRESS_ORG_API_SALT_ENDPOINT,
+				$assoc_args['keys-and-salts-alt'] = self::fetch_remote_salts(
 					(bool) Utils\get_flag_value( $assoc_args, 'insecure', false )
 				);
 			}
@@ -731,10 +724,7 @@ class Config_Command extends WP_CLI_Command {
 				}
 			}
 
-			$remote_salts = self::read_(
-				self::WORDPRESS_ORG_API_SALT_ENDPOINT,
-				(bool) Utils\get_flag_value( $assoc_args, 'insecure', false )
-			);
+			$remote_salts = self::fetch_remote_salts( (bool) Utils\get_flag_value( $assoc_args, 'insecure', false ) );
 			$remote_salts = explode( "\n", $remote_salts );
 			foreach ( $remote_salts as $k => $salt ) {
 				if ( ! empty( $salt ) ) {
@@ -788,25 +778,18 @@ class Config_Command extends WP_CLI_Command {
 	/**
 	 * Read the salts from the WordPress.org API.
 	 *
-	 * @param string $url      URL of the WordPress.org API endpoint to use.
-	 * @param bool   $insecure Whether to retry without certificate validation on TLS handshake failure.
+	 * @param bool   $insecure Optional. Whether to retry without certificate validation on TLS handshake failure.
 	 * @return string String with a set of PHP define() statements to define the salts.
 	 * @throws ExitException If the remote request failed.
 	 */
-	private static function read_( $url, $insecure ) {
-		$headers = [ 'Accept' => 'application/json' ];
-		$options = [
-			'timeout'  => 30,
-			'insecure' => $insecure,
-		];
-
-		$response = Utils\http_request( 'GET', $url, null, $headers, $options );
-
-		if ( 200 !== $response->status_code ) {
-			WP_CLI::error( "Couldn't fetch response from {$url} (HTTP code {$response->status_code})." );
+	private static function fetch_remote_salts( $insecure = false ) {
+		try {
+			$salts = (string) ( new WpOrgApi( [ 'insecure' => $insecure ] ) )->get_salts();
+		} catch ( Exception $exception ) {
+			WP_CLI::error( $exception );
 		}
 
-		return $response->body;
+		return $salts;
 	}
 
 	/**
