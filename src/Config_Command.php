@@ -1,17 +1,13 @@
 <?php
-use \WP_CLI\Utils;
+
+use WP_CLI\ExitException;
+use WP_CLI\Utils;
+use WP_CLI\WpOrgApi;
 
 /**
  * Generates and reads the wp-config.php file.
  */
 class Config_Command extends WP_CLI_Command {
-
-	/**
-	 * WordPress.org API endpoint to fall back to if salts cannot be generated.
-	 *
-	 * @var string
-	 */
-	const WORDPRESS_ORG_API_SALT_ENDPOINT = 'https://api.wordpress.org/secret-key/1.1/salt/';
 
 	/**
 	 * List of characters that are valid for a key name.
@@ -109,6 +105,9 @@ class Config_Command extends WP_CLI_Command {
 	 * [--force]
 	 * : Overwrites existing files, if present.
 	 *
+	 * [--insecure]
+	 * : Retry API download without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Standard wp-config.php file
@@ -128,7 +127,7 @@ class Config_Command extends WP_CLI_Command {
 	 *     Success: Generated 'wp-config.php' file.
 	 */
 	public function create( $_, $assoc_args ) {
-		if ( ! \WP_CLI\Utils\get_flag_value( $assoc_args, 'force' ) && Utils\locate_wp_config() ) {
+		if ( ! Utils\get_flag_value( $assoc_args, 'force' ) && Utils\locate_wp_config() ) {
 			WP_CLI::error( "The 'wp-config.php' file already exists." );
 		}
 
@@ -176,8 +175,8 @@ class Config_Command extends WP_CLI_Command {
 				$assoc_args['wp-cache-key-salt'] = self::unique_key();
 			} catch ( Exception $e ) {
 				$assoc_args['keys-and-salts']     = false;
-				$assoc_args['keys-and-salts-alt'] = self::read_(
-					self::WORDPRESS_ORG_API_SALT_ENDPOINT
+				$assoc_args['keys-and-salts-alt'] = self::fetch_remote_salts(
+					(bool) Utils\get_flag_value( $assoc_args, 'insecure', false )
 				);
 			}
 		}
@@ -217,7 +216,7 @@ class Config_Command extends WP_CLI_Command {
 		$contents    = file_get_contents( $config_path );
 		$r           = Utils\launch_editor_for_input( $contents, 'wp-config.php', 'php' );
 		if ( false === $r ) {
-			WP_CLI::warning( 'No changes made to wp-config.php.', 'Aborted' );
+			WP_CLI::warning( 'No changes made to wp-config.php, aborted.' );
 		} else {
 			file_put_contents( $config_path, $r );
 		}
@@ -680,6 +679,9 @@ class Config_Command extends WP_CLI_Command {
 	 * [--force]
 	 * : If an unknown key is requested to be shuffled, add it instead of throwing a warning.
 	 *
+	 * [--insecure]
+	 * : Retry API download without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Get new salts for your wp-config.php file
@@ -722,7 +724,7 @@ class Config_Command extends WP_CLI_Command {
 				}
 			}
 
-			$remote_salts = self::read_( self::WORDPRESS_ORG_API_SALT_ENDPOINT );
+			$remote_salts = self::fetch_remote_salts( (bool) Utils\get_flag_value( $assoc_args, 'insecure', false ) );
 			$remote_salts = explode( "\n", $remote_salts );
 			foreach ( $remote_salts as $k => $salt ) {
 				if ( ! empty( $salt ) ) {
@@ -773,14 +775,21 @@ class Config_Command extends WP_CLI_Command {
 		return $result;
 	}
 
-	private static function read_( $url ) {
-		$headers  = [ 'Accept' => 'application/json' ];
-		$response = Utils\http_request( 'GET', $url, null, $headers, [ 'timeout' => 30 ] );
-		if ( 200 === $response->status_code ) {
-			return $response->body;
-		} else {
-			WP_CLI::error( "Couldn't fetch response from {$url} (HTTP code {$response->status_code})." );
+	/**
+	 * Read the salts from the WordPress.org API.
+	 *
+	 * @param bool   $insecure Optional. Whether to retry without certificate validation on TLS handshake failure.
+	 * @return string String with a set of PHP define() statements to define the salts.
+	 * @throws ExitException If the remote request failed.
+	 */
+	private static function fetch_remote_salts( $insecure = false ) {
+		try {
+			$salts = (string) ( new WpOrgApi( [ 'insecure' => $insecure ] ) )->get_salts();
+		} catch ( Exception $exception ) {
+			WP_CLI::error( $exception );
 		}
+
+		return $salts;
 	}
 
 	/**
