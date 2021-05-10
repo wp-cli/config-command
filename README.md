@@ -3,7 +3,7 @@ wp-cli/config-command
 
 Generates and reads the wp-config.php file.
 
-[![Build Status](https://travis-ci.org/wp-cli/config-command.svg?branch=master)](https://travis-ci.org/wp-cli/config-command)
+
 
 Quick links: [Using](#using) | [Installing](#installing) | [Contributing](#contributing) | [Support](#support)
 
@@ -369,16 +369,25 @@ wp config set <name> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<p
 Refreshes the salts defined in the wp-config.php file.
 
 ~~~
-wp config shuffle-salts 
+wp config shuffle-salts [<keys>...] [--force]
 ~~~
 
 **OPTIONS**
+
+	[<keys>...]
+		One ore more keys to shuffle. If none are provided, this falls back to the default WordPress Core salt keys.
+
+	[--force]
+		If an unknown key is requested to be shuffled, add it instead of throwing a warning.
 
 **EXAMPLES**
 
     # Get new salts for your wp-config.php file
     $ wp config shuffle-salts
     Success: Shuffled the salt keys.
+
+    # Add a cache key salt to the wp-config.php file
+    $ wp config shuffle-salts WP_CACHE_KEY_SALT --force
 
 ## Installing
 
