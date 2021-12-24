@@ -936,8 +936,15 @@ class Config_Command extends WP_CLI_Command {
 			return;
 		}
 
+		$name           = strtoupper( $value['name'] );
 		$variable_value = isset( $value['value'] ) ? $value['value'] : '';
 
-		echo strtoupper( $value['name'] ) . '\"' . addslashes( $variable_value ) . '\"' . PHP_EOL;
+		$variable_value = str_replace( "'", "\'", $variable_value );
+
+		if ( ! is_numeric( $variable_value ) ) {
+			$variable_value = "'{$variable_value}'";
+		}
+
+		WP_CLI::line( "{$name}={$variable_value}" );
 	}
 }
