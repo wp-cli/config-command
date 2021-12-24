@@ -6,7 +6,7 @@ Feature: Edit a wp-config file
     When I try `EDITOR='ex -i NONE -c q!' wp config edit;`
     Then STDERR should contain:
       """
-      Warning: No changes made to wp-config.php.
+      Warning: No changes made to wp-config.php, aborted.
       """
     And the return code should be 0
 
@@ -24,6 +24,6 @@ Feature: Edit a wp-config file
     When I try `EDITOR='ex -i NONE -c q!' wp config edit --config-file=wp-custom-config.php`
     Then STDERR should contain:
       """
-      No changes made to wp-custom-config.php.
+      No changes made to wp-custom-config.php, aborted.
       """
     And the return code should be 0
