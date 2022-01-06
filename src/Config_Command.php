@@ -191,19 +191,8 @@ class Config_Command extends WP_CLI_Command {
 			$assoc_args['add-wplang'] = false;
 		}
 
-		// Store 'extra-php' and reinsert later, it mustn't be escaped.
-		if ( array_key_exists( 'extra-php', $assoc_args ) ) {
-			$unescaped_extra_php = $assoc_args['extra-php'];
-			unset( $assoc_args['extra-php'] );
-		}
-
-		$assoc_args = array_map(
-			[ $this, 'escape_config_value' ],
-			$assoc_args
-		);
-
-		if ( isset( $unescaped_extra_php ) ) {
-			$assoc_args['extra-php'] = $unescaped_extra_php;
+		foreach ( $assoc_args as $key => $value ) {
+			$assoc_args[ $key ] = $this->escape_config_value( $key, $value );
 		}
 
 		// 'extra-php' from STDIN is retrieved after escaping to avoid breaking
@@ -1042,10 +1031,21 @@ class Config_Command extends WP_CLI_Command {
 	/**
 	 * Escape a config value so it can be safely used within single quotes.
 	 *
-	 * @param mixed $value Value to escape.
+	 * @param string $key   Key into the arguments array.
+	 * @param mixed  $value Value to escape.
 	 * @return mixed Escaped value.
 	 */
-	private function escape_config_value( $value ) {
+	private function escape_config_value( $key, $value ) {
+		// Skip 'extra-php', it mustn't be escaped.
+		if ( 'extra-php' === $key ) {
+			return $value;
+		}
+
+		// Skip 'keys-and-salts-alt' and assume they are safe.
+		if ( 'keys-and-salts-alt' === $key && ! empty( $value ) ) {
+			return $value;
+		}
+
 		if ( is_string( $value ) ) {
 			return addslashes( $value );
 		}
