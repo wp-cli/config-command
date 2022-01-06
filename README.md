@@ -28,8 +28,14 @@ wp config
 Launches system editor to edit the wp-config.php file.
 
 ~~~
-wp config edit 
+wp config edit [--config-file=<path>]
 ~~~
+
+**OPTIONS**
+
+	[--config-file=<path>]
+		Specify the file path to the config file to be edited. Defaults to the root of the
+		WordPress installation and the filename "wp-config.php".
 
 **EXAMPLES**
 
@@ -46,7 +52,7 @@ wp config edit
 Deletes a specific constant or variable from the wp-config.php file.
 
 ~~~
-wp config delete <name> [--type=<type>]
+wp config delete <name> [--type=<type>] [--config-file=<path>]
 ~~~
 
 **OPTIONS**
@@ -64,6 +70,10 @@ wp config delete <name> [--type=<type>]
 		  - all
 		---
 
+	[--config-file=<path>]
+		Specify the file path to the config file to be modified. Defaults to the root of the
+		WordPress installation and the filename "wp-config.php".
+
 **EXAMPLES**
 
     # Delete the COOKIE_DOMAIN constant from the wp-config.php file.
@@ -76,7 +86,7 @@ wp config delete <name> [--type=<type>]
 Generates a wp-config.php file.
 
 ~~~
-wp config create --dbname=<dbname> --dbuser=<dbuser> [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--locale=<locale>] [--extra-php] [--skip-salts] [--skip-check] [--force] [--insecure]
+wp config create --dbname=<dbname> --dbuser=<dbuser> [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--locale=<locale>] [--extra-php] [--skip-salts] [--skip-check] [--force] [--config-file=<path>] [--insecure]
 ~~~
 
 Creates a new wp-config.php with database constants, and verifies that
@@ -132,6 +142,10 @@ the database constants are correct.
 	[--force]
 		Overwrites existing files, if present.
 
+	[--config-file=<path>]
+		Specify the file path to the config file to be created. Defaults to the root of the
+		WordPress installation and the filename "wp-config.php".
+
 	[--insecure]
 		Retry API download without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
 
@@ -160,7 +174,7 @@ the database constants are correct.
 Gets the value of a specific constant or variable defined in wp-config.php file.
 
 ~~~
-wp config get <name> [--type=<type>] [--format=<format>]
+wp config get <name> [--type=<type>] [--format=<format>] [--config-file=<path>]
 ~~~
 
 **OPTIONS**
@@ -190,6 +204,10 @@ wp config get <name> [--type=<type>] [--format=<format>]
 		  - dotenv
 		---
 
+	[--config-file=<path>]
+		Specify the file path to the config file to be read. Defaults to the root of the
+		WordPress installation and the filename "wp-config.php".
+
 **EXAMPLES**
 
     # Get the table_prefix as defined in wp-config.php file.
@@ -203,7 +221,7 @@ wp config get <name> [--type=<type>] [--format=<format>]
 Checks whether a specific constant or variable exists in the wp-config.php file.
 
 ~~~
-wp config has <name> [--type=<type>]
+wp config has <name> [--type=<type>] [--config-file=<path>]
 ~~~
 
 **OPTIONS**
@@ -221,6 +239,10 @@ wp config has <name> [--type=<type>]
 		  - all
 		---
 
+	[--config-file=<path>]
+		Specify the file path to the config file to be checked. Defaults to the root of the
+		WordPress installation and the filename "wp-config.php".
+
 **EXAMPLES**
 
     # Check whether the DB_PASSWORD constant exists in the wp-config.php file.
@@ -233,7 +255,7 @@ wp config has <name> [--type=<type>]
 Lists variables, constants, and file includes defined in wp-config.php file.
 
 ~~~
-wp config list [<filter>...] [--fields=<fields>] [--format=<format>] [--strict]
+wp config list [<filter>...] [--fields=<fields>] [--format=<format>] [--strict] [--config-file=<path>]
 ~~~
 
 **OPTIONS**
@@ -259,6 +281,10 @@ wp config list [<filter>...] [--fields=<fields>] [--format=<format>] [--strict]
 
 	[--strict]
 		Enforce strict matching when a filter is provided.
+
+	[--config-file=<path>]
+		Specify the file path to the config file to be read. Defaults to the root of the
+		WordPress installation and the filename "wp-config.php".
 
 **EXAMPLES**
 
@@ -318,7 +344,7 @@ wp config path
 Sets the value of a specific constant or variable defined in wp-config.php file.
 
 ~~~
-wp config set <name> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<placement>] [--separator=<separator>] [--type=<type>]
+wp config set <name> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<placement>] [--separator=<separator>] [--type=<type>] [--config-file=<path>]
 ~~~
 
 **OPTIONS**
@@ -365,6 +391,10 @@ wp config set <name> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<p
 		  - all
 		---
 
+	[--config-file=<path>]
+		Specify the file path to the config file to be modified. Defaults to the root of the
+		WordPress installation and the filename "wp-config.php".
+
 **EXAMPLES**
 
     # Set the WP_DEBUG constant to true.
@@ -377,7 +407,7 @@ wp config set <name> <value> [--add] [--raw] [--anchor=<anchor>] [--placement=<p
 Refreshes the salts defined in the wp-config.php file.
 
 ~~~
-wp config shuffle-salts [<keys>...] [--force] [--insecure]
+wp config shuffle-salts [<keys>...] [--force] [--config-file=<path>] [--insecure]
 ~~~
 
 **OPTIONS**
@@ -387,6 +417,10 @@ wp config shuffle-salts [<keys>...] [--force] [--insecure]
 
 	[--force]
 		If an unknown key is requested to be shuffled, add it instead of throwing a warning.
+
+	[--config-file=<path>]
+		Specify the file path to the config file to be modified. Defaults to the root of the
+		WordPress installation and the filename "wp-config.php".
 
 	[--insecure]
 		Retry API download without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
