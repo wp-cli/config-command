@@ -114,7 +114,7 @@ Feature: Create a wp-config file
     When I run `wp core config {CORE_CONFIG_SETTINGS}`
     Then the wp-config.php file should contain:
       """
-      define('AUTH_SALT',
+      define( 'AUTH_SALT',
       """
 
   Scenario: Define WPLANG when running WP < 4.0
