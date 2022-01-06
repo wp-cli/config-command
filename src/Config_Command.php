@@ -851,6 +851,9 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( $exception );
 		}
 
+		// Adapt whitespace to adhere to WPCS.
+		$salts = preg_replace( '/define\(\'(.*?)\'\);/', 'define( \'$1\' );', $salts );
+
 		return $salts;
 	}
 
