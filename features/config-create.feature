@@ -155,3 +155,20 @@ Feature: Create a wp-config file
       """
       define( 'WPLANG', 'ja' );
       """
+
+  Scenario: Values are properly escaped to avoid creating invalid config files
+    Given an empty directory
+    And WP files
+
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass="PasswordWith'SingleQuotes'"`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_PASSWORD', 'PasswordWith\'SingleQuotes\'' )
+      """
+
+    When I run `wp config get DB_PASSWORD`
+    Then STDOUT should be:
+      """
+      PasswordWith'SingleQuotes'
+      """
+

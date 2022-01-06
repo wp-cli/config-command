@@ -165,10 +165,6 @@ class Config_Command extends WP_CLI_Command {
 			Utils\run_mysql_command( '/usr/bin/env mysql --no-defaults', $mysql_db_connection_args );
 		}
 
-		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
-			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
-		}
-
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
 			try {
 				$assoc_args['keys-and-salts']    = true;
@@ -193,6 +189,16 @@ class Config_Command extends WP_CLI_Command {
 			$assoc_args['add-wplang'] = true;
 		} else {
 			$assoc_args['add-wplang'] = false;
+		}
+
+		foreach ( $assoc_args as $key => $value ) {
+			$assoc_args[ $key ] = $this->escape_config_value( $key, $value );
+		}
+
+		// 'extra-php' from STDIN is retrieved after escaping to avoid breaking
+		// the PHP code.
+		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
+			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
 		}
 
 		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
@@ -1020,5 +1026,30 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		WP_CLI::line( "{$name}={$variable_value}" );
+	}
+
+	/**
+	 * Escape a config value so it can be safely used within single quotes.
+	 *
+	 * @param string $key   Key into the arguments array.
+	 * @param mixed  $value Value to escape.
+	 * @return mixed Escaped value.
+	 */
+	private function escape_config_value( $key, $value ) {
+		// Skip 'extra-php', it mustn't be escaped.
+		if ( 'extra-php' === $key ) {
+			return $value;
+		}
+
+		// Skip 'keys-and-salts-alt' and assume they are safe.
+		if ( 'keys-and-salts-alt' === $key && ! empty( $value ) ) {
+			return $value;
+		}
+
+		if ( is_string( $value ) ) {
+			return addslashes( $value );
+		}
+
+		return $value;
 	}
 }
