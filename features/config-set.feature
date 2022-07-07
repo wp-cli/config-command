@@ -223,28 +223,28 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
   Scenario: Update raw values in wp-config.php
     Given a WP install
 
-    When I run `wp config set WP_DEBUG true --type=constant`
+    When I run `wp config set WP_TEST true --type=constant`
     Then STDOUT should be:
       """
-      Success: Added the constant 'WP_DEBUG' to the 'wp-config.php' file with the value 'true'.
+      Success: Added the constant 'WP_TEST' to the 'wp-config.php' file with the value 'true'.
       """
 
-    When I run `wp config list WP_DEBUG --strict --format=json`
+    When I run `wp config list WP_TEST --strict --format=json`
     Then STDOUT should contain:
       """
-      {"name":"WP_DEBUG","value":"true","type":"constant"}
+      {"name":"WP_TEST","value":"true","type":"constant"}
       """
 
-    When I run `wp config set WP_DEBUG true --raw`
+    When I run `wp config set WP_TEST true --raw`
     Then STDOUT should be:
       """
-      Success: Updated the constant 'WP_DEBUG' in the 'wp-config.php' file with the raw value 'true'.
+      Success: Updated the constant 'WP_TEST' in the 'wp-config.php' file with the raw value 'true'.
       """
 
-    When I run `wp config list WP_DEBUG --strict --format=json`
+    When I run `wp config list WP_TEST --strict --format=json`
     Then STDOUT should contain:
       """
-      {"name":"WP_DEBUG","value":true,"type":"constant"}
+      {"name":"WP_TEST","value":true,"type":"constant"}
       """
 
   @custom-config-file
@@ -258,28 +258,28 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
       Generated 'wp-custom-config.php' file.
       """
 
-    When I run `wp config set WP_DEBUG true --type=constant --config-file='wp-custom-config.php'`
+    When I run `wp config set WP_TEST true --type=constant --config-file='wp-custom-config.php'`
     Then STDOUT should be:
       """
-      Success: Added the constant 'WP_DEBUG' to the 'wp-custom-config.php' file with the value 'true'.
+      Success: Added the constant 'WP_TEST' to the 'wp-custom-config.php' file with the value 'true'.
       """
 
-    When I run `wp config list WP_DEBUG --strict --format=json --config-file='wp-custom-config.php'`
+    When I run `wp config list WP_TEST --strict --format=json --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
-      {"name":"WP_DEBUG","value":"true","type":"constant"}
+      {"name":"WP_TEST","value":"true","type":"constant"}
       """
 
-    When I run `wp config set WP_DEBUG true --raw --config-file='wp-custom-config.php'`
+    When I run `wp config set WP_TEST true --raw --config-file='wp-custom-config.php'`
     Then STDOUT should be:
       """
-      Success: Updated the constant 'WP_DEBUG' in the 'wp-custom-config.php' file with the raw value 'true'.
+      Success: Updated the constant 'WP_TEST' in the 'wp-custom-config.php' file with the raw value 'true'.
       """
 
-    When I run `wp config list WP_DEBUG --strict --format=json --config-file='wp-custom-config.php'`
+    When I run `wp config list WP_TEST --strict --format=json --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
-      {"name":"WP_DEBUG","value":true,"type":"constant"}
+      {"name":"WP_TEST","value":true,"type":"constant"}
       """
 
   Scenario: Ambiguous change requests for wp-config.php throw errors
