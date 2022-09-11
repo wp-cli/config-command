@@ -72,20 +72,6 @@ define( 'WP_CACHE_KEY_SALT', '{{wp-cache-key-salt}}' );
  */
 $table_prefix = '{{dbprefix}}';
 
-/**
- * For developers: WordPress debugging mode.
- *
- * Change this to true to enable the display of notices during development.
- * It is strongly recommended that plugin and theme developers use WP_DEBUG
- * in their development environments.
- *
- * For information on other constants that can be used for debugging,
- * visit the documentation.
- *
- * @link https://wordpress.org/support/article/debugging-in-wordpress/
- */
-define( 'WP_DEBUG', false );
-
 {{#add-wplang}}
 /**
  * WordPress localized language, defaults to English.
@@ -101,6 +87,22 @@ define( 'WPLANG', '{{locale}}' );
 /* Add any custom values between this line and the "stop editing" line. */
 
 {{extra-php}}
+
+/**
+ * For developers: WordPress debugging mode.
+ *
+ * Change this to true to enable the display of notices during development.
+ * It is strongly recommended that plugin and theme developers use WP_DEBUG
+ * in their development environments.
+ *
+ * For information on other constants that can be used for debugging,
+ * visit the documentation.
+ *
+ * @link https://wordpress.org/support/article/debugging-in-wordpress/
+ */
+if ( ! defined( 'WP_DEBUG' ) ) {
+	define( 'WP_DEBUG', false );
+}
 
 /* That's all, stop editing! Happy publishing. */
 

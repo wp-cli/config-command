@@ -66,6 +66,30 @@ Feature: Create a wp-config file
       Error: The site you have requested is not installed
       """
 
+    When I run `rm wp-custom-config.php`
+    Then the wp-custom-config.php file should not exist
+
+    Given a wp-config-extra.php file:
+      """
+      define( 'WP_DEBUG', true );
+      """
+
+    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
+    Then the wp-custom-config.php file should contain:
+      """
+      define( 'WP_DEBUG', true );
+      """
+    And the wp-custom-config.php file should contain:
+      """
+      define( 'WP_DEBUG', false );
+      """
+
+    When I try `wp version`
+    Then STDERR should not contain:
+    """
+    Constant WP_DEBUG already defined
+    """
+
   @require-wp-4.0
   Scenario: No wp-config.php and WPLANG
     Given an empty directory
