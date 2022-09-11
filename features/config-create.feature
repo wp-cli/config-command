@@ -66,13 +66,13 @@ Feature: Create a wp-config file
       Error: The site you have requested is not installed
       """
 
+    When I run `rm wp-custom-config.php`
+    Then the wp-custom-config.php file should not exist
+
     Given a wp-config-extra.php file:
       """
       define( 'WP_DEBUG', true );
       """
-
-    When I run `rm wp-custom-config.php`
-    Then the wp-custom-config.php file should not exist
 
     When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
     Then the wp-custom-config.php file should contain:
