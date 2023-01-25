@@ -18,6 +18,15 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
       wp_cli_test
       """
 
+  Scenario: Get the raw value of an existing wp-config.php constant without explicit type
+  Given a WP install
+
+  When I run `wp config get MYSQL_CLIENT_FLAGS`
+  Then STDOUT should be:
+    """
+    MYSQLI_CLIENT_SSL
+    """
+
   Scenario: Get the value of an existing wp-config.php variable
     Given a WP install
 
