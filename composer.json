@@ -50,9 +50,9 @@
         ]
     },
     "autoload": {
-        "psr-4": {
-            "": "src/"
-        },
+        "classmap": [
+            "src/"
+        ],
         "files": [
             "config-command.php"
         ]
