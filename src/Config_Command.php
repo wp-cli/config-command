@@ -155,12 +155,12 @@ class Config_Command extends WP_CLI_Command {
 
 		// Check DB connection.
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
-			// phpcs:disable WordPress.DB.RestrictedFunctions
+			// phpcs:disable WordPress.DB.RestrictedFunctions,WordPress.PHP.NoSilencedErrors.Discouraged
 			$mysql = mysqli_init();
 			if ( ! @mysqli_real_connect( $mysql, $assoc_args['dbhost'], $assoc_args['dbuser'], $assoc_args['dbpass'] ) ) {
 				die( 'Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error() );
 			}
-			// phpcs:enable WordPress.DB.RestrictedFunctions
+			// phpcs:enable WordPress.DB.RestrictedFunctions,WordPress.PHP.NoSilencedErrors.Discouraged
 		}
 
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
