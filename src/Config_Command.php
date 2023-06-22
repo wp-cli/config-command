@@ -153,16 +153,12 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( '--dbprefix can only contain numbers, letters, and underscores.' );
 		}
 
-		$mysql_db_connection_args = [
-			'execute' => ';',
-			'host'    => $assoc_args['dbhost'],
-			'user'    => $assoc_args['dbuser'],
-			'pass'    => $assoc_args['dbpass'],
-		];
-
 		// Check DB connection.
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
-			Utils\run_mysql_command( '/usr/bin/env mysql --no-defaults', $mysql_db_connection_args );
+			$mysql = mysqli_init();
+			if ( ! @mysqli_real_connect( $mysql, $assoc_args['dbhost'], $assoc_args['dbuser'], $assoc_args['dbpass'] ) ) {
+				die('Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
+			}
 		}
 
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
