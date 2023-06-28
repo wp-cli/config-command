@@ -162,7 +162,7 @@ class Config_Command extends WP_CLI_Command {
 			try {
 				mysqli_real_connect( $mysql, $assoc_args['dbhost'], $assoc_args['dbuser'], $assoc_args['dbpass'] );
 			} catch ( mysqli_sql_exception $exception ) {
-				die( 'Error (' . $exception->getCode() . ') ' . $exception->getMessage() );
+				die( 'Database connection error (' . $exception->getCode() . ') ' . $exception->getMessage() );
 			}
 			// phpcs:enable WordPress.DB.RestrictedFunctions
 		}
