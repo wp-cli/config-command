@@ -153,7 +153,8 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( '--dbprefix can only contain numbers, letters, and underscores.' );
 		}
 
-		// Check DB connection.
+		// Check DB connection. To make command more portable, we are not using MySQL CLI and using
+		// mysqli directly instead, as $wpdb is not accessible in this context.
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
 			// phpcs:disable WordPress.DB.RestrictedFunctions
 			$mysql = mysqli_init();
