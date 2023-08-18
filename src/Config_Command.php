@@ -460,7 +460,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * @when before_wp_load
 	 */
-	public function get_truth( $args, $assoc_args ) {
+	public function is_true( $args, $assoc_args ) {
 		$path                = $this->get_config_path( $assoc_args );
 		$wp_config_file_name = basename( $path );
 		list( $name )        = $args;
