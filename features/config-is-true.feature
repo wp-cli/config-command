@@ -1,4 +1,4 @@
-Feature: Get the value of a constant or variable defined in wp-config.php and wp-custom-config.php files
+Feature: Determine whether the value of a constant or variable defined in wp-config.php and wp-custom-config.php files is true.
 
   Scenario: Get the value of a variable whose value is true
     Given a WP install
