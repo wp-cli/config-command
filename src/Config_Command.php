@@ -431,6 +431,54 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
+	 * Determines whether value of a specific constant or variable defined is true.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <name>
+	 * : Name of the wp-config.php constant or variable.
+	 *
+	 * [--type=<type>]
+	 * : Type of config value to retrieve. Defaults to 'all'.
+	 * ---
+	 * default: all
+	 * options:
+	 *   - constant
+	 *   - variable
+	 *   - all
+	 * ---
+	 *
+	 * [--config-file=<path>]
+	 * : Specify the file path to the config file to be read. Defaults to the root of the
+	 * WordPress installation and the filename "wp-config.php".
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Get the table_prefix as defined in wp-config.php file.
+	 *     $ wp config get table_prefix
+	 *     wp_
+	 *
+	 * @when before_wp_load
+	 */
+	public function get_truth( $args, $assoc_args ) {
+		$path                = $this->get_config_path( $assoc_args );
+		$wp_config_file_name = basename( $path );
+		list( $name )        = $args;
+		$type                = Utils\get_flag_value( $assoc_args, 'type' );
+
+		$value = $this->return_value( $name, $type, self::get_wp_config_vars( $path ), $wp_config_file_name );
+
+		if ( $value !== true && $value !== 'true') {
+			$value = 'false';
+		}
+		else {
+			$value = 'true';
+		}
+
+		WP_CLI::print_value( $value, $assoc_args );
+	}
+
+	/**
 	 * Get the array of wp-config.php constants and variables.
 	 *
 	 * @param string $wp_config_path Config file path
