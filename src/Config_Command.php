@@ -459,9 +459,9 @@ class Config_Command extends WP_CLI_Command {
 		$value = $this->get_value($assoc_args, $args);
 
 		if ( $value ) {
-			WP_CLI::halt( 1 );
+			WP_CLI::halt( 0 );
 		}
-		WP_CLI::halt( 0 );
+		WP_CLI::halt( 1 );
 
 	}
 
