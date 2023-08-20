@@ -453,6 +453,7 @@ class Config_Command extends WP_CLI_Command {
 	 *     $ wp config get table_prefix
 	 *     wp_
 	 *
+	 * @subcommand is-true
 	 * @when before_wp_load
 	 */
 	public function is_true( $args, $assoc_args ) {
