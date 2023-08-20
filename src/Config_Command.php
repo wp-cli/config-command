@@ -449,9 +449,8 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     # Get the table_prefix as defined in wp-config.php file.
-	 *     $ wp config get table_prefix
-	 *     wp_
+	 *     # Assert if MULTISITE is true
+	 *     $ wp config is-true MULTISITE
 	 *
 	 * @subcommand is-true
 	 * @when before_wp_load
