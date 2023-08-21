@@ -1058,7 +1058,7 @@ class Config_Command extends WP_CLI_Command {
 		$type                = Utils\get_flag_value( $assoc_args, 'type' );
 
 		$value = $this->return_value( $name, $type,
-			self::get_wp_config_vars($path), $wp_config_file_name );
+			self::get_wp_config_vars( $path ), $wp_config_file_name );
 
 		return $value;
 	}
