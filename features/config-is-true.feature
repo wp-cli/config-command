@@ -8,7 +8,7 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
     """
     Success:
     """
-    When I try `wp config is_true WP_TRUTH`
+    When I try `wp config is-true WP_TRUTH`
     Then STDOUT should be empty
     Then STDERR should be empty
     And the return code should be 0
@@ -18,7 +18,7 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
     """
     Success:
     """
-    When I try `wp config is_true WP_TRUTH`
+    When I try `wp config is-true WP_TRUTH`
     Then STDOUT should be empty
     Then STDERR should be empty
     And the return code should be 0
@@ -28,7 +28,7 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
     """
     Success:
     """
-    When I try `wp config is_true WP_FALSE_STRING`
+    When I try `wp config is-true WP_FALSE_STRING`
     Then STDOUT should be empty
     Then STDERR should be empty
     And the return code should be 0
@@ -38,7 +38,7 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
     """
     Success:
     """
-    When I try `wp config is_true WP_STRING`
+    When I try `wp config is-true WP_STRING`
     Then STDOUT should be empty
     Then STDERR should be empty
     And the return code should be 0
@@ -48,7 +48,7 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
     """
     Success:
     """
-    When I try `wp config is_true wp_variable_str_true`
+    When I try `wp config is-true wp_variable_str_true`
     Then STDOUT should be empty
     Then STDERR should be empty
     And the return code should be 0
@@ -58,7 +58,7 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
     """
     Success:
     """
-    When I try `wp config is_true wp_variable_bool_true`
+    When I try `wp config is-true wp_variable_bool_true`
     Then STDOUT should be empty
     Then STDERR should be empty
     And the return code should be 0
@@ -68,7 +68,7 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
     """
     Success:
     """
-    When I try `wp config is_true wp_variable_str_false`
+    When I try `wp config is-true wp_variable_str_false`
     Then STDOUT should be empty
     Then STDERR should be empty
     And the return code should be 0
@@ -81,7 +81,7 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
     """
     Success:
     """
-    When I try `wp config is_true WP_FALSE`
+    When I try `wp config is-true WP_FALSE`
     Then STDOUT should be empty
     And the return code should be 1
 
@@ -90,7 +90,7 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
     """
     Success:
     """
-    When I try `wp config is_true WP_STRZERO`
+    When I try `wp config is-true WP_STRZERO`
     Then STDOUT should be empty
     And the return code should be 1
 
@@ -99,7 +99,7 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
     """
     Success:
     """
-    When I try `wp config is_true WP_NUMZERO`
+    When I try `wp config is-true WP_NUMZERO`
     Then STDOUT should be empty
     And the return code should be 1
 
@@ -108,6 +108,6 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
     """
     Success:
     """
-    When I try `wp config is_true wp_variable_bool_false`
+    When I try `wp config is-true wp_variable_bool_false`
     Then STDOUT should be empty
     And the return code should be 1
