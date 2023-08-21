@@ -1,7 +1,11 @@
 Feature: Determine whether the value of a constant or variable defined in wp-config.php and wp-custom-config.php files is true.
   Background:
     Given an empty directory
-    And WP files
+    And a wp-includes/version.php file:
+   """
+   <?php
+   $wp_version = '6.3';
+   """
     And wp-config.php
 
   Scenario Outline: Get the value of a variable whose value is true
