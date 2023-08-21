@@ -1,4 +1,4 @@
-Feature: Determine whether the value of a constant or variable defined in wp-config.php and wp-custom-config.php files is true.
+Feature: Determine whether the value of a constant or variable defined in wp-config.php is true.
   Background:
     Given an empty directory
     And a wp-includes/version.php file:
