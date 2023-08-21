@@ -449,19 +449,19 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     # Get the table_prefix as defined in wp-config.php file.
-	 *     $ wp config get table_prefix
-	 *     wp_
+	 *     # Assert if MULTISITE is true
+	 *     $ wp config is-true MULTISITE
 	 *
+	 * @subcommand is-true
 	 * @when before_wp_load
 	 */
 	public function is_true( $args, $assoc_args ) {
 		$value = $this->get_value($assoc_args, $args);
 
 		if ( boolval( $value ) ) {
-			WP_CLI::halt( 1 );
+			WP_CLI::halt( 0 );
 		}
-		WP_CLI::halt( 0 );
+		WP_CLI::halt( 1 );
 
 	}
 
