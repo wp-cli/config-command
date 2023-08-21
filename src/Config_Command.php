@@ -421,7 +421,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function get( $args, $assoc_args ) {
-		$value = $this->get_value($assoc_args, $args);
+		$value = $this->get_value( $assoc_args, $args );
 		WP_CLI::print_value( $value, $assoc_args );
 	}
 
@@ -456,7 +456,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function is_true( $args, $assoc_args ) {
-		$value = $this->get_value($assoc_args, $args);
+		$value = $this->get_value( $assoc_args, $args );
 
 		if ( boolval( $value ) ) {
 			WP_CLI::halt( 0 );
@@ -1046,19 +1046,19 @@ class Config_Command extends WP_CLI_Command {
 	/**
 	 * Gets the value of a specific constant or variable defined in wp-config.php file.
 	 *
-	 * @param array $assoc_args
+	 * @param $assoc_args
 	 * @param $args
 	 *
 	 * @return string
 	 */
-	public function get_value( $assoc_args, $args ) {
-		$path = $this->get_config_path($assoc_args);
-		$wp_config_file_name = basename($path);
-		list($name) = $args;
-		$type = Utils\get_flag_value($assoc_args, 'type');
+	protected function get_value( $assoc_args, $args ) {
+		$path                = $this->get_config_path( $assoc_args );
+		$wp_config_file_name = basename( $path );
+		list( $name )        = $args;
+		$type                = Utils\get_flag_value( $assoc_args, 'type' );
 
-		$value = $this->return_value($name, $type,
-			self::get_wp_config_vars($path), $wp_config_file_name);
+		$value = $this->return_value( $name, $type,
+			self::get_wp_config_vars($path), $wp_config_file_name );
 
 		return $value;
 	}
