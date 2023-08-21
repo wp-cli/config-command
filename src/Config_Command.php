@@ -458,7 +458,7 @@ class Config_Command extends WP_CLI_Command {
 	public function is_true( $args, $assoc_args ) {
 		$value = $this->get_value($assoc_args, $args);
 
-		if ( $value ) {
+		if ( boolval( $value ) ) {
 			WP_CLI::halt( 1 );
 		}
 		WP_CLI::halt( 0 );
