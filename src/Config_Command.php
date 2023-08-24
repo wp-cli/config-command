@@ -452,7 +452,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 *     # Assert if MULTISITE is true
 	 *     $ wp config is-true MULTISITE
-	 *     echo $?
+	 *     $ echo $?
 	 *     0
 	 *
 	 * @subcommand is-true
