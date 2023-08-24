@@ -426,7 +426,8 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Determines whether value of a specific constant or variable defined is truthy.
+	 * Determines whether value of a specific defined constant or variable is truthy.
+	 *
 	 * This determination is made by evaluating the retrieved value via boolval().
 	 *
 	 * ## OPTIONS
@@ -452,7 +453,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 *     # Assert if MULTISITE is true
 	 *     $ wp config is-true MULTISITE
-	 *     echo $?
+	 *     $ echo $?
 	 *     0
 	 *
 	 * @subcommand is-true

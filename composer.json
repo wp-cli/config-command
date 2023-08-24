@@ -44,6 +44,7 @@
             "config create",
             "config get",
             "config has",
+            "config is-true",
             "config list",
             "config path",
             "config set",

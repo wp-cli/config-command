@@ -250,6 +250,44 @@ wp config has <name> [--type=<type>] [--config-file=<path>]
 
 
 
+### wp config is-true
+
+Determines whether value of a specific defined constant or variable is truthy.
+
+~~~
+wp config is-true <name> [--type=<type>] [--config-file=<path>]
+~~~
+
+This determination is made by evaluating the retrieved value via boolval().
+
+**OPTIONS**
+
+	<name>
+		Name of the wp-config.php constant or variable.
+
+	[--type=<type>]
+		Type of config value to retrieve. Defaults to 'all'.
+		---
+		default: all
+		options:
+		  - constant
+		  - variable
+		  - all
+		---
+
+	[--config-file=<path>]
+		Specify the file path to the config file to be read. Defaults to the root of the
+		WordPress installation and the filename "wp-config.php".
+
+**EXAMPLES**
+
+    # Assert if MULTISITE is true
+    $ wp config is-true MULTISITE
+    $ echo $?
+    0
+
+
+
 ### wp config list
 
 Lists variables, constants, and file includes defined in wp-config.php file.
