@@ -426,7 +426,8 @@ class Config_Command extends WP_CLI_Command {
 	}
 
 	/**
-	 * Determines whether value of a specific constant or variable defined is true.
+	 * Determines whether value of a specific constant or variable defined is truthy.
+	 * This determination is made by evaluating the retrieved value via boolval().
 	 *
 	 * ## OPTIONS
 	 *
