@@ -466,7 +466,6 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::halt( 0 );
 		}
 		WP_CLI::halt( 1 );
-
 	}
 
 	/**
@@ -857,7 +856,6 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		WP_CLI::success( 'Shuffled the salt keys.' );
-
 	}
 
 	/**
