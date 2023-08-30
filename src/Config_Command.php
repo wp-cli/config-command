@@ -466,7 +466,6 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::halt( 0 );
 		}
 		WP_CLI::halt( 1 );
-
 	}
 
 	/**
@@ -857,21 +856,20 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		WP_CLI::success( 'Shuffled the salt keys.' );
-
 	}
 
 	/**
 	 * Filters wp-config.php file configurations.
 	 *
-	 * @param array $list
+	 * @param array $vars
 	 * @param array $previous_list
 	 * @param string $type
 	 * @param array $exclude_list
 	 * @return array
 	 */
-	private static function get_wp_config_diff( $list, $previous_list, $type, $exclude_list = [] ) {
+	private static function get_wp_config_diff( $vars, $previous_list, $type, $exclude_list = [] ) {
 		$result = [];
-		foreach ( $list as $name => $val ) {
+		foreach ( $vars as $name => $val ) {
 			if ( array_key_exists( $name, $previous_list ) || in_array( $name, $exclude_list, true ) ) {
 				continue;
 			}
