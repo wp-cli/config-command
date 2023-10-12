@@ -123,20 +123,23 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
 
-    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix=""`
-    And STDERR should be:
+    When I try `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix=""`
+    Then the return code should be 1
+    And STDERR should contain:
       """
       Error: --dbprefix cannot be empty
       """
 
-    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix=" "`
-    And STDERR should be:
+    When I try `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix=" "`
+    Then the return code should be 1
+    And STDERR should contain:
       """
       Error: --dbprefix can only contain numbers, letters, and underscores.
       """
 
-    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix="wp-"`
-    And STDERR should be:
+    When I try `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix="wp-"`
+    Then the return code should be 1
+    And STDERR should contain:
       """
       Error: --dbprefix can only contain numbers, letters, and underscores.
       """
