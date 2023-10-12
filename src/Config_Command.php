@@ -149,6 +149,9 @@ class Config_Command extends WP_CLI_Command {
 			'config-file' => rtrim( ABSPATH, '/\\' ) . '/wp-config.php',
 		];
 		$assoc_args = array_merge( $defaults, $assoc_args );
+		if ( empty( $assoc_args['dbprefix'] ) ) {
+			WP_CLI::error( '--dbprefix cannot be empty' );
+		}
 		if ( preg_match( '|[^a-z0-9_]|i', $assoc_args['dbprefix'] ) ) {
 			WP_CLI::error( '--dbprefix can only contain numbers, letters, and underscores.' );
 		}
