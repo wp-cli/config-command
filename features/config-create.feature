@@ -119,6 +119,22 @@ Feature: Create a wp-config file
       define( 'AUTH_SALT',
       """
 
+  Scenario: Configure with invalid table prefix
+    Given an empty directory
+    And WP files
+
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix=""`
+    Then the return code should be 1
+    And STDERR should not be empty
+
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix=" "`
+    Then the return code should be 1
+    And STDERR should not be empty
+
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix="wp-"`
+    Then the return code should be 1
+    And STDERR should not be empty
+
   @require-php-7.0
   Scenario: Configure with salts generated
     Given an empty directory
