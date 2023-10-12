@@ -124,16 +124,22 @@ Feature: Create a wp-config file
     And WP files
 
     When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix=""`
-    Then the return code should be 1
-    And STDERR should not be empty
+    And STDERR should be:
+      """
+      Error: --dbprefix cannot be empty
+      """
 
     When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix=" "`
-    Then the return code should be 1
-    And STDERR should not be empty
+    And STDERR should be:
+      """
+      Error: --dbprefix can only contain numbers, letters, and underscores.
+      """
 
     When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix="wp-"`
-    Then the return code should be 1
-    And STDERR should not be empty
+    And STDERR should be:
+      """
+      Error: --dbprefix can only contain numbers, letters, and underscores.
+      """
 
   @require-php-7.0
   Scenario: Configure with salts generated
