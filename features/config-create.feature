@@ -43,7 +43,7 @@ Feature: Create a wp-config file
       define( 'WP_DEBUG_LOG', true );
       """
 
-    When I run `wp config create {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
     Then the wp-custom-config.php file should contain:
       """
       'AUTH_SALT',
@@ -206,7 +206,7 @@ Feature: Create a wp-config file
       define( 'WPLANG', 'ja' );
       """
 
-    When I run `wp config create {CORE_CONFIG_SETTINGS} --config-file=wp-custom-config.php --locale=ja --force`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file=wp-custom-config.php --locale=ja --force`
     Then the return code should be 0
     And STDOUT should contain:
       """
