@@ -1,5 +1,9 @@
 Feature: Create a wp-config file
 
+  # Skipped for SQLite because `wp db create` does not yet support SQLite.
+  # See https://github.com/wp-cli/db-command/issues/234
+  # and https://github.com/wp-cli/config-command/issues/167
+  @require-mysql
   Scenario: No wp-config.php
     Given an empty directory
     And WP files
