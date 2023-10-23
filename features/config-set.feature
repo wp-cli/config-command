@@ -20,7 +20,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php'`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
@@ -80,7 +80,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS}  --config-file='wp-custom-config.php'`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
@@ -168,11 +168,11 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
       """
 
   @custom-config-file
-  Scenario: Updating a non-existent value  in wp-custom-config.php without --add
+  Scenario: Updating a non-existent value in wp-custom-config.php without --add
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS}  --config-file='wp-custom-config.php'`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
@@ -252,7 +252,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS}  --config-file='wp-custom-config.php'`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
@@ -314,19 +314,19 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS}  --config-file='wp-custom-config.php'`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
       """
 
-    When I run `wp config set SOME_NAME some_value --type=constant  --config-file='wp-custom-config.php'`
+    When I run `wp config set SOME_NAME some_value --type=constant --config-file='wp-custom-config.php'`
     Then STDOUT should be:
       """
       Success: Added the constant 'SOME_NAME' to the 'wp-custom-config.php' file with the value 'some_value'.
       """
 
-    When I run `wp config set SOME_NAME some_value --type=variable  --config-file='wp-custom-config.php'`
+    When I run `wp config set SOME_NAME some_value --type=variable --config-file='wp-custom-config.php'`
     Then STDOUT should be:
       """
       Success: Added the variable 'SOME_NAME' to the 'wp-custom-config.php' file with the value 'some_value'.

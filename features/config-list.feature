@@ -12,7 +12,7 @@ Feature: List the values of a wp-config.php file
       <?php // This won't work without this file being empty. ?>
       """
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --extra-php < wp-config-extra.php`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --extra-php < wp-config-extra.php`
     Then STDOUT should contain:
       """
       Generated 'wp-config.php' file.
@@ -43,7 +43,7 @@ Feature: List the values of a wp-config.php file
       <?php // This won't work without this file being empty. ?>
       """
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
@@ -66,7 +66,7 @@ Feature: List the values of a wp-config.php file
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS}`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check`
     Then STDOUT should contain:
       """
       Generated 'wp-config.php' file.
@@ -198,13 +198,13 @@ Feature: List the values of a wp-config.php file
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php'`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
       """
 
-    When I run `wp config list --fields=name  --config-file='wp-custom-config.php'`
+    When I run `wp config list --fields=name --config-file='wp-custom-config.php'`
     Then STDOUT should be a table containing rows:
       | name             |
       | table_prefix     |

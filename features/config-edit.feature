@@ -15,7 +15,7 @@ Feature: Edit a wp-config file
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS}  --config-file='wp-custom-config.php'`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
