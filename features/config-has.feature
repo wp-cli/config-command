@@ -20,7 +20,7 @@ Feature: Check whether the wp-config.php file or the wp-custom-config.php file h
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS}  --config-file='wp-custom-config.php'`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
@@ -29,11 +29,11 @@ Feature: Check whether the wp-config.php file or the wp-custom-config.php file h
     Then STDOUT should be empty
     And the return code should be 0
 
-    When I run `wp config has DB_USER --type=constant  --config-file='wp-custom-config.php'`
+    When I run `wp config has DB_USER --type=constant --config-file='wp-custom-config.php'`
     Then STDOUT should be empty
     And the return code should be 0
 
-    When I run `wp config has table_prefix --type=variable  --config-file='wp-custom-config.php'`
+    When I run `wp config has table_prefix --type=variable --config-file='wp-custom-config.php'`
     Then STDOUT should be empty
     And the return code should be 0
 
@@ -70,7 +70,7 @@ Feature: Check whether the wp-config.php file or the wp-custom-config.php file h
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php'`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.
@@ -133,7 +133,7 @@ Feature: Check whether the wp-config.php file or the wp-custom-config.php file h
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php'`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php'`
     Then STDOUT should contain:
       """
       Generated 'wp-custom-config.php' file.

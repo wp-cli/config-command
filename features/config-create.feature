@@ -1,5 +1,9 @@
 Feature: Create a wp-config file
 
+  # Skipped for SQLite because `wp db create` does not yet support SQLite.
+  # See https://github.com/wp-cli/db-command/issues/234
+  # and https://github.com/wp-cli/config-command/issues/167
+  @require-mysql
   Scenario: No wp-config.php
     Given an empty directory
     And WP files
@@ -24,7 +28,7 @@ Feature: Create a wp-config file
       define( 'WP_DEBUG_LOG', true );
       """
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --extra-php < wp-config-extra.php`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --extra-php < wp-config-extra.php`
     Then the wp-config.php file should contain:
       """
       'AUTH_SALT',
@@ -43,7 +47,7 @@ Feature: Create a wp-config file
       define( 'WP_DEBUG_LOG', true );
       """
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
     Then the wp-custom-config.php file should contain:
       """
       'AUTH_SALT',
@@ -74,7 +78,7 @@ Feature: Create a wp-config file
       define( 'WP_DEBUG', true );
       """
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
     Then the wp-custom-config.php file should contain:
       """
       define( 'WP_DEBUG', true );
@@ -99,7 +103,7 @@ Feature: Create a wp-config file
       define( 'WP_DEBUG_LOG', true );
       """
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --extra-php < wp-config-extra.php`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --extra-php < wp-config-extra.php`
     Then the wp-config.php file should not contain:
       """
       define( 'WPLANG', '' );
@@ -109,7 +113,7 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --skip-salts --extra-php < /dev/null`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --skip-salts --extra-php < /dev/null`
     Then the wp-config.php file should not contain:
       """
       define('AUTH_SALT',
@@ -123,25 +127,37 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
 
-    When I try `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix=""`
+    When I try `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=somepassword --dbprefix=""`
     Then the return code should be 1
     And STDERR should contain:
       """
       Error: --dbprefix cannot be empty
       """
 
-    When I try `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix=" "`
+    When I try `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=somepassword --dbprefix=" "`
     Then the return code should be 1
     And STDERR should contain:
       """
       Error: --dbprefix can only contain numbers, letters, and underscores.
       """
 
-    When I try `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=sompassword --dbprefix="wp-"`
+    When I try `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=somepassword --dbprefix="wp-"`
     Then the return code should be 1
     And STDERR should contain:
       """
       Error: --dbprefix can only contain numbers, letters, and underscores.
+      """
+
+  @require-mysql
+  Scenario: Configure with invalid database credentials
+    Given an empty directory
+    And WP files
+
+    When I try `wp config create --dbname=somedb --dbuser=someuser --dbpass=somepassword`
+    Then the return code should be 1
+    And STDERR should contain:
+      """
+      Error: Database connection error
       """
 
   @require-php-7.0
@@ -149,7 +165,7 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS}`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check`
     Then the wp-config.php file should contain:
       """
       define( 'AUTH_SALT',
@@ -160,7 +176,7 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS}`
+    When I run `wp config create {CORE_CONFIG_SETTINGS}`
     Then the wp-config.php file should contain:
       """
       define( 'AUTH_SALT',
@@ -170,20 +186,20 @@ Feature: Create a wp-config file
     Given an empty directory
     And I run `wp core download --version=3.9 --force`
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS}`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check`
     Then the wp-config.php file should contain:
       """
       define( 'WPLANG', '' );
       """
 
-    When I try `wp core config {CORE_CONFIG_SETTINGS}`
+    When I try `wp config create {CORE_CONFIG_SETTINGS}`
     Then the return code should be 1
     And STDERR should contain:
       """
       Error: The 'wp-config.php' file already exists.
       """
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --locale=ja --force`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --locale=ja --force`
     Then the return code should be 0
     And STDOUT should contain:
       """
@@ -194,7 +210,7 @@ Feature: Create a wp-config file
       define( 'WPLANG', 'ja' );
       """
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS} --config-file=wp-custom-config.php --locale=ja --force`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file=wp-custom-config.php --locale=ja --force`
     Then the return code should be 0
     And STDOUT should contain:
       """

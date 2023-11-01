@@ -22,7 +22,7 @@ Feature: Backwards compatibility
     Given an empty directory
     And WP files
 
-    When I run `wp core config {CORE_CONFIG_SETTINGS}`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check`
     Then STDOUT should contain:
       """
       Generated 'wp-config.php' file.
