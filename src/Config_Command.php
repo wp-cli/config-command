@@ -163,7 +163,13 @@ class Config_Command extends WP_CLI_Command {
 			$mysql = mysqli_init();
 			mysqli_report( MYSQLI_REPORT_STRICT );
 			try {
-				mysqli_real_connect( $mysql, $assoc_args['dbhost'], $assoc_args['dbuser'], $assoc_args['dbpass'] );
+				if ( file_exists($assoc_args['dbhost']) ) {
+					// If dbhost is a path to a socket
+					mysqli_real_connect( $mysql, null, $assoc_args['dbuser'], $assoc_args['dbpass'], null, null, $assoc_args['dbhost'] );
+				} else {
+					// If dbhost is a hostname or IP address
+					mysqli_real_connect( $mysql, $assoc_args['dbhost'], $assoc_args['dbuser'], $assoc_args['dbpass'] );
+				}
 			} catch ( mysqli_sql_exception $exception ) {
 				WP_CLI::error( 'Database connection error (' . $exception->getCode() . ') ' . $exception->getMessage() );
 			}
