@@ -160,14 +160,20 @@ Feature: Create a wp-config file
       Error: Database connection error
       """
 
+  @require-mysql
   Scenario: Configure with database credentials using socket path
-    Given an empty directory
-    And WP files
+    Given a WP install
 
-    When I try `wp config create {CORE_CONFIG_SETTINGS} --dbhost=/tmp/mysql.sock  --skip-check`
+    When I run `wp db query 'SELECT @@GLOBAL.SOCKET' --skip-column-names`
+    Then save STDOUT as {SOCKET}
+
+    When I run `rm wp-config.php`
+    Then the wp-config.php file should not exist
+
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --dbhost={SOCKET}`
     Then the wp-config.php file should contain:
       """
-      define( 'DB_HOST', '/tmp/mysql.sock' );
+      define( 'DB_HOST', '{SOCKET}' );
       """
 
   @require-php-7.0
