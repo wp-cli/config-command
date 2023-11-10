@@ -177,8 +177,9 @@ Feature: Create a wp-config file
       }
       """
 
-    When I run `#!/usr/bin/env php find-socket.php`
+    When I run `php find-socket.php`
     Then save STDOUT as {SOCKET}
+    And STDOUT should not be empty
 
     When I run `wp config create {CORE_CONFIG_SETTINGS} --dbhost={SOCKET}`
     Then the wp-config.php file should contain:
