@@ -162,13 +162,23 @@ Feature: Create a wp-config file
 
   @require-mysql
   Scenario: Configure with database credentials using socket path
-    Given a WP install
+    Given an empty directory
+    And WP files
+    And a find-socket.php file:
+      """
+      <?php
+      if ( file_exists( '/var/run/mysqld/mysqld.sock' ) ) {
+        echo '/var/run/mysqld/mysqld.sock';
+      } else if ( file_exists( '/tmp/mysql.sock' ) ) {
+        echo '/tmp/mysql.sock';
+      } else {
+        echo 'No socket found';
+        exit(1);
+      }
+      """
 
-    When I run `wp db query 'SELECT @@GLOBAL.SOCKET' --skip-column-names`
+    When I run `#!/usr/bin/env php find-socket.php`
     Then save STDOUT as {SOCKET}
-
-    When I run `rm wp-config.php`
-    Then the wp-config.php file should not exist
 
     When I run `wp config create {CORE_CONFIG_SETTINGS} --dbhost={SOCKET}`
     Then the wp-config.php file should contain:
