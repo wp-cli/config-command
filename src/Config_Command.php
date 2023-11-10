@@ -163,7 +163,7 @@ class Config_Command extends WP_CLI_Command {
 			$mysql = mysqli_init();
 			mysqli_report( MYSQLI_REPORT_STRICT );
 			try {
-				if ( file_exists($assoc_args['dbhost']) ) {
+				if ( file_exists( $assoc_args['dbhost'] ) ) {
 					// If dbhost is a path to a socket
 					mysqli_real_connect( $mysql, null, $assoc_args['dbuser'], $assoc_args['dbpass'], null, null, $assoc_args['dbhost'] );
 				} else {
