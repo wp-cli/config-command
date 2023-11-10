@@ -160,6 +160,17 @@ Feature: Create a wp-config file
       Error: Database connection error
       """
 
+  @require-mysql
+  Scenario: Configure with database credentials using socket path
+    Given an empty directory
+    And WP files
+
+    When I try `wp config create {CORE_CONFIG_SETTINGS} --dbhost=/tmp/mysql.sock`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_HOST', '/tmp/mysql.sock' );
+      """
+
   @require-php-7.0
   Scenario: Configure with salts generated
     Given an empty directory
