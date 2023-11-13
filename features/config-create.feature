@@ -181,10 +181,10 @@ Feature: Create a wp-config file
     Then save STDOUT as {SOCKET}
     And STDOUT should not be empty
 
-    When I run `wp config create {CORE_CONFIG_SETTINGS} --dbhost={SOCKET}`
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --dbhost=localhost:{SOCKET}`
     Then the wp-config.php file should contain:
       """
-      define( 'DB_HOST', '{SOCKET}' );
+      define( 'DB_HOST', 'localhost:{SOCKET}' );
       """
 
   @require-php-7.0
