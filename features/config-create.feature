@@ -190,16 +190,16 @@ Feature: Create a wp-config file
     When I run `chmod +x {RUN_DIR}/install-package-tests`
     Then STDERR should be empty
 
-    When I run `WP_CLI_TEST_DBHOST=127.0.0.1:{SOCKET} {RUN_DIR}/install-package-tests`
+    When I run `WP_CLI_TEST_DBHOST=localhost:{SOCKET} {RUN_DIR}/install-package-tests`
     Then STDOUT should contain:
       """
       Detected MySQL
       """
 
-    When I run `wp config create --dbname='{DB_NAME}' --dbuser='{DB_USER}' --dbpass='{DB_PASSWORD}' --dbhost='127.0.0.1:{SOCKET}'`
+    When I run `wp config create --dbname='{DB_NAME}' --dbuser='{DB_USER}' --dbpass='{DB_PASSWORD}' --dbhost='localhost:{SOCKET}'`
     Then the wp-config.php file should contain:
       """
-      define( 'DB_HOST', '127.0.0.1:{SOCKET}' );
+      define( 'DB_HOST', 'localhost:{SOCKET}' );
       """
 
   @require-php-7.0
