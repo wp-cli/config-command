@@ -181,6 +181,12 @@ Feature: Create a wp-config file
     Then save STDOUT as {SOCKET}
     And STDOUT should not be empty
 
+    When I run `WP_CLI_TEST_DBHOST=localhost:{SOCKET} composer prepare-tests`
+    Then STDOUT should contain:
+      """
+      Detected MySQL
+      """
+
     When I run `wp config create --dbname='{DB_NAME}' --dbuser='{DB_USER}' --dbpass='{DB_PASSWORD}' --dbhost='localhost:{SOCKET}'`
     Then the wp-config.php file should contain:
       """
