@@ -181,7 +181,7 @@ Feature: Create a wp-config file
     Then save STDOUT as {SOCKET}
     And STDOUT should not be empty
 
-    When I run `WP_CLI_TEST_DBHOST={SOCKET} vendor/bin/install-package-tests`
+    When I run `WP_CLI_TEST_DBHOST={SOCKET} {RUN_DIR}/vendor/bin/install-package-tests`
     Then STDOUT should contain:
       """
       Detected MySQL
