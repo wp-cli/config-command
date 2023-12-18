@@ -181,7 +181,16 @@ Feature: Create a wp-config file
     Then save STDOUT as {SOCKET}
     And STDOUT should not be empty
 
-    When I run `WP_CLI_TEST_DBHOST={SOCKET} {RUN_DIR}/vendor/bin/install-package-tests`
+    When I try `wget -O {RUN_DIR}/install-package-tests https://raw.githubusercontent.com/wp-cli/wp-cli-tests/main/bin/install-package-tests`
+    Then STDERR should contain:
+      """
+      install-package-tests' saved
+      """
+
+    When I run `chmod +x {RUN_DIR}/install-package-tests`
+    Then STDERR should be empty
+
+    When I run `WP_CLI_TEST_DBHOST={SOCKET} {RUN_DIR}/install-package-tests`
     Then STDOUT should contain:
       """
       Detected MySQL
