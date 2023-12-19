@@ -167,7 +167,9 @@ Feature: Create a wp-config file
     And a find-socket.php file:
       """
       <?php
-      if ( file_exists( '/var/run/mysqld/mysqld.sock' ) ) {
+      if ( file_exists( '/tmp/mysqld.sock' ) ) {
+        echo '/tmp/mysqld.sock';
+      } else if ( file_exists( '/var/run/mysqld/mysqld.sock' ) ) {
         echo '/var/run/mysqld/mysqld.sock';
       } else if ( file_exists( '/tmp/mysql.sock' ) ) {
         echo '/tmp/mysql.sock';
