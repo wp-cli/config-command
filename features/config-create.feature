@@ -190,7 +190,7 @@ Feature: Create a wp-config file
     When I run `chmod +x {RUN_DIR}/install-package-tests`
     Then STDERR should be empty
 
-    When I run `WP_CLI_TEST_DBHOST=localhost:{SOCKET} {RUN_DIR}/install-package-tests`
+    When I run `WP_CLI_TEST_DBHOST='localhost:{SOCKET}' WP_CLI_TEST_DBROOTPASS='root' {RUN_DIR}/install-package-tests`
     Then STDOUT should contain:
       """
       Detected MySQL
