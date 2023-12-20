@@ -173,7 +173,10 @@ Feature: Create a wp-config file
         echo getenv( 'WP_CLI_TEST_DBSOCKET' );
         exit(0);
       }
+      // From within Behat, the WP_CLI_TEST_DBSOCKET will be mapped to the internal
+      // DB_SOCKET variable, as Behat pushes a new environment context.
       $locations = [
+        '{DB_SOCKET}',
         '/var/run/mysqld/mysqld.sock',
         '/tmp/mysql.sock',
       ];
