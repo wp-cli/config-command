@@ -168,10 +168,8 @@ Feature: Create a wp-config file
       """
       <?php
       $environment_socket = getenv( 'WP_CLI_TEST_DBSOCKET' );
-      $vendor_dir = \WP_CLI\Tests\Context\FeatureContext::get_vendor_dir();
       $locations = [
         $environment_socket,
-        "{$vendor_dir}/wp-cli/wp-cli-tests/utils/mapped_socket_folder/mysqld.sock",
         '/var/run/mysqld/mysqld.sock',
         '/tmp/mysql.sock',
       ];
