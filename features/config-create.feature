@@ -167,6 +167,8 @@ Feature: Create a wp-config file
     And a find-socket.php file:
       """
       <?php
+      // The WP_CLI_TEST_DBSOCKET variable can be set in the environment to
+      // override the default locations.
       $environment_socket = getenv( 'WP_CLI_TEST_DBSOCKET' );
       $locations = [
         $environment_socket,
