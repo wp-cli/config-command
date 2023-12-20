@@ -167,16 +167,22 @@ Feature: Create a wp-config file
     And a find-socket.php file:
       """
       <?php
-      if ( file_exists( '/tmp/mysqld.sock' ) ) {
-        echo '/tmp/mysqld.sock';
-      } else if ( file_exists( '/var/run/mysqld/mysqld.sock' ) ) {
-        echo '/var/run/mysqld/mysqld.sock';
-      } else if ( file_exists( '/tmp/mysql.sock' ) ) {
-        echo '/tmp/mysql.sock';
-      } else {
-        echo 'No socket found';
-        exit(1);
+      $environment_socket = getenv( 'WP_CLI_TEST_DBSOCKET' );
+      $vendor_dir = \WP_CLI\Tests\Context\FeatureContext::get_vendor_dir();
+      $locations = [
+        $environment_socket,
+        "{$vendor_dir}/wp-cli/wp-cli-tests/utils/mapped_socket_folder/mysqld.sock",
+        '/var/run/mysqld/mysqld.sock',
+        '/tmp/mysql.sock',
+      ];
+      foreach ( $locations as $location ) {
+        if ( ! empty( $location ) && file_exists( $location ) ) {
+          echo $location;
+          exit(0);
+        }
       }
+      echo 'No socket found';
+      exit(1);
       """
 
     When I run `php find-socket.php`
