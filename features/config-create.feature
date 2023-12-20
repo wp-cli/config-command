@@ -168,10 +168,12 @@ Feature: Create a wp-config file
       """
       <?php
       // The WP_CLI_TEST_DBSOCKET variable can be set in the environment to
-      // override the default locations.
-      $environment_socket = getenv( 'WP_CLI_TEST_DBSOCKET' );
+      // override the default locations and will take precedence.
+      if ( ! empty( getenv( 'WP_CLI_TEST_DBSOCKET' ) ) ) {
+        echo getenv( 'WP_CLI_TEST_DBSOCKET' );
+        exit(0);
+      }
       $locations = [
-        $environment_socket,
         '/var/run/mysqld/mysqld.sock',
         '/tmp/mysql.sock',
       ];
