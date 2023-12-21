@@ -160,6 +160,62 @@ Feature: Create a wp-config file
       Error: Database connection error
       """
 
+  @require-mysql
+  Scenario: Configure with database credentials using socket path
+    Given an empty directory
+    And WP files
+    And a find-socket.php file:
+      """
+      <?php
+      // The WP_CLI_TEST_DBSOCKET variable can be set in the environment to
+      // override the default locations and will take precedence.
+      if ( ! empty( getenv( 'WP_CLI_TEST_DBSOCKET' ) ) ) {
+        echo getenv( 'WP_CLI_TEST_DBSOCKET' );
+        exit(0);
+      }
+      // From within Behat, the WP_CLI_TEST_DBSOCKET will be mapped to the internal
+      // DB_SOCKET variable, as Behat pushes a new environment context.
+      $locations = [
+        '{DB_SOCKET}',
+        '/var/run/mysqld/mysqld.sock',
+        '/tmp/mysql.sock',
+      ];
+      foreach ( $locations as $location ) {
+        if ( ! empty( $location ) && file_exists( $location ) ) {
+          echo $location;
+          exit(0);
+        }
+      }
+      echo 'No socket found';
+      exit(1);
+      """
+
+    When I run `php find-socket.php`
+    Then save STDOUT as {SOCKET}
+    And STDOUT should not be empty
+
+    When I try `wget -O {RUN_DIR}/install-package-tests https://raw.githubusercontent.com/wp-cli/wp-cli-tests/main/bin/install-package-tests`
+    Then STDERR should contain:
+      """
+      install-package-tests' saved
+      """
+
+    When I run `chmod +x {RUN_DIR}/install-package-tests`
+    Then STDERR should be empty
+
+    # We try to account for the warnings we get for passing the password on the command line.
+    When I try `MYSQL_HOST=localhost WP_CLI_TEST_DBHOST='localhost:{SOCKET}' WP_CLI_TEST_DBROOTPASS='root' {RUN_DIR}/install-package-tests`
+    Then STDOUT should contain:
+      """
+      Detected MySQL
+      """
+
+    When I run `wp config create --dbname='{DB_NAME}' --dbuser='{DB_USER}' --dbpass='{DB_PASSWORD}' --dbhost='localhost:{SOCKET}'`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_HOST', 'localhost:{SOCKET}' );
+      """
+
   @require-php-7.0
   Scenario: Configure with salts generated
     Given an empty directory
