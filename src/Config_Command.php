@@ -582,6 +582,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 *     # Set the WP_DEBUG constant to true.
 	 *     $ wp config set WP_DEBUG true --raw
+	 *     Success: Updated the constant 'WP_DEBUG' in the 'wp-config.php' file with the raw value 'true'.
 	 *
 	 * @when before_wp_load
 	 */
@@ -685,6 +686,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 *     # Delete the COOKIE_DOMAIN constant from the wp-config.php file.
 	 *     $ wp config delete COOKIE_DOMAIN
+	 *     Success: Deleted the constant 'COOKIE_DOMAIN' from the 'wp-config.php' file.
 	 *
 	 * @when before_wp_load
 	 */
@@ -815,6 +817,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 *     # Add a cache key salt to the wp-config.php file
 	 *     $ wp config shuffle-salts WP_CACHE_KEY_SALT --force
+	 *     Success: Shuffled the salt keys.
 	 *
 	 * @subcommand shuffle-salts
 	 * @when before_wp_load
