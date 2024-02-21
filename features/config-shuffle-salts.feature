@@ -338,3 +338,17 @@ Feature: Refresh the salts in the wp-config.php file
     """
     define( 'NEW_KEY'
     """
+
+  @less-than-php-7.0
+  Scenario: Shuffling salts duplicate warnings on PHP < 7.0
+    Given a WP install
+    When I try `wp config shuffle-salts WP_CACHE_KEY_SALT NONCE_SALT`
+    Then STDERR should contain:
+    """
+    Warning: Could not shuffle the unknown key 'WP_CACHE_KEY_SALT'.
+    """
+    And STDERR should not contain:
+    """
+    Warning: Could not shuffle the unknown key 'WP_CACHE_KEY_SALT'.
+    Warning: Could not shuffle the unknown key 'WP_CACHE_KEY_SALT'.
+    """
