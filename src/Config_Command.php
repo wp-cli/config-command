@@ -877,13 +877,18 @@ class Config_Command extends WP_CLI_Command {
 	 * @when before_wp_load
 	 */
 	public function shuffle_salts( $args, $assoc_args ) {
-
 		$keys  = $args;
 		$force = Utils\get_flag_value( $assoc_args, 'force', false );
+
+		$is_default_keys = ( empty( $keys ) ) ? true : false;
 
 		if ( empty( $keys ) ) {
 			$keys = self::DEFAULT_SALT_CONSTANTS;
 		}
+
+		$successes = 0;
+		$errors    = 0;
+		$skipped   = 0;
 
 		$secret_keys = [];
 
@@ -891,6 +896,7 @@ class Config_Command extends WP_CLI_Command {
 			foreach ( $keys as $key ) {
 				if ( ! $force && ! in_array( $key, self::DEFAULT_SALT_CONSTANTS, true ) ) {
 					WP_CLI::warning( "Could not shuffle the unknown key '{$key}'." );
+					++$skipped;
 					continue;
 				}
 				$secret_keys[ $key ] = trim( self::unique_key() );
@@ -903,6 +909,7 @@ class Config_Command extends WP_CLI_Command {
 					} else {
 						WP_CLI::warning( "Could not shuffle the unknown key '{$key}'." );
 					}
+					++$skipped;
 				}
 			}
 
@@ -924,13 +931,18 @@ class Config_Command extends WP_CLI_Command {
 			$config_transformer = new WPConfigTransformer( $path );
 			foreach ( $secret_keys as $key => $value ) {
 				$config_transformer->update( 'constant', $key, (string) $value );
+				++$successes;
 			}
 		} catch ( Exception $exception ) {
 			$wp_config_file_name = basename( $path );
 			WP_CLI::error( "Could not process the '{$wp_config_file_name}' transformation.\nReason: {$exception->getMessage()}" );
 		}
 
-		WP_CLI::success( 'Shuffled the salt keys.' );
+		if ( $is_default_keys ) {
+			WP_CLI::success( 'Shuffled the salt keys.' );
+		} else {
+			Utils\report_batch_operation_results( 'salt', 'shuffle', count( $keys ), $successes, $errors, $skipped );
+		}
 	}
 
 	/**
