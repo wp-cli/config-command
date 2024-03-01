@@ -295,7 +295,7 @@ Feature: Refresh the salts in the wp-config.php file
     When I try `wp config shuffle-salts AUTH_KEY NEW_KEY`
     Then STDOUT should contain:
     """
-    Shuffled 2 of 2 salts.
+    Shuffled 1 of 2 salts (1 skipped).
     """
     And STDERR should contain:
     """
