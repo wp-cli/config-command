@@ -894,12 +894,13 @@ class Config_Command extends WP_CLI_Command {
 
 		try {
 			foreach ( $keys as $key ) {
+				$unique_key = self::unique_key();
 				if ( ! $force && ! in_array( $key, self::DEFAULT_SALT_CONSTANTS, true ) ) {
 					WP_CLI::warning( "Could not shuffle the unknown key '{$key}'." );
 					++$skipped;
 					continue;
 				}
-				$secret_keys[ $key ] = trim( self::unique_key() );
+				$secret_keys[ $key ] = trim( $unique_key );
 			}
 		} catch ( Exception $ex ) {
 			foreach ( $keys as $key ) {
