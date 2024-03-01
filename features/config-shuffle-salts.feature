@@ -111,7 +111,7 @@ Feature: Refresh the salts in the wp-config.php file
     When I run `wp config shuffle-salts AUTH_KEY NONCE_KEY`
     Then STDOUT should contain:
     """
-    Shuffled the salt keys.
+    Shuffled 2 of 2 salts.
     """
     And the wp-config.php file should not contain:
     """
@@ -199,7 +199,7 @@ Feature: Refresh the salts in the wp-config.php file
     When I try `wp config shuffle-salts AUTH_KEY NEW_KEY`
     Then STDOUT should contain:
     """
-    Shuffled the salt keys.
+    Shuffled 1 of 2 salts (1 skipped).
     """
     And STDERR should contain:
     """
@@ -224,7 +224,7 @@ Feature: Refresh the salts in the wp-config.php file
     When I run `wp config shuffle-salts AUTH_KEY NEW_KEY --force`
     Then STDOUT should contain:
     """
-    Shuffled the salt keys.
+    Shuffled 2 of 2 salts.
     """
     And the wp-config.php file should not contain:
     """
@@ -247,7 +247,7 @@ Feature: Refresh the salts in the wp-config.php file
     When I run `wp config shuffle-salts AUTH_KEY NEW_KEY --force`
     Then STDOUT should contain:
     """
-    Shuffled the salt keys.
+    Shuffled 2 of 2 salts.
     """
     And the wp-config.php file should not contain:
     """
@@ -295,7 +295,7 @@ Feature: Refresh the salts in the wp-config.php file
     When I try `wp config shuffle-salts AUTH_KEY NEW_KEY`
     Then STDOUT should contain:
     """
-    Shuffled the salt keys.
+    Shuffled 2 of 2 salts.
     """
     And STDERR should contain:
     """
@@ -320,7 +320,7 @@ Feature: Refresh the salts in the wp-config.php file
     When I try `wp config shuffle-salts AUTH_KEY NEW_KEY --force`
     Then STDOUT should contain:
     """
-    Shuffled the salt keys.
+    Shuffled 1 of 2 salts (1 skipped).
     """
     And STDERR should contain:
     """
