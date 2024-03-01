@@ -880,7 +880,7 @@ class Config_Command extends WP_CLI_Command {
 		$keys  = $args;
 		$force = Utils\get_flag_value( $assoc_args, 'force', false );
 
-		$is_default_keys = ( empty( $keys ) ) ? true : false;
+		$has_keys = ( ! empty( $keys ) ) ? true : false;
 
 		if ( empty( $keys ) ) {
 			$keys = self::DEFAULT_SALT_CONSTANTS;
@@ -930,18 +930,22 @@ class Config_Command extends WP_CLI_Command {
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
 			foreach ( $secret_keys as $key => $value ) {
-				$config_transformer->update( 'constant', $key, (string) $value );
-				++$successes;
+				$is_updated = $config_transformer->update( 'constant', $key, (string) $value );
+				if ( $is_updated ) {
+					++$successes;
+				} else {
+					++$errors;
+				}
 			}
 		} catch ( Exception $exception ) {
 			$wp_config_file_name = basename( $path );
 			WP_CLI::error( "Could not process the '{$wp_config_file_name}' transformation.\nReason: {$exception->getMessage()}" );
 		}
 
-		if ( $is_default_keys ) {
-			WP_CLI::success( 'Shuffled the salt keys.' );
-		} else {
+		if ( $has_keys ) {
 			Utils\report_batch_operation_results( 'salt', 'shuffle', count( $keys ), $successes, $errors, $skipped );
+		} else {
+			WP_CLI::success( 'Shuffled the salt keys.' );
 		}
 	}
 
