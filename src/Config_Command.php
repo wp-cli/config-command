@@ -193,16 +193,6 @@ class Config_Command extends WP_CLI_Command {
 			}
 		}
 
-		$defaults   = [
-			'dbhost'      => 'localhost',
-			'dbpass'      => '',
-			'dbprefix'    => 'wp_',
-			'dbcharset'   => 'utf8',
-			'dbcollate'   => '',
-			'locale'      => self::get_initial_locale(),
-			'config-file' => rtrim( ABSPATH, '/\\' ) . '/wp-config.php',
-		];
-		$assoc_args = array_merge( $defaults, $assoc_args );
 		if ( empty( $assoc_args['dbprefix'] ) ) {
 			WP_CLI::error( '--dbprefix cannot be empty' );
 		}
@@ -239,35 +229,63 @@ class Config_Command extends WP_CLI_Command {
 			// phpcs:enable WordPress.DB.RestrictedFunctions
 		}
 
+		$defaults = [
+			'dbhost'      => 'localhost',
+			'dbpass'      => '',
+			'dbprefix'    => 'wp_',
+			'dbcharset'   => 'utf8',
+			'dbcollate'   => '',
+			'locale'      => self::get_initial_locale(),
+			'config-file' => rtrim( ABSPATH, '/\\' ) . '/wp-config.php',
+		];
+
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
 			try {
-				$assoc_args['keys-and-salts']    = true;
-				$assoc_args['auth-key']          = self::unique_key();
-				$assoc_args['secure-auth-key']   = self::unique_key();
-				$assoc_args['logged-in-key']     = self::unique_key();
-				$assoc_args['nonce-key']         = self::unique_key();
-				$assoc_args['auth-salt']         = self::unique_key();
-				$assoc_args['secure-auth-salt']  = self::unique_key();
-				$assoc_args['logged-in-salt']    = self::unique_key();
-				$assoc_args['nonce-salt']        = self::unique_key();
-				$assoc_args['wp-cache-key-salt'] = self::unique_key();
+				$defaults['keys-and-salts']    = true;
+				$defaults['auth-key']          = self::unique_key();
+				$defaults['secure-auth-key']   = self::unique_key();
+				$defaults['logged-in-key']     = self::unique_key();
+				$defaults['nonce-key']         = self::unique_key();
+				$defaults['auth-salt']         = self::unique_key();
+				$defaults['secure-auth-salt']  = self::unique_key();
+				$defaults['logged-in-salt']    = self::unique_key();
+				$defaults['nonce-salt']        = self::unique_key();
+				$defaults['wp-cache-key-salt'] = self::unique_key();
 			} catch ( Exception $e ) {
-				$assoc_args['keys-and-salts']     = false;
-				$assoc_args['keys-and-salts-alt'] = self::fetch_remote_salts(
+				$defaults['keys-and-salts']     = false;
+				$defaults['keys-and-salts-alt'] = self::fetch_remote_salts(
 					(bool) Utils\get_flag_value( $assoc_args, 'insecure', false )
 				);
 			}
 		}
 
 		if ( Utils\wp_version_compare( '4.0', '<' ) ) {
-			$assoc_args['add-wplang'] = true;
+			$defaults['add-wplang'] = true;
 		} else {
-			$assoc_args['add-wplang'] = false;
+			$defaults['add-wplang'] = false;
 		}
 
-		foreach ( $assoc_args as $key => $value ) {
-			$assoc_args[ $key ] = $this->escape_config_value( $key, $value );
+		$path = $defaults['config-file'];
+		if ( ! empty( $assoc_args['config-file'] ) ) {
+			$path = $assoc_args['config-file'];
 		}
+
+		if ( ! empty( $assoc_args['extra-php'] ) ) {
+			$defaults['extra-php'] = $this->escape_config_value( 'extra-php', $assoc_args['extra-php'] );
+		}
+
+		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
+		$out          = Utils\mustache_render( "{$command_root}/templates/wp-config.mustache", $defaults );
+
+		// Output the default config file at path specified in assoc args.
+		$wp_config_file_name = basename( $path );
+		$bytes_written       = file_put_contents( $path, $out );
+
+		if ( ! $bytes_written ) {
+			WP_CLI::error( "Could not create new '{$wp_config_file_name}' file." );
+		}
+
+		$assoc_args = array_merge( $defaults, $assoc_args );
 
 		// 'extra-php' from STDIN is retrieved after escaping to avoid breaking
 		// the PHP code.
@@ -275,16 +293,67 @@ class Config_Command extends WP_CLI_Command {
 			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
 		}
 
-		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
-		$out          = Utils\mustache_render( "{$command_root}/templates/wp-config.mustache", $assoc_args );
+		$options = [
+			'raw'       => false,
+			'add'       => true,
+			'normalize' => true,
+		];
 
-		$wp_config_file_name = basename( $assoc_args['config-file'] );
-		$bytes_written       = file_put_contents( $assoc_args['config-file'], $out );
-		if ( ! $bytes_written ) {
-			WP_CLI::error( "Could not create new '{$wp_config_file_name}' file." );
-		} else {
-			WP_CLI::success( "Generated '{$wp_config_file_name}' file." );
+		$config_keys = [
+			'dbhost'    => array(
+				'name' => 'DB_HOST',
+				'type' => 'constant',
+			),
+			'dbpass'    => array(
+				'name' => 'DB_PASSWORD',
+				'type' => 'constant',
+			),
+			'dbprefix'  => array(
+				'name' => 'table_prefix',
+				'type' => 'variable',
+			),
+			'dbcharset' => array(
+				'name' => 'DB_CHARSET',
+				'type' => 'constant',
+			),
+			'dbcollate' => array(
+				'name' => 'DB_COLLATE',
+				'type' => 'constant',
+			),
+			'locale'    => array(
+				'name' => 'WPLANG',
+				'type' => 'constant',
+			),
+			'dbname'    => array(
+				'name' => 'DB_NAME',
+				'type' => 'constant',
+			),
+			'dbuser'    => array(
+				'name' => 'DB_USER',
+				'type' => 'constant',
+			),
+		];
+
+		try {
+			$config_transformer = new WPConfigTransformer( $path );
+
+			foreach ( $config_keys as $key => $const ) {
+
+				$value = $assoc_args[ $key ];
+				if ( ! empty( $value ) ) {
+					$config_transformer->update( $const['type'], $const['name'], $value, $options );
+				}
+			}
+		} catch ( Exception $exception ) {
+			//Remove the default moustache wp-config.php template file.
+			if ( file_exists( $assoc_args['config-file'] ) ) {
+				unlink( $path );
+			}
+
+			WP_CLI::error( "Could not create new '{$wp_config_file_name}' file.\nReason: {$exception->getMessage()}" );
 		}
+
+		WP_CLI::success( "Generated '{$wp_config_file_name}' file." );
 	}
 
 	/**
