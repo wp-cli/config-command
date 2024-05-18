@@ -239,6 +239,12 @@ class Config_Command extends WP_CLI_Command {
 			'config-file' => rtrim( ABSPATH, '/\\' ) . '/wp-config.php',
 		];
 
+		if ( Utils\wp_version_compare( '4.0', '<' ) ) {
+			$defaults['add-wplang'] = true;
+		} else {
+			$defaults['add-wplang'] = false;
+		}
+
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-salts' ) ) {
 			try {
 				$defaults['keys-and-salts']    = true;
@@ -259,19 +265,14 @@ class Config_Command extends WP_CLI_Command {
 			}
 		}
 
-		if ( Utils\wp_version_compare( '4.0', '<' ) ) {
-			$defaults['add-wplang'] = true;
-		} else {
-			$defaults['add-wplang'] = false;
-		}
-
 		$path = $defaults['config-file'];
 		if ( ! empty( $assoc_args['config-file'] ) ) {
 			$path = $assoc_args['config-file'];
 		}
 
-		if ( ! empty( $assoc_args['extra-php'] ) ) {
-			$defaults['extra-php'] = $this->escape_config_value( 'extra-php', $assoc_args['extra-php'] );
+		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
+			// 'extra-php' from STDIN is retrieved.
+			$defaults['extra-php'] = file_get_contents( 'php://stdin' );
 		}
 
 		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
@@ -286,12 +287,6 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		$assoc_args = array_merge( $defaults, $assoc_args );
-
-		// 'extra-php' from STDIN is retrieved after escaping to avoid breaking
-		// the PHP code.
-		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
-			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
-		}
 
 		$options = [
 			'raw'       => false,
