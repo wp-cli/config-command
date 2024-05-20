@@ -340,7 +340,7 @@ class Config_Command extends WP_CLI_Command {
 				}
 			}
 		} catch ( Exception $exception ) {
-			//Remove the default moustache wp-config.php template file.
+			// Remove the default moustache wp-config.php template file.
 			if ( file_exists( $assoc_args['config-file'] ) ) {
 				unlink( $path );
 			}
