@@ -446,6 +446,14 @@ class Config_Command extends WP_CLI_Command {
 		if ( 'dotenv' === $assoc_args['format'] ) {
 			return array_walk( $values, array( $this, 'print_dotenv' ) );
 		}
+		
+		if ( ! $strict ) {
+			foreach ( $values as $index => $value ) {
+				if ( is_bool( $value['value'] ) ) {
+					$values[ $index ]['value'] = $value['value'] ? 'true' : 'false';
+				}
+			}
+		}
 
 		Utils\format_items( $assoc_args['format'], $values, $assoc_args['fields'] );
 	}
@@ -494,6 +502,10 @@ class Config_Command extends WP_CLI_Command {
 	 */
 	public function get( $args, $assoc_args ) {
 		$value = $this->get_value( $assoc_args, $args );
+		if ( is_bool( $value ) ) {
+			$value = $value ? 'true' : 'false';
+		}
+
 		WP_CLI::print_value( $value, $assoc_args );
 	}
 
@@ -534,7 +546,7 @@ class Config_Command extends WP_CLI_Command {
 	public function is_true( $args, $assoc_args ) {
 		$value = $this->get_value( $assoc_args, $args );
 
-		if ( boolval( $value ) && 'false' !== $value ) { // Second condition is needed because we have literal "false" as string and boolval('false') is true.
+		if ( boolval( $value ) ) {
 			WP_CLI::halt( 0 );
 		}
 		WP_CLI::halt( 1 );
@@ -578,14 +590,7 @@ class Config_Command extends WP_CLI_Command {
 			];
 		}
 
-		$merged_vars = array_merge( $wp_config_vars, $wp_config_constants, $wp_config_includes_array );
-		// Modify boolean values for easier handling.
-		foreach ( $merged_vars as $index => $var ) {
-			if ( 'boolean' === gettype( $var['value'] ) ) {
-				$merged_vars[ $index ]['value'] = $var['value'] ? 'true' : 'false';
-			}
-		}
-		return $merged_vars;
+		return array_merge( $wp_config_vars, $wp_config_constants, $wp_config_includes_array );
 	}
 
 	/**
