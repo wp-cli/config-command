@@ -446,7 +446,7 @@ class Config_Command extends WP_CLI_Command {
 		if ( 'dotenv' === $assoc_args['format'] ) {
 			return array_walk( $values, array( $this, 'print_dotenv' ) );
 		}
-		
+
 		if ( ! $strict ) {
 			foreach ( $values as $index => $value ) {
 				if ( is_bool( $value['value'] ) ) {
