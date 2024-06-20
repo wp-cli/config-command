@@ -202,3 +202,25 @@ Feature: Delete a constant or variable from the wp-config.php file
       """
       Error: Found both a constant and a variable 'SOME_NAME' in the 'wp-custom-config.php' file. Use --type=<type> to disambiguate.
       """
+
+  @require-mysql
+  Scenario: Delete constant with concatenated strings
+    Given an empty directory
+    And WP files
+    And a wp-config-extra.php file:
+      """
+      define( 'USER_PATH', '/var/www/' . get_current_user() );
+      """
+
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --extra-php < wp-config-extra.php`
+    Then the wp-config.php file should contain:
+      """
+      'USER_PATH',
+      """
+
+    When I run `wp config delete USER_PATH`
+    Then the wp-config.php file should not contain:
+      """
+      'USER_PATH'
+      """
+
