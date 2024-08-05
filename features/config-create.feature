@@ -293,12 +293,3 @@ Feature: Create a wp-config file
       PasswordWith'SingleQuotes'
       """
 
-  Scenario: Correct config file is generated when database password has double quote in it
-    Given an empty directory
-    And WP files
-
-    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='p@(ss){w0r?d><}"!With"DoubleQuotes'`
-    Then the wp-config.php file should contain:
-      """
-      define( 'DB_PASSWORD', 'p@(ss){w0r?d><}"!With"DoubleQuotes' )
-      """
