@@ -15,6 +15,14 @@ Feature: Check whether the wp-config.php file or the wp-custom-config.php file h
     Then STDOUT should be empty
     And the return code should be 0
 
+  Scenario: Check for the existance of an existing wp-config.php constant in a read-only file system
+    Given a WP install
+
+    When I run `chmod -w wp-config.php`
+    And I try `wp config has DB_NAME`
+    Then STDOUT should be empty
+    And the return code should be 0
+
   @custom-config-file
   Scenario: Check the existence of an existing wp-custom-config.php constant or variable
     Given an empty directory
