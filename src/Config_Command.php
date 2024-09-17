@@ -818,7 +818,7 @@ class Config_Command extends WP_CLI_Command {
 		$type                = Utils\get_flag_value( $assoc_args, 'type' );
 
 		try {
-			$config_transformer = new WPConfigTransformer( $path );
+			$config_transformer = new WPConfigTransformer( $path, true );
 
 			switch ( $type ) {
 				case 'all':
