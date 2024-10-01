@@ -552,8 +552,12 @@ class Config_Command extends WP_CLI_Command {
 		$wp_cli_original_defined_vars      = get_defined_vars();
 		$wp_cli_original_includes          = get_included_files();
 
+		// Output buffering prevents warnings or notices while parsing wp-config
+		// from printing twice. See https://github.com/wp-cli/wp-cli/issues/4944
+		ob_start();
 		// phpcs:ignore Squiz.PHP.Eval.Discouraged -- Don't have another way.
 		eval( WP_CLI::get_runner()->get_wp_config_code( $wp_config_path ) );
+		ob_end_clean();
 
 		$wp_config_vars      = self::get_wp_config_diff( get_defined_vars(), $wp_cli_original_defined_vars, 'variable', [ 'wp_cli_original_defined_vars' ] );
 		$wp_config_constants = self::get_wp_config_diff( get_defined_constants(), $wp_cli_original_defined_constants, 'constant' );
