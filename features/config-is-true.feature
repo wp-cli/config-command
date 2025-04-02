@@ -37,7 +37,7 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
   Scenario Outline: Get the value of a variable whose value is true
     When I try `wp config is-true <variable>`
     Then STDOUT should be empty
-    Then STDERR should be empty
+    And STDERR should be empty
     And the return code should be 0
 
     Examples:
@@ -75,10 +75,9 @@ Feature: Determine whether the value of a constant or variable defined in wp-con
   Scenario: Test for correct functionality with included PHP files.
     When I try `wp config is-true WP_INC_TRUTH`
     Then STDOUT should be empty
-    Then STDERR should be empty
+    And STDERR should be empty
     And the return code should be 0
 
     When I try `wp config is-true WP_INC_FALSE`
     Then STDOUT should be empty
     And the return code should be 1
-
