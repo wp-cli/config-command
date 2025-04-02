@@ -292,4 +292,3 @@ Feature: Create a wp-config file
       """
       PasswordWith'SingleQuotes'
       """
-
