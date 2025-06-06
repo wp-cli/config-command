@@ -166,6 +166,9 @@ class Config_Command extends WP_CLI_Command {
 	 * [--insecure]
 	 * : Retry API download without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
 	 *
+	 * [--ssl]
+	 * : Enable SSL connection.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Standard wp-config.php file
@@ -201,6 +204,7 @@ class Config_Command extends WP_CLI_Command {
 			'dbcollate'   => '',
 			'locale'      => self::get_initial_locale(),
 			'config-file' => rtrim( ABSPATH, '/\\' ) . '/wp-config.php',
+			'ssl'         => false,
 		];
 		$assoc_args = array_merge( $defaults, $assoc_args );
 		if ( empty( $assoc_args['dbprefix'] ) ) {
@@ -226,12 +230,18 @@ class Config_Command extends WP_CLI_Command {
 					$host   = substr( $host, 0, $socket_pos );
 				}
 
+				$flags = 0;
+
+				if ( $assoc_args['ssl'] ) {
+					$flags = MYSQLI_CLIENT_SSL;
+				}
+
 				if ( file_exists( $socket ) ) {
 					// If dbhost is a path to a socket
-					mysqli_real_connect( $mysql, null, $assoc_args['dbuser'], $assoc_args['dbpass'], null, null, $socket );
+					mysqli_real_connect( $mysql, null, $assoc_args['dbuser'], $assoc_args['dbpass'], null, null, $socket, $flags );
 				} else {
 					// If dbhost is a hostname or IP address
-					mysqli_real_connect( $mysql, $host, $assoc_args['dbuser'], $assoc_args['dbpass'] );
+					mysqli_real_connect( $mysql, $host, $assoc_args['dbuser'], $assoc_args['dbpass'], null, null, null, $flags );
 				}
 			} catch ( mysqli_sql_exception $exception ) {
 				WP_CLI::error( 'Database connection error (' . $exception->getCode() . ') ' . $exception->getMessage() );
