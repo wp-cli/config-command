@@ -251,7 +251,7 @@ Feature: Create a wp-config file
 
     When I try `wp config create --dbhost=127.0.0.1 --dbname=wp_cli_test --dbuser=wp_cli_test_ssl --dbpass=password2 --ssl`
     Then the return code should be 0
-    Then the wp-config.php file should contain:
+    And the wp-config.php file should contain:
       """
       define( 'DB_USER', 'wp_cli_test_ssl' )
       """
