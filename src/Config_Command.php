@@ -219,6 +219,11 @@ class Config_Command extends WP_CLI_Command {
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
 			// phpcs:disable WordPress.DB.RestrictedFunctions
 			$mysql = mysqli_init();
+
+			if ( ! $mysql ) {
+				WP_CLI::error( 'Database connection error. Could not initialize MySQLi.' );
+			}
+
 			mysqli_report( MYSQLI_REPORT_STRICT );
 			try {
 				// Accept similar format to one used by parse_db_host() e.g. 'localhost:/tmp/mysql.sock'
@@ -267,12 +272,6 @@ class Config_Command extends WP_CLI_Command {
 					(bool) Utils\get_flag_value( $assoc_args, 'insecure', false )
 				);
 			}
-		}
-
-		if ( Utils\wp_version_compare( '4.0', '<' ) ) {
-			$assoc_args['add-wplang'] = true;
-		} else {
-			$assoc_args['add-wplang'] = false;
 		}
 
 		foreach ( $assoc_args as $key => $value ) {
@@ -329,7 +328,7 @@ class Config_Command extends WP_CLI_Command {
 	public function edit( $_, $assoc_args ) {
 		$path                = $this->get_config_path( $assoc_args );
 		$wp_config_file_name = basename( $path );
-		$contents            = file_get_contents( $path );
+		$contents            = (string) file_get_contents( $path );
 		$r                   = Utils\launch_editor_for_input( $contents, $wp_config_file_name, 'php' );
 		if ( false === $r ) {
 			WP_CLI::warning( "No changes made to {$wp_config_file_name}, aborted." );
@@ -425,7 +424,7 @@ class Config_Command extends WP_CLI_Command {
 	public function list_( $args, $assoc_args ) {
 		$path                = $this->get_config_path( $assoc_args );
 		$wp_config_file_name = basename( $path );
-		$strict              = Utils\get_flag_value( $assoc_args, 'strict' );
+		$strict              = (bool) Utils\get_flag_value( $assoc_args, 'strict' );
 		if ( $strict && empty( $args ) ) {
 			WP_CLI::error( 'The --strict option can only be used in combination with a filter.' );
 		}
@@ -579,7 +578,9 @@ class Config_Command extends WP_CLI_Command {
 			}
 		}
 
-		unset( $wp_config_vars[ $name_backup ] );
+		if ( isset( $name_backup ) ) {
+			unset( $wp_config_vars[ $name_backup ] );
+		}
 		$wp_config_vars           = array_values( $wp_config_vars );
 		$wp_config_includes       = array_diff( get_included_files(), $wp_cli_original_includes );
 		$wp_config_includes_array = [];
@@ -658,7 +659,11 @@ class Config_Command extends WP_CLI_Command {
 		$path                 = $this->get_config_path( $assoc_args );
 		$wp_config_file_name  = basename( $path );
 		list( $name, $value ) = $args;
-		$type                 = Utils\get_flag_value( $assoc_args, 'type' );
+
+		/**
+		 * @var string $type
+		 */
+		$type = Utils\get_flag_value( $assoc_args, 'type' );
 
 		$options = [];
 
@@ -671,8 +676,14 @@ class Config_Command extends WP_CLI_Command {
 		];
 
 		foreach ( $option_flags as $option => $default ) {
+			/**
+			 * @var string|null $option_value
+			 */
 			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
 			if ( null !== $option_value ) {
+				/**
+				 * @var array<string, string> $options
+				 */
 				$options[ $option ] = $option_value;
 				if ( 'separator' === $option ) {
 					$options['separator'] = $this->parse_separator( $options['separator'] );
@@ -762,7 +773,11 @@ class Config_Command extends WP_CLI_Command {
 		$path                = $this->get_config_path( $assoc_args );
 		$wp_config_file_name = basename( $path );
 		list( $name )        = $args;
-		$type                = Utils\get_flag_value( $assoc_args, 'type' );
+
+		/**
+		 * @var string $type
+		 */
+		$type = Utils\get_flag_value( $assoc_args, 'type' );
 
 		try {
 			$config_transformer = new WPConfigTransformer( $path );
@@ -829,7 +844,11 @@ class Config_Command extends WP_CLI_Command {
 		$path                = $this->get_config_path( $assoc_args );
 		$wp_config_file_name = basename( $path );
 		list( $name )        = $args;
-		$type                = Utils\get_flag_value( $assoc_args, 'type' );
+
+		/**
+		 * @var string $type
+		 */
+		$type = Utils\get_flag_value( $assoc_args, 'type' );
 
 		try {
 			$config_transformer = new WPConfigTransformer( $path, true );
@@ -846,6 +865,7 @@ class Config_Command extends WP_CLI_Command {
 					} else {
 						WP_CLI::halt( 0 );
 					}
+					// @phpstan-ignore deadCode.unreachable
 					break;
 				case 'constant':
 				case 'variable':
@@ -1003,7 +1023,7 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		// Adapt whitespace to adhere to WPCS.
-		$salts = preg_replace( '/define\(\'(.*?)\'\);/', 'define( \'$1\' );', $salts );
+		$salts = (string) preg_replace( '/define\(\'(.*?)\'\);/', 'define( \'$1\' );', $salts );
 
 		return $salts;
 	}
@@ -1163,7 +1183,11 @@ class Config_Command extends WP_CLI_Command {
 		$path                = $this->get_config_path( $assoc_args );
 		$wp_config_file_name = basename( $path );
 		list( $name )        = $args;
-		$type                = Utils\get_flag_value( $assoc_args, 'type' );
+
+		/**
+		 * @var string $type
+		 */
+		$type = Utils\get_flag_value( $assoc_args, 'type' );
 
 		$value = $this->return_value(
 			$name,

@@ -72,18 +72,6 @@ define( 'WP_CACHE_KEY_SALT', '{{wp-cache-key-salt}}' );
  */
 $table_prefix = '{{dbprefix}}';
 
-{{#add-wplang}}
-/**
- * WordPress localized language, defaults to English.
- *
- * Change this to localize WordPress. A corresponding MO file for the chosen
- * language must be installed to wp-content/languages. For example, install
- * de_DE.mo to wp-content/languages and set WPLANG to 'de_DE' to enable German
- * language support.
- */
-define( 'WPLANG', '{{locale}}' );
-{{/add-wplang}}
-
 /* Add any custom values between this line and the "stop editing" line. */
 
 {{extra-php}}

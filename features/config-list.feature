@@ -100,11 +100,11 @@ Feature: List the values of a wp-config.php file
       | DB_HOST     |
       | DB_CHARSET  |
       | DB_COLLATE  |
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       table_prefix
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       AUTH_KEY
       """
@@ -113,15 +113,15 @@ Feature: List the values of a wp-config.php file
     Then STDOUT should be a table containing rows:
       | name    |
       | DB_HOST |
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       table_prefix
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       AUTH_KEY
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       DB_NAME
       """
@@ -143,15 +143,15 @@ Feature: List the values of a wp-config.php file
       | name        |
       | DB_USER     |
       | DB_PASSWORD |
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       table_prefix
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       AUTH_KEY
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       DB_HOST
       """
@@ -161,15 +161,15 @@ Feature: List the values of a wp-config.php file
       | name        |
       | DB_USER     |
       | DB_PASSWORD |
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       table_prefix
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       AUTH_KEY
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       DB_HOST
       """
@@ -185,11 +185,11 @@ Feature: List the values of a wp-config.php file
       | SECURE_AUTH_SALT |
       | LOGGED_IN_SALT   |
       | NONCE_SALT       |
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       table_prefix
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       DB_HOST
       """
@@ -232,11 +232,11 @@ Feature: List the values of a wp-config.php file
       | DB_HOST     |
       | DB_CHARSET  |
       | DB_COLLATE  |
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       table_prefix
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       AUTH_KEY
       """
@@ -245,15 +245,15 @@ Feature: List the values of a wp-config.php file
     Then STDOUT should be a table containing rows:
       | name    |
       | DB_HOST |
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       table_prefix
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       AUTH_KEY
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       DB_NAME
       """
@@ -275,15 +275,15 @@ Feature: List the values of a wp-config.php file
       | name        |
       | DB_USER     |
       | DB_PASSWORD |
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       table_prefix
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       AUTH_KEY
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       DB_HOST
       """
@@ -293,15 +293,15 @@ Feature: List the values of a wp-config.php file
       | name        |
       | DB_USER     |
       | DB_PASSWORD |
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       table_prefix
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       AUTH_KEY
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       DB_HOST
       """
@@ -317,11 +317,11 @@ Feature: List the values of a wp-config.php file
       | SECURE_AUTH_SALT |
       | LOGGED_IN_SALT   |
       | NONCE_SALT       |
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       table_prefix
       """
-    Then STDOUT should not contain:
+    And STDOUT should not contain:
       """
       DB_HOST
       """
