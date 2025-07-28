@@ -137,7 +137,7 @@ wp config delete <name> [--type=<type>] [--config-file=<path>]
 Generates a wp-config.php file.
 
 ~~~
-wp config create --dbname=<dbname> --dbuser=<dbuser> [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--locale=<locale>] [--extra-php] [--skip-salts] [--skip-check] [--force] [--config-file=<path>] [--insecure]
+wp config create --dbname=<dbname> --dbuser=<dbuser> [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--locale=<locale>] [--extra-php] [--skip-salts] [--skip-check] [--force] [--config-file=<path>] [--insecure] [--ssl]
 ~~~
 
 Creates a new wp-config.php with database constants, and verifies that
@@ -199,6 +199,9 @@ the database constants are correct.
 
 	[--insecure]
 		Retry API download without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
+
+	[--ssl]
+		Use SSL when checking the database connection.
 
 **EXAMPLES**
 
