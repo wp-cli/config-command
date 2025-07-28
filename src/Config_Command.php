@@ -167,7 +167,7 @@ class Config_Command extends WP_CLI_Command {
 	 * : Retry API download without certificate validation if TLS handshake fails. Note: This makes the request vulnerable to a MITM attack.
 	 *
 	 * [--ssl]
-	 * : Enable SSL connection.
+	 * : Use SSL when checking the database connection.
 	 *
 	 * ## EXAMPLES
 	 *
