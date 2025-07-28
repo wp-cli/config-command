@@ -242,3 +242,16 @@ Feature: Create a wp-config file
       """
       PasswordWith'SingleQuotes'
       """
+
+  @require-mysql @require-mysql-5.7
+  Scenario: Configure with required SSL connection
+    Given an empty directory
+    And WP files
+    And I run `MYSQL_PWD='{DB_ROOT_PASSWORD}' MYSQL_HOST='{MYSQL_HOST}' MYSQL_TCP_PORT='{MYSQL_PORT}' mysql -u root -e "CREATE USER IF NOT EXISTS 'wp_cli_test_ssl'@'%' IDENTIFIED BY 'password2' REQUIRE SSL;"`
+
+    When I try `wp config create --dbhost=127.0.0.1 --dbname=wp_cli_test --dbuser=wp_cli_test_ssl --dbpass=password2 --ssl`
+    Then the return code should be 0
+    And the wp-config.php file should contain:
+      """
+      define( 'DB_USER', 'wp_cli_test_ssl' )
+      """
