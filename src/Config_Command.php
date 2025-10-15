@@ -1240,7 +1240,8 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		if ( is_string( $value ) ) {
-			return addslashes( $value );
+			// For single-quoted strings, only escape single quotes; double quotes don't need escaping
+			return str_replace( "'", "\\'", $value );
 		}
 
 		return $value;

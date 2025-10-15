@@ -243,6 +243,22 @@ Feature: Create a wp-config file
       PasswordWith'SingleQuotes'
       """
 
+  Scenario: Passwords with special characters and double quotes
+    Given an empty directory
+    And WP files
+
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='p@(ss){w0r?d><}"!With"DoubleQuotes'`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_PASSWORD', 'p@(ss){w0r?d><}"!With"DoubleQuotes' )
+      """
+
+    When I run `wp config get DB_PASSWORD`
+    Then STDOUT should be:
+      """
+      p@(ss){w0r?d><}"!With"DoubleQuotes
+      """
+
   @require-mysql @require-mysql-5.7
   Scenario: Configure with required SSL connection
     Given an empty directory
