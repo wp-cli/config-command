@@ -1035,10 +1035,9 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * @param string $name
 	 * @param string $type
-	 * @param array $values
+	 * @param array<array{name: string, value: mixed, type: string}> $values
 	 * @param string $wp_config_file_name Config file name
-	 * @return mixed The value of the requested constant or variable as defined in the wp-config.php file; if the
-	 *                requested constant or variable is not defined then the function will print an error and exit.
+	 * @return mixed|null Original PHP value from wp-config.php or null if not found.
 	 */
 	private function return_value( $name, $type, $values, $wp_config_file_name ) {
 		$results = [];
