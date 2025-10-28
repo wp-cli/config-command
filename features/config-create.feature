@@ -216,6 +216,12 @@ Feature: Create a wp-config file
       define( 'DB_HOST', 'localhost:{SOCKET}' );
       """
 
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='my\\password'`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_PASSWORD', 'my\\\\password' )
+      """
+
   @require-php-7.0
   Scenario: Configure with salts generated
     Given an empty directory
