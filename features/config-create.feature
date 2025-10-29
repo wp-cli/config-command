@@ -259,10 +259,20 @@ Feature: Create a wp-config file
       p@(ss){w0r?d><}"!With"DoubleQuotes
       """
 
+  Scenario: Passwords with backslash should properly escaped
+    Given an empty directory
+    And WP files
+  
     When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='my\\password'` --force
     Then the wp-config.php file should contain:
       """
       define( 'DB_PASSWORD', 'my\\\\password' )
+      """
+    
+    When I run `wp config get DB_PASSWORD`
+    Then STDOUT should be:
+      """
+      my\\password
       """
 
   @require-mysql @require-mysql-5.7
