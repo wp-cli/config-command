@@ -263,7 +263,7 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
   
-    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='my\\password'` --force
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='my\\password'`
     Then the wp-config.php file should contain:
       """
       define( 'DB_PASSWORD', 'my\\\\password' )
