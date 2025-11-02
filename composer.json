@@ -41,6 +41,7 @@
         "bundled": true,
         "commands": [
             "config",
+            "config add",
             "config edit",
             "config delete",
             "config create",
@@ -50,7 +51,8 @@
             "config list",
             "config path",
             "config set",
-            "config shuffle-salts"
+            "config shuffle-salts",
+            "config update"
         ]
     },
     "autoload": {
