@@ -33,16 +33,16 @@ Feature: Add a constant or variable to wp-config.php file
   Scenario: Add a raw constant to wp-config.php
     Given a WP install
 
-    When I run `wp config add WP_DEBUG true --raw`
+    When I run `wp config add WP_CUSTOM_CONSTANT true --raw`
     Then STDOUT should be:
       """
-      Success: Added the constant 'WP_DEBUG' to the 'wp-config.php' file with the raw value 'true'.
+      Success: Added the constant 'WP_CUSTOM_CONSTANT' to the 'wp-config.php' file with the raw value 'true'.
       """
 
-    When I run `wp config list WP_DEBUG --strict --format=json`
+    When I run `wp config list WP_CUSTOM_CONSTANT --strict --format=json`
     Then STDOUT should contain:
       """
-      {"name":"WP_DEBUG","value":true,"type":"constant"}
+      {"name":"WP_CUSTOM_CONSTANT","value":true,"type":"constant"}
       """
 
   Scenario: Fail when trying to add an existing constant

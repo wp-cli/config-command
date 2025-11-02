@@ -78,7 +78,7 @@ Feature: Update or add a constant or variable in wp-config.php file
     When I run `wp config update WP_DEBUG true --raw`
     Then STDOUT should be:
       """
-      Success: Added the constant 'WP_DEBUG' to the 'wp-config.php' file with the raw value 'true'.
+      Success: Updated the constant 'WP_DEBUG' in the 'wp-config.php' file with the raw value 'true'.
       """
 
     When I run `wp config list WP_DEBUG --strict --format=json`

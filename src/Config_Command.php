@@ -853,7 +853,7 @@ class Config_Command extends WP_CLI_Command {
 			WP_CLI::error( "Could not process the '{$wp_config_file_name}' transformation.\nReason: {$exception->getMessage()}" );
 		}
 
-		$raw = $options['raw'] ? 'raw ' : '';
+		$raw     = $options['raw'] ? 'raw ' : '';
 		$message = "Added the {$type} '{$name}' to the '{$wp_config_file_name}' file with the {$raw}value '{$value}'.";
 
 		WP_CLI::success( $message );
