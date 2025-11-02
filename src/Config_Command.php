@@ -924,7 +924,7 @@ class Config_Command extends WP_CLI_Command {
 		/**
 		 * @var string $type
 		 */
-		$type = Utils\get_flag_value( $assoc_args, 'type' );
+		$type = Utils\get_flag_value( $assoc_args, 'type', 'all' );
 
 		$options = [];
 
@@ -977,6 +977,7 @@ class Config_Command extends WP_CLI_Command {
 					if ( ! $config_transformer->exists( $type, $name ) ) {
 						$adding = true;
 					}
+					break;
 			}
 
 			$config_transformer->update( $type, $name, $value, $options );
