@@ -383,7 +383,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
       require_once( ABSPATH . 'wp-settings.php' );
       """
 
-    Scenario: Additions can be properly placed in wp-custom-config.php
+  Scenario: Additions can be properly placed in wp-custom-config.php
     Given a WP install
     And a wp-custom-config.php file:
       """

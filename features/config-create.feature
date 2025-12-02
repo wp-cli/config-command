@@ -90,9 +90,9 @@ Feature: Create a wp-config file
 
     When I try `wp version`
     Then STDERR should not contain:
-    """
-    Constant WP_DEBUG already defined
-    """
+      """
+      Constant WP_DEBUG already defined
+      """
 
   @require-wp-4.0
   Scenario: No wp-config.php and WPLANG
@@ -227,56 +227,6 @@ Feature: Create a wp-config file
       define( 'AUTH_SALT',
       """
 
-  @less-than-php-7.0
-  Scenario: Configure with salts fetched from WordPress.org
-    Given an empty directory
-    And WP files
-
-    When I run `wp config create {CORE_CONFIG_SETTINGS}`
-    Then the wp-config.php file should contain:
-      """
-      define( 'AUTH_SALT',
-      """
-
-  Scenario: Define WPLANG when running WP < 4.0
-    Given an empty directory
-    And I run `wp core download --version=3.9 --force`
-
-    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check`
-    Then the wp-config.php file should contain:
-      """
-      define( 'WPLANG', '' );
-      """
-
-    When I try `wp config create {CORE_CONFIG_SETTINGS}`
-    Then the return code should be 1
-    And STDERR should contain:
-      """
-      Error: The 'wp-config.php' file already exists.
-      """
-
-    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --locale=ja --force`
-    Then the return code should be 0
-    And STDOUT should contain:
-      """
-      Success: Generated 'wp-config.php' file.
-      """
-    And the wp-config.php file should contain:
-      """
-      define( 'WPLANG', 'ja' );
-      """
-
-    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file=wp-custom-config.php --locale=ja --force`
-    Then the return code should be 0
-    And STDOUT should contain:
-      """
-      Success: Generated 'wp-custom-config.php' file.
-      """
-    And the wp-custom-config.php file should contain:
-      """
-      define( 'WPLANG', 'ja' );
-      """
-
   Scenario: Values are properly escaped to avoid creating invalid config files
     Given an empty directory
     And WP files
@@ -293,3 +243,47 @@ Feature: Create a wp-config file
       PasswordWith'SingleQuotes'
       """
 
+  Scenario: Passwords with special characters and double quotes
+    Given an empty directory
+    And WP files
+
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='p@(ss){w0r?d><}"!With"DoubleQuotes'`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_PASSWORD', 'p@(ss){w0r?d><}"!With"DoubleQuotes' )
+      """
+
+    When I run `wp config get DB_PASSWORD`
+    Then STDOUT should be:
+      """
+      p@(ss){w0r?d><}"!With"DoubleQuotes
+      """
+
+  Scenario: Passwords with backslash should properly escaped
+    Given an empty directory
+    And WP files
+  
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='my\\password'`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_PASSWORD', 'my\\\\password' )
+      """
+    
+    When I run `wp config get DB_PASSWORD`
+    Then STDOUT should be:
+      """
+      my\\password
+      """
+
+  @require-mysql @require-mysql-5.7
+  Scenario: Configure with required SSL connection
+    Given an empty directory
+    And WP files
+    And I run `MYSQL_PWD='{DB_ROOT_PASSWORD}' MYSQL_HOST='{MYSQL_HOST}' MYSQL_TCP_PORT='{MYSQL_PORT}' mysql -u root -e "CREATE USER IF NOT EXISTS 'wp_cli_test_ssl'@'%' IDENTIFIED BY 'password2' REQUIRE SSL;"`
+
+    When I try `wp config create --dbhost=127.0.0.1 --dbname=wp_cli_test --dbuser=wp_cli_test_ssl --dbpass=password2 --ssl`
+    Then the return code should be 0
+    And the wp-config.php file should contain:
+      """
+      define( 'DB_USER', 'wp_cli_test_ssl' )
+      """
