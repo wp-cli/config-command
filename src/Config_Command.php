@@ -119,6 +119,9 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * [--dbpass=<dbpass>]
 	 * : Set the database user password.
+	 * ---
+	 * sensitive: true
+	 * ---
 	 *
 	 * [--dbhost=<dbhost>]
 	 * : Set the database host.
