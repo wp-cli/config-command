@@ -726,6 +726,7 @@ class Config_Command extends WP_CLI_Command {
 					}
 			}
 
+			// @phpstan-ignore argument.type
 			$config_transformer->update( $type, $name, $value, $options );
 
 		} catch ( Exception $exception ) {
