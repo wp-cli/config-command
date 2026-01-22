@@ -459,6 +459,14 @@ class Config_Command extends WP_CLI_Command {
 			return array_walk( $values, array( $this, 'print_dotenv' ) );
 		}
 
+		if ( ! $strict ) {
+			foreach ( $values as $index => $value ) {
+				if ( is_bool( $value['value'] ) ) {
+					$values[ $index ]['value'] = $value['value'] ? 'true' : 'false';
+				}
+			}
+		}
+
 		Utils\format_items( $assoc_args['format'], $values, $assoc_args['fields'] );
 	}
 
@@ -506,6 +514,10 @@ class Config_Command extends WP_CLI_Command {
 	 */
 	public function get( $args, $assoc_args ) {
 		$value = $this->get_value( $assoc_args, $args );
+		if ( is_bool( $value ) ) {
+			$value = $value ? 'true' : 'false';
+		}
+
 		WP_CLI::print_value( $value, $assoc_args );
 	}
 
