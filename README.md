@@ -153,6 +153,9 @@ the database constants are correct.
 
 	[--dbpass=<dbpass>]
 		Set the database user password.
+		---
+		sensitive: true
+		---
 
 	[--dbhost=<dbhost>]
 		Set the database host.
