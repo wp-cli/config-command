@@ -189,6 +189,8 @@ class Config_Command extends WP_CLI_Command {
 	 *     # Using --prompt=dbpass will prompt for the 'dbpass' argument
 	 *     $ wp config create --dbname=testing --dbuser=wp --prompt=dbpass < password.txt
 	 *     Success: Generated 'wp-config.php' file.
+	 *
+	 * @when before_wp_load
 	 */
 	public function create( $_, $assoc_args ) {
 		if ( ! Utils\get_flag_value( $assoc_args, 'force' ) ) {
