@@ -673,31 +673,7 @@ class Config_Command extends WP_CLI_Command {
 		 */
 		$type = Utils\get_flag_value( $assoc_args, 'type' );
 
-		$options = [];
-
-		$option_flags = [
-			'raw'       => false,
-			'add'       => true,
-			'anchor'    => null,
-			'placement' => null,
-			'separator' => null,
-		];
-
-		foreach ( $option_flags as $option => $default ) {
-			/**
-			 * @var string|null $option_value
-			 */
-			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
-			if ( null !== $option_value ) {
-				/**
-				 * @var array<string, string> $options
-				 */
-				$options[ $option ] = $option_value;
-				if ( 'separator' === $option ) {
-					$options['separator'] = $this->parse_separator( $options['separator'] );
-				}
-			}
-		}
+		$options = $this->parse_config_transformer_options( $assoc_args, [ 'add' => true ] );
 
 		$adding = false;
 		try {
@@ -811,30 +787,7 @@ class Config_Command extends WP_CLI_Command {
 		 */
 		$type = Utils\get_flag_value( $assoc_args, 'type', 'constant' );
 
-		$options = [];
-
-		$option_flags = [
-			'raw'       => false,
-			'anchor'    => null,
-			'placement' => null,
-			'separator' => null,
-		];
-
-		foreach ( $option_flags as $option => $default ) {
-			/**
-			 * @var string|null $option_value
-			 */
-			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
-			if ( null !== $option_value ) {
-				/**
-				 * @var array<string, string> $options
-				 */
-				$options[ $option ] = $option_value;
-				if ( 'separator' === $option ) {
-					$options['separator'] = $this->parse_separator( $options['separator'] );
-				}
-			}
-		}
+		$options = $this->parse_config_transformer_options( $assoc_args );
 
 		// add command always adds, so we set the 'add' option to true
 		$options['add'] = true;
@@ -926,30 +879,7 @@ class Config_Command extends WP_CLI_Command {
 		 */
 		$type = Utils\get_flag_value( $assoc_args, 'type', 'all' );
 
-		$options = [];
-
-		$option_flags = [
-			'raw'       => false,
-			'anchor'    => null,
-			'placement' => null,
-			'separator' => null,
-		];
-
-		foreach ( $option_flags as $option => $default ) {
-			/**
-			 * @var string|null $option_value
-			 */
-			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
-			if ( null !== $option_value ) {
-				/**
-				 * @var array<string, string> $options
-				 */
-				$options[ $option ] = $option_value;
-				if ( 'separator' === $option ) {
-					$options['separator'] = $this->parse_separator( $options['separator'] );
-				}
-			}
-		}
+		$options = $this->parse_config_transformer_options( $assoc_args );
 
 		// update command always adds if not exists, so we set the 'add' option to true
 		$options['add'] = true;
@@ -1426,6 +1356,43 @@ class Config_Command extends WP_CLI_Command {
 		);
 
 		return $separator;
+	}
+
+	/**
+	 * Parses and returns options for config transformer operations.
+	 *
+	 * Extracts common flags (raw, anchor, placement, separator) from assoc_args
+	 * and builds an options array for use with WPConfigTransformer.
+	 *
+	 * @param array $assoc_args Associative arguments from the command.
+	 * @param array $defaults   Default values for the options.
+	 *
+	 * @return array<string, string|bool> Parsed options array.
+	 */
+	private function parse_config_transformer_options( $assoc_args, $defaults = [] ) {
+		$options = [];
+
+		$option_flags = array_merge(
+			[
+				'raw'       => false,
+				'anchor'    => null,
+				'placement' => null,
+				'separator' => null,
+			],
+			$defaults
+		);
+
+		foreach ( $option_flags as $option => $default ) {
+			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
+			if ( null !== $option_value ) {
+				$options[ $option ] = $option_value;
+				if ( 'separator' === $option ) {
+					$options['separator'] = $this->parse_separator( $options['separator'] );
+				}
+			}
+		}
+
+		return $options;
 	}
 
 	/**
