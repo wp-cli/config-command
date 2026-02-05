@@ -1180,7 +1180,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @param $assoc_args
 	 * @param $args
 	 *
-	 * @return string
+	 * @return mixed
 	 */
 	protected function get_value( $assoc_args, $args ) {
 		$path                = $this->get_config_path( $assoc_args );
