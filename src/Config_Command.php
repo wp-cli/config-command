@@ -710,7 +710,6 @@ class Config_Command extends WP_CLI_Command {
 					}
 			}
 
-			// @phpstan-ignore argument.type
 			$config_transformer->update( $type, $name, $value, $options );
 
 		} catch ( Exception $exception ) {
@@ -1371,7 +1370,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @param array $assoc_args Associative arguments from the command.
 	 * @param array $defaults   Default values for the options.
 	 *
-	 * @return array<string, string|bool> Parsed options array.
+	 * @return array<string, bool> Parsed options array.
 	 */
 	private function parse_config_transformer_options( $assoc_args, $defaults = [] ) {
 		$options = [];
