@@ -287,3 +287,14 @@ Feature: Create a wp-config file
       """
       define( 'DB_USER', 'wp_cli_test_ssl' )
       """
+
+  Scenario: Create config without WordPress bootstrap
+    Given an empty directory
+
+    When I run `wp config create --skip-check --dbname=testdb --dbuser=testuser --dbpass=testpass`
+    Then the return code should be 0
+    And STDOUT should contain:
+      """
+      Success: Generated 'wp-config.php' file.
+      """
+    And the wp-config.php file should exist
