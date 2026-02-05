@@ -676,6 +676,9 @@ class Config_Command extends WP_CLI_Command {
 		 */
 		$type = Utils\get_flag_value( $assoc_args, 'type' );
 
+		/**
+		 * @var array{raw: bool, anchor?: string, separator?: string, placement?: 'after'|'before', add: bool} $options
+		 */
 		$options = $this->parse_config_transformer_options( $assoc_args, [ 'add' => true ] );
 
 		$adding = false;
@@ -882,6 +885,9 @@ class Config_Command extends WP_CLI_Command {
 		 */
 		$type = Utils\get_flag_value( $assoc_args, 'type', 'all' );
 
+		/**
+		 * @var array{raw: bool, anchor?: string, separator?: string, placement?: 'after'|'before', add: bool} $options
+		 */
 		$options = $this->parse_config_transformer_options( $assoc_args );
 
 		// update command always adds if not exists, so we set the 'add' option to true
@@ -1349,7 +1355,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * @param string $separator Separator string to parse.
 	 *
-	 * @return mixed Parsed separator string.
+	 * @return string Parsed separator string.
 	 */
 	private function parse_separator( $separator ) {
 		$separator = str_replace(
@@ -1370,11 +1376,17 @@ class Config_Command extends WP_CLI_Command {
 	 * @param array $assoc_args Associative arguments from the command.
 	 * @param array $defaults   Default values for the options.
 	 *
-	 * @return array<string, bool> Parsed options array.
+	 * @return array{raw: bool, anchor?: string, separator?: string, placement?: 'after'|'before'} Parsed options array.
 	 */
 	private function parse_config_transformer_options( $assoc_args, $defaults = [] ) {
+		/**
+		 * @var array{raw: bool, anchor?: string, separator?: string, placement?: 'after'|'before'} $options
+		 */
 		$options = [];
 
+		/**
+		 * @var array{raw: bool, anchor?: string, separator?: string, placement?: 'after'|'before'} $option_flags
+		 */
 		$option_flags = array_merge(
 			[
 				'raw'       => false,
@@ -1390,6 +1402,7 @@ class Config_Command extends WP_CLI_Command {
 			if ( null !== $option_value ) {
 				$options[ $option ] = $option_value;
 				if ( 'separator' === $option ) {
+					// @phpstan-ignore offsetAccess.notFound
 					$options['separator'] = $this->parse_separator( $options['separator'] );
 				}
 			}
