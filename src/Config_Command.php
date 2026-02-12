@@ -34,6 +34,14 @@ use WP_CLI\WpOrgApi;
  *     $ wp config get table_prefix
  *     wp_
  *
+ *     # Add a new constant to the wp-config.php file.
+ *     $ wp config add WP_DEBUG true --raw
+ *     Success: Added the constant 'WP_DEBUG' to the 'wp-config.php' file with the raw value 'true'.
+ *
+ *     # Update or add a constant to the wp-config.php file.
+ *     $ wp config update WP_DEBUG false --raw
+ *     Success: Updated the constant 'WP_DEBUG' in the 'wp-config.php' file with the raw value 'false'.
+ *
  *     # Set the WP_DEBUG constant to true.
  *     $ wp config set WP_DEBUG true --raw
  *     Success: Updated the constant 'WP_DEBUG' in the 'wp-config.php' file with the raw value 'true'.
@@ -668,31 +676,10 @@ class Config_Command extends WP_CLI_Command {
 		 */
 		$type = Utils\get_flag_value( $assoc_args, 'type' );
 
-		$options = [];
-
-		$option_flags = [
-			'raw'       => false,
-			'add'       => true,
-			'anchor'    => null,
-			'placement' => null,
-			'separator' => null,
-		];
-
-		foreach ( $option_flags as $option => $default ) {
-			/**
-			 * @var string|null $option_value
-			 */
-			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
-			if ( null !== $option_value ) {
-				/**
-				 * @var array<string, string> $options
-				 */
-				$options[ $option ] = $option_value;
-				if ( 'separator' === $option ) {
-					$options['separator'] = $this->parse_separator( $options['separator'] );
-				}
-			}
-		}
+		/**
+		 * @var array{raw: bool, anchor?: string, separator?: string, placement?: 'after'|'before', add: bool} $options
+		 */
+		$options = $this->parse_config_transformer_options( $assoc_args, [ 'add' => true ] );
 
 		$adding = false;
 		try {
@@ -726,7 +713,212 @@ class Config_Command extends WP_CLI_Command {
 					}
 			}
 
-			// @phpstan-ignore argument.type
+			$config_transformer->update( $type, $name, $value, $options );
+
+		} catch ( Exception $exception ) {
+			WP_CLI::error( "Could not process the '{$wp_config_file_name}' transformation.\nReason: {$exception->getMessage()}" );
+		}
+
+		$raw = $options['raw'] ? 'raw ' : '';
+		if ( $adding ) {
+			$message = "Added the {$type} '{$name}' to the '{$wp_config_file_name}' file with the {$raw}value '{$value}'.";
+		} else {
+			$message = "Updated the {$type} '{$name}' in the '{$wp_config_file_name}' file with the {$raw}value '{$value}'.";
+		}
+
+		WP_CLI::success( $message );
+	}
+
+	/**
+	 * Adds a new constant or variable to the wp-config.php file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <name>
+	 * : Name of the wp-config.php constant or variable.
+	 *
+	 * <value>
+	 * : Value to set the wp-config.php constant or variable to.
+	 *
+	 * [--raw]
+	 * : Place the value into the wp-config.php file as is, instead of as a quoted string.
+	 *
+	 * [--anchor=<anchor>]
+	 * : Anchor string where additions of new values are anchored around.
+	 * Defaults to "/* That's all, stop editing!".
+	 * The special case "EOF" string uses the end of the file as the anchor.
+	 *
+	 * [--placement=<placement>]
+	 * : Where to place the new values in relation to the anchor string.
+	 * ---
+	 * default: 'before'
+	 * options:
+	 *   - before
+	 *   - after
+	 * ---
+	 *
+	 * [--separator=<separator>]
+	 * : Separator string to put between an added value and its anchor string.
+	 * The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\r' => carriage return, '\t' => tab.
+	 * Defaults to a single EOL ("\n" on *nix and "\r\n" on Windows).
+	 *
+	 * [--type=<type>]
+	 * : Type of the config value to add. Defaults to 'constant'.
+	 * ---
+	 * default: constant
+	 * options:
+	 *   - constant
+	 *   - variable
+	 * ---
+	 *
+	 * [--config-file=<path>]
+	 * : Specify the file path to the config file to be modified. Defaults to the root of the
+	 * WordPress installation and the filename "wp-config.php".
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Add the WP_DEBUG constant to the wp-config.php file.
+	 *     $ wp config add WP_DEBUG true --raw
+	 *     Success: Added the constant 'WP_DEBUG' to the 'wp-config.php' file with the raw value 'true'.
+	 *
+	 * @when before_wp_load
+	 */
+	public function add( $args, $assoc_args ) {
+		$path                 = $this->get_config_path( $assoc_args );
+		$wp_config_file_name  = basename( $path );
+		list( $name, $value ) = $args;
+
+		/**
+		 * @var string $type
+		 */
+		$type = Utils\get_flag_value( $assoc_args, 'type', 'constant' );
+
+		$options = $this->parse_config_transformer_options( $assoc_args );
+
+		// add command always adds, so we set the 'add' option to true
+		$options['add'] = true;
+
+		try {
+			$config_transformer = new WPConfigTransformer( $path );
+
+			// Check if the constant/variable already exists
+			if ( $config_transformer->exists( $type, $name ) ) {
+				WP_CLI::error( "The {$type} '{$name}' already exists in the '{$wp_config_file_name}' file." );
+			}
+
+			$config_transformer->update( $type, $name, $value, $options );
+
+		} catch ( Exception $exception ) {
+			WP_CLI::error( "Could not process the '{$wp_config_file_name}' transformation.\nReason: {$exception->getMessage()}" );
+		}
+
+		$raw     = $options['raw'] ? 'raw ' : '';
+		$message = "Added the {$type} '{$name}' to the '{$wp_config_file_name}' file with the {$raw}value '{$value}'.";
+
+		WP_CLI::success( $message );
+	}
+
+	/**
+	 * Updates or adds a constant or variable in the wp-config.php file.
+	 *
+	 * This command will add the constant or variable if it doesn't exist, or update it if it does.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <name>
+	 * : Name of the wp-config.php constant or variable.
+	 *
+	 * <value>
+	 * : Value to set the wp-config.php constant or variable to.
+	 *
+	 * [--raw]
+	 * : Place the value into the wp-config.php file as is, instead of as a quoted string.
+	 *
+	 * [--anchor=<anchor>]
+	 * : Anchor string where additions of new values are anchored around.
+	 * Defaults to "/* That's all, stop editing!".
+	 * The special case "EOF" string uses the end of the file as the anchor.
+	 *
+	 * [--placement=<placement>]
+	 * : Where to place the new values in relation to the anchor string.
+	 * ---
+	 * default: 'before'
+	 * options:
+	 *   - before
+	 *   - after
+	 * ---
+	 *
+	 * [--separator=<separator>]
+	 * : Separator string to put between an added value and its anchor string.
+	 * The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\r' => carriage return, '\t' => tab.
+	 * Defaults to a single EOL ("\n" on *nix and "\r\n" on Windows).
+	 *
+	 * [--type=<type>]
+	 * : Type of the config value to update. Defaults to 'all'.
+	 * ---
+	 * default: all
+	 * options:
+	 *   - constant
+	 *   - variable
+	 *   - all
+	 * ---
+	 *
+	 * [--config-file=<path>]
+	 * : Specify the file path to the config file to be modified. Defaults to the root of the
+	 * WordPress installation and the filename "wp-config.php".
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Update or add the WP_DEBUG constant to the wp-config.php file.
+	 *     $ wp config update WP_DEBUG true --raw
+	 *     Success: Updated the constant 'WP_DEBUG' in the 'wp-config.php' file with the raw value 'true'.
+	 *
+	 * @when before_wp_load
+	 */
+	public function update( $args, $assoc_args ) {
+		$path                 = $this->get_config_path( $assoc_args );
+		$wp_config_file_name  = basename( $path );
+		list( $name, $value ) = $args;
+
+		/**
+		 * @var string $type
+		 */
+		$type = Utils\get_flag_value( $assoc_args, 'type', 'all' );
+
+		/**
+		 * @var array{raw: bool, anchor?: string, separator?: string, placement?: 'after'|'before', add: bool} $options
+		 */
+		$options = $this->parse_config_transformer_options( $assoc_args );
+
+		// update command always adds if not exists, so we set the 'add' option to true
+		$options['add'] = true;
+
+		$adding = false;
+		try {
+			$config_transformer = new WPConfigTransformer( $path );
+
+			switch ( $type ) {
+				case 'all':
+					$has_constant = $config_transformer->exists( 'constant', $name );
+					$has_variable = $config_transformer->exists( 'variable', $name );
+					if ( $has_constant && $has_variable ) {
+						WP_CLI::error( "Found both a constant and a variable '{$name}' in the '{$wp_config_file_name}' file. Use --type=<type> to disambiguate." );
+					}
+					if ( ! $has_constant && ! $has_variable ) {
+						$type   = 'constant';
+						$adding = true;
+					} else {
+						$type = $has_constant ? 'constant' : 'variable';
+					}
+					break;
+				case 'constant':
+				case 'variable':
+					if ( ! $config_transformer->exists( $type, $name ) ) {
+						$adding = true;
+					}
+					break;
+			}
+
 			$config_transformer->update( $type, $name, $value, $options );
 
 		} catch ( Exception $exception ) {
@@ -1162,7 +1354,7 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * @param string $separator Separator string to parse.
 	 *
-	 * @return mixed Parsed separator string.
+	 * @return string Parsed separator string.
 	 */
 	private function parse_separator( $separator ) {
 		$separator = str_replace(
@@ -1172,6 +1364,50 @@ class Config_Command extends WP_CLI_Command {
 		);
 
 		return $separator;
+	}
+
+	/**
+	 * Parses and returns options for config transformer operations.
+	 *
+	 * Extracts common flags (raw, anchor, placement, separator) from assoc_args
+	 * and builds an options array for use with WPConfigTransformer.
+	 *
+	 * @param array $assoc_args Associative arguments from the command.
+	 * @param array $defaults   Default values for the options.
+	 *
+	 * @return array{raw: bool, anchor?: string, separator?: string, placement?: 'after'|'before'} Parsed options array.
+	 */
+	private function parse_config_transformer_options( $assoc_args, $defaults = [] ) {
+		/**
+		 * @var array{raw: bool, anchor?: string, separator?: string, placement?: 'after'|'before'} $options
+		 */
+		$options = [];
+
+		/**
+		 * @var array{raw: bool, anchor?: string, separator?: string, placement?: 'after'|'before'} $option_flags
+		 */
+		$option_flags = array_merge(
+			[
+				'raw'       => false,
+				'anchor'    => null,
+				'placement' => null,
+				'separator' => null,
+			],
+			$defaults
+		);
+
+		foreach ( $option_flags as $option => $default ) {
+			$option_value = Utils\get_flag_value( $assoc_args, $option, $default );
+			if ( null !== $option_value ) {
+				$options[ $option ] = $option_value;
+				if ( 'separator' === $option ) {
+					// @phpstan-ignore offsetAccess.notFound
+					$options['separator'] = $this->parse_separator( $options['separator'] );
+				}
+			}
+		}
+
+		return $options;
 	}
 
 	/**
