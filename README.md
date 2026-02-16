@@ -46,6 +46,14 @@ wp config
     $ wp config get table_prefix
     wp_
 
+    # Add a new constant to the wp-config.php file.
+    $ wp config add WP_DEBUG true --raw
+    Success: Added the constant 'WP_DEBUG' to the 'wp-config.php' file with the raw value 'true'.
+
+    # Update or add a constant to the wp-config.php file.
+    $ wp config update WP_DEBUG false --raw
+    Success: Updated the constant 'WP_DEBUG' in the 'wp-config.php' file with the raw value 'false'.
+
     # Set the WP_DEBUG constant to true.
     $ wp config set WP_DEBUG true --raw
     Success: Updated the constant 'WP_DEBUG' in the 'wp-config.php' file with the raw value 'true'.
@@ -70,6 +78,65 @@ wp config
     # Get new salts for your wp-config.php file.
     $ wp config shuffle-salts
     Success: Shuffled the salt keys.
+
+
+
+### wp config add
+
+Adds a new constant or variable to the wp-config.php file.
+
+~~~
+wp config add <name> <value> [--raw] [--anchor=<anchor>] [--placement=<placement>] [--separator=<separator>] [--type=<type>] [--config-file=<path>]
+~~~
+
+**OPTIONS**
+
+	<name>
+		Name of the wp-config.php constant or variable.
+
+	<value>
+		Value to set the wp-config.php constant or variable to.
+
+	[--raw]
+		Place the value into the wp-config.php file as is, instead of as a quoted string.
+
+	[--anchor=<anchor>]
+		Anchor string where additions of new values are anchored around.
+		Defaults to "/* That's all, stop editing!".
+		The special case "EOF" string uses the end of the file as the anchor.
+
+	[--placement=<placement>]
+		Where to place the new values in relation to the anchor string.
+		---
+		default: 'before'
+		options:
+		  - before
+		  - after
+		---
+
+	[--separator=<separator>]
+		Separator string to put between an added value and its anchor string.
+		The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\r' => carriage return, '\t' => tab.
+		Defaults to a single EOL ("\n" on *nix and "\r\n" on Windows).
+
+	[--type=<type>]
+		Type of the config value to add. Defaults to 'constant'.
+		---
+		default: constant
+		options:
+		  - constant
+		  - variable
+		---
+
+	[--config-file=<path>]
+		Specify the file path to the config file to be modified. Defaults to the root of the
+		WordPress installation and the filename "wp-config.php".
+
+**EXAMPLES**
+
+    # Add the WP_DEBUG constant to the wp-config.php file.
+    $ wp config add WP_DEBUG true --raw
+    Success: Added the constant 'WP_DEBUG' to the 'wp-config.php' file with the raw value 'true'.
 
 
 
@@ -153,6 +220,9 @@ the database constants are correct.
 
 	[--dbpass=<dbpass>]
 		Set the database user password.
+		---
+		sensitive: true
+		---
 
 	[--dbhost=<dbhost>]
 		Set the database host.
@@ -527,6 +597,68 @@ wp config shuffle-salts [<keys>...] [--force] [--config-file=<path>] [--insecure
     # Add a cache key salt to the wp-config.php file
     $ wp config shuffle-salts WP_CACHE_KEY_SALT --force
     Success: Shuffled the salt keys.
+
+
+
+### wp config update
+
+Updates or adds a constant or variable in the wp-config.php file.
+
+~~~
+wp config update <name> <value> [--raw] [--anchor=<anchor>] [--placement=<placement>] [--separator=<separator>] [--type=<type>] [--config-file=<path>]
+~~~
+
+This command will add the constant or variable if it doesn't exist, or update it if it does.
+
+**OPTIONS**
+
+	<name>
+		Name of the wp-config.php constant or variable.
+
+	<value>
+		Value to set the wp-config.php constant or variable to.
+
+	[--raw]
+		Place the value into the wp-config.php file as is, instead of as a quoted string.
+
+	[--anchor=<anchor>]
+		Anchor string where additions of new values are anchored around.
+		Defaults to "/* That's all, stop editing!".
+		The special case "EOF" string uses the end of the file as the anchor.
+
+	[--placement=<placement>]
+		Where to place the new values in relation to the anchor string.
+		---
+		default: 'before'
+		options:
+		  - before
+		  - after
+		---
+
+	[--separator=<separator>]
+		Separator string to put between an added value and its anchor string.
+		The following escape sequences will be recognized and properly interpreted: '\n' => newline, '\r' => carriage return, '\t' => tab.
+		Defaults to a single EOL ("\n" on *nix and "\r\n" on Windows).
+
+	[--type=<type>]
+		Type of the config value to update. Defaults to 'all'.
+		---
+		default: all
+		options:
+		  - constant
+		  - variable
+		  - all
+		---
+
+	[--config-file=<path>]
+		Specify the file path to the config file to be modified. Defaults to the root of the
+		WordPress installation and the filename "wp-config.php".
+
+**EXAMPLES**
+
+    # Update or add the WP_DEBUG constant to the wp-config.php file.
+    $ wp config update WP_DEBUG true --raw
+    Success: Updated the constant 'WP_DEBUG' in the 'wp-config.php' file with the raw value 'true'.
 
 ## Installing
 
