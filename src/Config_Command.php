@@ -202,7 +202,7 @@ class Config_Command extends WP_CLI_Command {
 		if ( ! Utils\get_flag_value( $assoc_args, 'force' ) ) {
 			if ( isset( $assoc_args['config-file'] ) && file_exists( $assoc_args['config-file'] ) ) {
 				$this->config_file_already_exist_error( basename( $assoc_args['config-file'] ) );
-			} elseif ( ! isset( $assoc_args['config-file'] ) && file_exists( ABSPATH . 'wp-config.php' ) ) {
+			} elseif ( ! isset( $assoc_args['config-file'] ) && file_exists( rtrim( ABSPATH, '/\\' ) . '/wp-config.php' ) ) {
 				$this->config_file_already_exist_error( 'wp-config.php' );
 			}
 		}
