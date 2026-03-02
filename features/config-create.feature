@@ -275,6 +275,21 @@ Feature: Create a wp-config file
       my\\password
       """
 
+  Scenario: wp-config.php in parent folder should not prevent config create in subfolder
+    Given an empty directory
+    And a wp-config.php file:
+      """
+      <?php
+      echo "some broken or custom wp-config.php file";
+      """
+
+    When I run `wp core download --path=subdir`
+    Then the return code should be 0
+
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=somepassword --path=subdir`
+    Then the return code should be 0
+    And the subdir/wp-config.php file should exist
+
   @require-mysql @require-mysql-5.7
   Scenario: Configure with required SSL connection
     Given an empty directory
