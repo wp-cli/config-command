@@ -467,6 +467,14 @@ class Config_Command extends WP_CLI_Command {
 			return array_walk( $values, array( $this, 'print_dotenv' ) );
 		}
 
+		if ( ! in_array( $assoc_args['format'], [ 'json', 'yaml' ], true ) ) {
+			foreach ( $values as $index => $value ) {
+				if ( is_bool( $value['value'] ) ) {
+					$values[ $index ]['value'] = $value['value'] ? 'true' : 'false';
+				}
+			}
+		}
+
 		Utils\format_items( $assoc_args['format'], $values, $assoc_args['fields'] );
 	}
 
@@ -514,6 +522,12 @@ class Config_Command extends WP_CLI_Command {
 	 */
 	public function get( $args, $assoc_args ) {
 		$value = $this->get_value( $assoc_args, $args );
+		if ( is_bool( $value ) ) {
+			$format = Utils\get_flag_value( $assoc_args, 'format' );
+			if ( ! in_array( $format, [ 'json', 'yaml' ], true ) ) {
+				$value = $value ? 'true' : 'false';
+			}
+		}
 		WP_CLI::print_value( $value, $assoc_args );
 	}
 
@@ -1450,6 +1464,11 @@ class Config_Command extends WP_CLI_Command {
 
 		$name           = strtoupper( $value['name'] );
 		$variable_value = isset( $value['value'] ) ? $value['value'] : '';
+
+		if ( is_bool( $variable_value ) ) {
+			WP_CLI::line( "{$name}=" . ( $variable_value ? 'true' : 'false' ) );
+			return;
+		}
 
 		$variable_value = str_replace( "'", "\'", $variable_value );
 
