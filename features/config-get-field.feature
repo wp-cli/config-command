@@ -293,3 +293,45 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
       ---
       - wp_cli_test
       """
+
+  Scenario: Get a boolean true constant from wp-config.php shows literal "true"
+    Given a WP install
+    And a wp-config.php file:
+      """
+      define( 'WP_DEBUG', true );
+      define( 'WP_DEBUG_LOG', false );
+      require_once( ABSPATH . 'wp-settings.php' );
+      """
+
+    When I run `wp config get WP_DEBUG`
+    Then STDOUT should be:
+      """
+      true
+      """
+
+    When I run `wp config get WP_DEBUG_LOG`
+    Then STDOUT should be:
+      """
+      false
+      """
+
+  Scenario: Get a boolean constant preserves native type for json and yaml formats
+    Given a WP install
+    And a wp-config.php file:
+      """
+      define( 'WP_DEBUG', true );
+      define( 'WP_DEBUG_LOG', false );
+      require_once( ABSPATH . 'wp-settings.php' );
+      """
+
+    When I run `wp config get WP_DEBUG --format=json`
+    Then STDOUT should be:
+      """
+      true
+      """
+
+    When I run `wp config get WP_DEBUG_LOG --format=json`
+    Then STDOUT should be:
+      """
+      false
+      """

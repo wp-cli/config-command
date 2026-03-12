@@ -412,11 +412,70 @@ Feature: List the values of a wp-config.php file
       SECURE_AUTH_SALT='VNH|C>w-z?*dtP4ofy!v%RumM.}ug]mx7$QZW|C-R4T`d-~x|xvL{Xc_5C89K(,^'
       LOGGED_IN_SALT='Iwtez|Q`M l7lup; x&ml8^C|Lk&X[3/-l!$`P3GM$7:WI&X$Hn)unjZ9u~g4m[c'
       NONCE_SALT='QxcY|80 $f_dRkn*Liu|Ak*aas41g(q5X_h+m8Z$)tf6#TZ+Q,D#%n]g -{=mj1)'
-      WP_ALLOW_MULTISITE=1
-      MULTISITE=1
-      SUBDOMAIN_INSTALL=''
+      WP_ALLOW_MULTISITE=true
+      MULTISITE=true
+      SUBDOMAIN_INSTALL=false
       DOMAIN_CURRENT_SITE='example.com'
       PATH_CURRENT_SITE='/'
       SITE_ID_CURRENT_SITE=1
       BLOG_ID_CURRENT_SITE=1
+      """
+
+  Scenario: List boolean constants shows literal "true" and "false" in table format
+    Given a WP install
+    And a wp-config.php file:
+      """
+      define( 'WP_DEBUG', true );
+      define( 'WP_DEBUG_LOG', true );
+      define( 'WP_DEBUG_DISPLAY', false );
+      require_once( ABSPATH . 'wp-settings.php' );
+      """
+
+    When I run `wp config list --fields=name,value,type --format=table`
+    Then STDOUT should be a table containing rows:
+      | name              | value | type     |
+      | WP_DEBUG          | true  | constant |
+      | WP_DEBUG_LOG      | true  | constant |
+      | WP_DEBUG_DISPLAY  | false | constant |
+
+  Scenario: List boolean constants preserves native boolean type for json format
+    Given a WP install
+    And a wp-config.php file:
+      """
+      define( 'WP_DEBUG', true );
+      define( 'WP_DEBUG_DISPLAY', false );
+      require_once( ABSPATH . 'wp-settings.php' );
+      """
+
+    When I run `wp config list WP_DEBUG --strict --format=json`
+    Then STDOUT should contain:
+      """
+      {"name":"WP_DEBUG","value":true,"type":"constant"}
+      """
+
+    When I run `wp config list WP_DEBUG_DISPLAY --strict --format=json`
+    Then STDOUT should contain:
+      """
+      {"name":"WP_DEBUG_DISPLAY","value":false,"type":"constant"}
+      """
+
+  Scenario: List boolean constants shows literal "true" and "false" in dotenv format
+    Given a WP install
+    And a wp-config.php file:
+      """
+      define( 'WP_DEBUG', true );
+      define( 'WP_DEBUG_DISPLAY', false );
+      require_once( ABSPATH . 'wp-settings.php' );
+      """
+
+    When I run `wp config list WP_DEBUG --strict --format=dotenv`
+    Then STDOUT should be:
+      """
+      WP_DEBUG=true
+      """
+
+    When I run `wp config list WP_DEBUG_DISPLAY --strict --format=dotenv`
+    Then STDOUT should be:
+      """
+      WP_DEBUG_DISPLAY=false
       """
