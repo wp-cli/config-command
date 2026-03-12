@@ -335,3 +335,15 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
       """
       false
       """
+
+    When I run `wp config get WP_DEBUG --format=yaml`
+    Then STDOUT should be:
+      """
+      true
+      """
+
+    When I run `wp config get WP_DEBUG_LOG --format=yaml`
+    Then STDOUT should be:
+      """
+      false
+      """
