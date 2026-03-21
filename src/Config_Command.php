@@ -2,6 +2,7 @@
 
 use WP_CLI\ExitException;
 use WP_CLI\Utils;
+use WP_CLI\Path;
 use WP_CLI\WpOrgApi;
 
 /**
@@ -295,7 +296,7 @@ class Config_Command extends WP_CLI_Command {
 			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
 		}
 
-		$command_root = Utils\phar_safe_path( dirname( __DIR__ ) );
+		$command_root = Path::phar_safe( dirname( __DIR__ ) );
 		$out          = Utils\mustache_render( "{$command_root}/templates/wp-config.mustache", $assoc_args );
 
 		$wp_config_file_name = basename( $assoc_args['config-file'] );
