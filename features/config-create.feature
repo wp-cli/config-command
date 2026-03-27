@@ -113,7 +113,10 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
 
-    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --skip-salts --extra-php < /dev/null`
+    Given an empty.php file:
+      """
+      """
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --skip-salts --extra-php < empty.php`
     Then the wp-config.php file should not contain:
       """
       define('AUTH_SALT',
@@ -247,7 +250,7 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
 
-    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='p@(ss){w0r?d><}"!With"DoubleQuotes'`
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass="p@(ss){w0r?d><}\"!With\"DoubleQuotes"`
     Then the wp-config.php file should contain:
       """
       define( 'DB_PASSWORD', 'p@(ss){w0r?d><}"!With"DoubleQuotes' )
@@ -263,7 +266,7 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
   
-    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='my\\password'`
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass="my\\password"`
     Then the wp-config.php file should contain:
       """
       define( 'DB_PASSWORD', 'my\\\\password' )
