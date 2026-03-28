@@ -197,11 +197,8 @@ Feature: Create a wp-config file
     Then save STDOUT as {SOCKET}
     And STDOUT should not be empty
 
-    When I try `wget -O {RUN_DIR}/install-package-tests https://raw.githubusercontent.com/wp-cli/wp-cli-tests/main/bin/install-package-tests`
-    Then STDERR should contain:
-      """
-      install-package-tests' saved
-      """
+    When I try `curl -sS -L -o {RUN_DIR}/install-package-tests https://raw.githubusercontent.com/wp-cli/wp-cli-tests/main/bin/install-package-tests`
+    Then the {RUN_DIR}/install-package-tests file should exist
 
     When I run `chmod +x {RUN_DIR}/install-package-tests`
     Then STDERR should be empty
