@@ -113,7 +113,10 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
 
-    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --skip-salts --extra-php < /dev/null`
+    And an empty.php file:
+      """
+      """
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --skip-salts --extra-php < empty.php`
     Then the wp-config.php file should not contain:
       """
       define('AUTH_SALT',
@@ -194,11 +197,8 @@ Feature: Create a wp-config file
     Then save STDOUT as {SOCKET}
     And STDOUT should not be empty
 
-    When I try `wget -O {RUN_DIR}/install-package-tests https://raw.githubusercontent.com/wp-cli/wp-cli-tests/main/bin/install-package-tests`
-    Then STDERR should contain:
-      """
-      install-package-tests' saved
-      """
+    When I try `curl -sS -L -o {RUN_DIR}/install-package-tests https://raw.githubusercontent.com/wp-cli/wp-cli-tests/main/bin/install-package-tests`
+    Then the {RUN_DIR}/install-package-tests file should exist
 
     When I run `chmod +x {RUN_DIR}/install-package-tests`
     Then STDERR should be empty
@@ -247,7 +247,7 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
 
-    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='p@(ss){w0r?d><}"!With"DoubleQuotes'`
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass="p@(ss){w0r?d><}\"!With\"DoubleQuotes"`
     Then the wp-config.php file should contain:
       """
       define( 'DB_PASSWORD', 'p@(ss){w0r?d><}"!With"DoubleQuotes' )
@@ -263,16 +263,16 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
   
-    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass='my\\password'`
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass="my\password"`
     Then the wp-config.php file should contain:
       """
-      define( 'DB_PASSWORD', 'my\\\\password' )
+      define( 'DB_PASSWORD', 'my\\password' )
       """
     
     When I run `wp config get DB_PASSWORD`
     Then STDOUT should be:
       """
-      my\\password
+      my\password
       """
 
   Scenario: wp-config.php in parent folder should not prevent config create in subfolder
