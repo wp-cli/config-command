@@ -113,7 +113,7 @@ Feature: Create a wp-config file
     Given an empty directory
     And WP files
 
-    Given an empty.php file:
+    And an empty.php file:
       """
       """
     When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --skip-salts --extra-php < empty.php`
