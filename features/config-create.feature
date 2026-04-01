@@ -290,6 +290,23 @@ Feature: Create a wp-config file
     Then the return code should be 0
     And the subdir/wp-config.php file should exist
 
+  @require-sqlite
+  Scenario: Configure without --dbname and --dbuser when SQLite integration is active
+    Given an empty directory
+    And WP files
+    And a wp-content/db.php file:
+      """
+      <?php
+      define( 'SQLITE_DB_DROPIN_VERSION', '1.0.0' );
+      """
+
+    When I run `wp config create --skip-salts --skip-check`
+    Then the return code should be 0
+    And STDOUT should contain:
+      """
+      Generated 'wp-config.php' file.
+      """
+
   @require-mysql @require-mysql-5.7
   Scenario: Configure with required SSL connection
     Given an empty directory
