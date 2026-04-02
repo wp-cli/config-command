@@ -170,3 +170,24 @@ Feature: Check whether the wp-config.php file or the wp-custom-config.php file h
       """
       Error: Found both a constant and a variable 'SOME_NAME' in the 'wp-custom-config.php' file. Use --type=<type> to disambiguate.
       """
+
+  Scenario: Find variable after a concatenation assignment
+    Given a WP install
+    And a wp-config.php file:
+      """
+      $do_redirect = 'https://example.com' . $_SERVER['REQUEST_URI'];
+      $table_prefix = 'wp_';
+      define( 'DB_NAME', 'wp' );
+      """
+
+    When I run `wp config has table_prefix --type=variable`
+    Then STDOUT should be empty
+    And the return code should be 0
+
+    When I run `wp config has DB_NAME --type=constant`
+    Then STDOUT should be empty
+    And the return code should be 0
+
+    When I run `wp config has do_redirect --type=variable`
+    Then STDOUT should be empty
+    And the return code should be 0
