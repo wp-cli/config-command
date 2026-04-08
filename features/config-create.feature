@@ -300,7 +300,7 @@ Feature: Create a wp-config file
       define( 'SQLITE_DB_DROPIN_VERSION', '1.0.0' );
       """
 
-    When I run `wp config create --skip-salts --skip-check`
+    When I run `wp config create --skip-salts`
     Then the return code should be 0
     And STDOUT should contain:
       """
