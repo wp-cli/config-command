@@ -223,11 +223,15 @@ class Config_Command extends WP_CLI_Command {
 		$is_sqlite = self::is_sqlite_integration_active();
 
 		if ( ! $is_sqlite ) {
+			$errors = [];
 			if ( empty( $assoc_args['dbname'] ) ) {
-				WP_CLI::error( 'Parameter errors:' . PHP_EOL . 'missing --dbname parameter (Set the database name.)' );
+				$errors[] = 'missing --dbname parameter (Set the database name.)';
 			}
 			if ( empty( $assoc_args['dbuser'] ) ) {
-				WP_CLI::error( 'Parameter errors:' . PHP_EOL . 'missing --dbuser parameter (Set the database user.)' );
+				$errors[] = 'missing --dbuser parameter (Set the database user.)';
+			}
+			if ( ! empty( $errors ) ) {
+				WP_CLI::error( 'Parameter errors:' . PHP_EOL . implode( PHP_EOL, $errors ) );
 			}
 		}
 
