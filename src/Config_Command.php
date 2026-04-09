@@ -120,10 +120,10 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * ## OPTIONS
 	 *
-	 * --dbname=<dbname>
+	 * [--dbname=<dbname>]
 	 * : Set the database name.
 	 *
-	 * --dbuser=<dbuser>
+	 * [--dbuser=<dbuser>]
 	 * : Set the database user.
 	 *
 	 * [--dbpass=<dbpass>]
@@ -219,6 +219,24 @@ class Config_Command extends WP_CLI_Command {
 			'ssl'         => false,
 		];
 		$assoc_args = array_merge( $defaults, $assoc_args );
+
+		$is_sqlite = self::is_sqlite_integration_active();
+
+		if ( ! $is_sqlite ) {
+			$errors = [];
+			if ( ! isset( $assoc_args['dbname'] ) ) {
+				$errors[] = 'missing --dbname parameter (Set the database name.)';
+			}
+			if ( ! isset( $assoc_args['dbuser'] ) ) {
+				$errors[] = 'missing --dbuser parameter (Set the database user.)';
+			}
+			if ( ! empty( $errors ) ) {
+				WP_CLI::error(
+					'Parameter errors:' . "\n " . implode( "\n ", $errors )
+				);
+			}
+		}
+
 		if ( empty( $assoc_args['dbprefix'] ) ) {
 			WP_CLI::error( '--dbprefix cannot be empty' );
 		}
@@ -228,7 +246,7 @@ class Config_Command extends WP_CLI_Command {
 
 		// Check DB connection. To make command more portable, we are not using MySQL CLI and using
 		// mysqli directly instead, as $wpdb is not accessible in this context.
-		if ( ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
+		if ( ! $is_sqlite && ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
 			// phpcs:disable WordPress.DB.RestrictedFunctions
 			$mysql = mysqli_init();
 
@@ -1505,5 +1523,23 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Check if the SQLite integration drop-in is active.
+	 *
+	 * @return bool
+	 */
+	private static function is_sqlite_integration_active() {
+		$wp_content_dir = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : ABSPATH . 'wp-content';
+		$db_dropin_path = $wp_content_dir . '/db.php';
+
+		if ( ! is_readable( $db_dropin_path ) ) {
+			return false;
+		}
+
+		$contents = file_get_contents( $db_dropin_path );
+
+		return false !== $contents && false !== strpos( $contents, 'SQLITE_DB_DROPIN_VERSION' );
 	}
 }

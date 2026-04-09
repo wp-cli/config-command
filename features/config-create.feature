@@ -290,6 +290,33 @@ Feature: Create a wp-config file
     Then the return code should be 0
     And the subdir/wp-config.php file should exist
 
+  @require-sqlite
+  Scenario: Configure without --dbname and --dbuser when SQLite integration is active
+    Given a WP install
+    When I run `rm wp-config.php`
+    When I run `wp config create --skip-salts`
+    Then the return code should be 0
+    And STDOUT should contain:
+      """
+      Generated 'wp-config.php' file.
+      """
+
+  @skip-sqlite
+  Scenario: Error when --dbname and --dbuser are missing without SQLite
+    Given an empty directory
+    And WP files
+
+    When I try `wp config create --skip-check --skip-salts`
+    Then the return code should be 1
+    And STDERR should contain:
+      """
+      missing --dbname parameter
+      """
+    And STDERR should contain:
+      """
+      missing --dbuser parameter
+      """
+
   @require-mysql @require-mysql-5.7
   Scenario: Configure with required SSL connection
     Given an empty directory
