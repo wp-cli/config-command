@@ -225,10 +225,10 @@ class Config_Command extends WP_CLI_Command {
 		if ( ! $is_sqlite ) {
 			$errors = [];
 			if ( ! isset( $assoc_args['dbname'] ) ) {
-				$errors[] = 'missing --dbname parameter (Set the database name.)';
+				$errors[] = 'missing --dbname parameter';
 			}
 			if ( ! isset( $assoc_args['dbuser'] ) ) {
-				$errors[] = 'missing --dbuser parameter (Set the database user.)';
+				$errors[] = 'missing --dbuser parameter';
 			}
 			if ( ! empty( $errors ) ) {
 				WP_CLI::error(
@@ -1531,7 +1531,7 @@ class Config_Command extends WP_CLI_Command {
 	 * @return bool
 	 */
 	private static function is_sqlite_integration_active() {
-		$wp_content_dir = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : ABSPATH . 'wp-content';
+		$wp_content_dir = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : rtrim( ABSPATH, '/\\' ) . '/wp-content';
 		$db_dropin_path = $wp_content_dir . '/db.php';
 
 		if ( ! is_readable( $db_dropin_path ) ) {
