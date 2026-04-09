@@ -164,6 +164,27 @@ Feature: Create a wp-config file
       """
 
   @require-mysql
+  Scenario: Missing --dbname or --dbuser without SQLite integration
+    Given an empty directory
+    And WP files
+
+    When I try `wp config create --skip-check --dbuser=someuser`
+    Then the return code should be 1
+    And STDERR should contain:
+      """
+      Error: Parameter errors:
+      missing --dbname parameter (Set the database name.)
+      """
+
+    When I try `wp config create --skip-check --dbname=somedb`
+    Then the return code should be 1
+    And STDERR should contain:
+      """
+      Error: Parameter errors:
+      missing --dbuser parameter (Set the database user.)
+      """
+
+  @require-mysql
   Scenario: Configure with database credentials using socket path
     Given an empty directory
     And WP files

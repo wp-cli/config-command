@@ -121,10 +121,10 @@ class Config_Command extends WP_CLI_Command {
 	 * ## OPTIONS
 	 *
 	 * [--dbname=<dbname>]
-	 * : Set the database name.
+	 * : Set the database name. Required unless the SQLite integration drop-in is detected.
 	 *
 	 * [--dbuser=<dbuser>]
-	 * : Set the database user.
+	 * : Set the database user. Required unless the SQLite integration drop-in is detected.
 	 *
 	 * [--dbpass=<dbpass>]
 	 * : Set the database user password.
@@ -1505,14 +1505,19 @@ class Config_Command extends WP_CLI_Command {
 		$wp_content_dir = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : ABSPATH . 'wp-content';
 		$db_dropin_path = $wp_content_dir . '/db.php';
 
-		if ( file_exists( $db_dropin_path ) ) {
-			$db_dropin_contents = file_get_contents( $db_dropin_path, false, null, 0, 8192 );
-			if ( false !== $db_dropin_contents && false !== strpos( $db_dropin_contents, 'SQLITE_DB_DROPIN_VERSION' ) ) {
-				return true;
-			}
+		if ( ! is_file( $db_dropin_path ) || ! is_readable( $db_dropin_path ) ) {
+			return false;
 		}
 
-		return false;
+		$db_dropin_contents = file_get_contents( $db_dropin_path, false, null, 0, 8192 );
+		if ( false === $db_dropin_contents ) {
+			return false;
+		}
+
+		return 1 === preg_match(
+			'/\b(?:define\s*\(\s*[\'"]SQLITE_DB_DROPIN_VERSION[\'"]|const\s+SQLITE_DB_DROPIN_VERSION\b)/',
+			$db_dropin_contents
+		);
 	}
 
 	/**
