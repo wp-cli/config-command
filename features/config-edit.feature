@@ -3,7 +3,7 @@ Feature: Edit a wp-config file
   Scenario: Edit a wp-config.php file
     Given a WP install
 
-    When I try `EDITOR="ex -i NONE -c q!" wp config edit;`
+    When I try `EDITOR="ex -i NONE -c q!" wp config edit`
     Then STDERR should contain:
       """
       Warning: No changes made to wp-config.php, aborted.
