@@ -120,11 +120,11 @@ class Config_Command extends WP_CLI_Command {
 	 *
 	 * ## OPTIONS
 	 *
-	 * --dbname=<dbname>
-	 * : Set the database name.
+	 * [--dbname=<dbname>]
+	 * : Set the database name. Required unless the SQLite integration drop-in is detected.
 	 *
-	 * --dbuser=<dbuser>
-	 * : Set the database user.
+	 * [--dbuser=<dbuser>]
+	 * : Set the database user. Required unless the SQLite integration drop-in is detected.
 	 *
 	 * [--dbpass=<dbpass>]
 	 * : Set the database user password.
@@ -219,6 +219,22 @@ class Config_Command extends WP_CLI_Command {
 			'ssl'         => false,
 		];
 		$assoc_args = array_merge( $defaults, $assoc_args );
+
+		$is_sqlite = self::is_sqlite_integration_active();
+
+		if ( ! $is_sqlite ) {
+			$errors = [];
+			if ( empty( $assoc_args['dbname'] ) ) {
+				$errors[] = 'missing --dbname parameter (Set the database name.)';
+			}
+			if ( empty( $assoc_args['dbuser'] ) ) {
+				$errors[] = 'missing --dbuser parameter (Set the database user.)';
+			}
+			if ( ! empty( $errors ) ) {
+				WP_CLI::error( 'Parameter errors:' . PHP_EOL . implode( PHP_EOL, $errors ) );
+			}
+		}
+
 		if ( empty( $assoc_args['dbprefix'] ) ) {
 			WP_CLI::error( '--dbprefix cannot be empty' );
 		}
@@ -228,7 +244,7 @@ class Config_Command extends WP_CLI_Command {
 
 		// Check DB connection. To make command more portable, we are not using MySQL CLI and using
 		// mysqli directly instead, as $wpdb is not accessible in this context.
-		if ( ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
+		if ( ! $is_sqlite && ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
 			// phpcs:disable WordPress.DB.RestrictedFunctions
 			$mysql = mysqli_init();
 
@@ -1478,6 +1494,30 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		WP_CLI::line( "{$name}={$variable_value}" );
+	}
+
+	/**
+	 * Check if the SQLite integration drop-in is active.
+	 *
+	 * @return bool True if SQLite integration is detected, false otherwise.
+	 */
+	private static function is_sqlite_integration_active() {
+		$wp_content_dir = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : ABSPATH . 'wp-content';
+		$db_dropin_path = $wp_content_dir . '/db.php';
+
+		if ( ! is_file( $db_dropin_path ) || ! is_readable( $db_dropin_path ) ) {
+			return false;
+		}
+
+		$db_dropin_contents = file_get_contents( $db_dropin_path, false, null, 0, 8192 );
+		if ( false === $db_dropin_contents ) {
+			return false;
+		}
+
+		return 1 === preg_match(
+			'/\b(?:define\s*\(\s*[\'"]SQLITE_DB_DROPIN_VERSION[\'"]|const\s+SQLITE_DB_DROPIN_VERSION\b)/',
+			$db_dropin_contents
+		);
 	}
 
 	/**

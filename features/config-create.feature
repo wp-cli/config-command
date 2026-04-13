@@ -164,6 +164,27 @@ Feature: Create a wp-config file
       """
 
   @require-mysql
+  Scenario: Missing --dbname or --dbuser without SQLite integration
+    Given an empty directory
+    And WP files
+
+    When I try `wp config create --skip-check --dbuser=someuser`
+    Then the return code should be 1
+    And STDERR should contain:
+      """
+      Error: Parameter errors:
+      missing --dbname parameter (Set the database name.)
+      """
+
+    When I try `wp config create --skip-check --dbname=somedb`
+    Then the return code should be 1
+    And STDERR should contain:
+      """
+      Error: Parameter errors:
+      missing --dbuser parameter (Set the database user.)
+      """
+
+  @require-mysql
   Scenario: Configure with database credentials using socket path
     Given an empty directory
     And WP files
@@ -289,6 +310,23 @@ Feature: Create a wp-config file
     When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=somepassword --path=subdir`
     Then the return code should be 0
     And the subdir/wp-config.php file should exist
+
+  @require-sqlite
+  Scenario: Configure without --dbname and --dbuser when SQLite integration is active
+    Given an empty directory
+    And WP files
+    And a wp-content/db.php file:
+      """
+      <?php
+      define( 'SQLITE_DB_DROPIN_VERSION', '1.0.0' );
+      """
+
+    When I run `wp config create --skip-salts`
+    Then the return code should be 0
+    And STDOUT should contain:
+      """
+      Generated 'wp-config.php' file.
+      """
 
   @require-mysql @require-mysql-5.7
   Scenario: Configure with required SSL connection
