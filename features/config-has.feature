@@ -170,3 +170,42 @@ Feature: Check whether the wp-config.php file or the wp-custom-config.php file h
       """
       Error: Found both a constant and a variable 'SOME_NAME' in the 'wp-custom-config.php' file. Use --type=<type> to disambiguate.
       """
+
+  Scenario Outline: Find constants and variables in a config with complex expressions
+    Given an empty directory
+    And a wp-includes/version.php file:
+      """
+      <?php $wp_version = '6.3';
+      """
+    And a wp-config.php file:
+      """
+      <?php
+      $do_redirect = 'https://example.com' . $_SERVER['REQUEST_URI'];
+      $table_prefix = 'wp_';
+      define( 'DB_NAME', 'wp' );
+      define( 'CUSTOM_CSS', 'body {
+        color: red;
+      }' );
+      $after_multiline = 'found';
+      $long_url = 'https://example.com'
+        . '/path';
+      define( 'ALLOWED_HOSTS', array(
+        'example.com',
+      ) );
+      $after_array_define = 'found';
+      """
+
+    When I run `wp config has <name> --type=<type>`
+    Then STDOUT should be empty
+    And the return code should be 0
+
+    Examples:
+      | name              | type     | description                              |
+      | do_redirect       | variable | concatenation expression itself          |
+      | table_prefix      | variable | variable after concatenation             |
+      | DB_NAME           | constant | constant after concatenation variable    |
+      | CUSTOM_CSS        | constant | constant with multiline string value     |
+      | after_multiline   | variable | variable after multiline string value    |
+      | long_url          | variable | multiline concatenation variable         |
+      | ALLOWED_HOSTS     | constant | constant with multiline raw value        |
+      | after_array_define | variable | variable after multiline raw define     |
