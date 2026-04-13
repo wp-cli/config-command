@@ -204,7 +204,7 @@ wp config delete <name> [--type=<type>] [--config-file=<path>]
 Generates a wp-config.php file.
 
 ~~~
-wp config create --dbname=<dbname> --dbuser=<dbuser> [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--locale=<locale>] [--extra-php] [--skip-salts] [--skip-check] [--force] [--config-file=<path>] [--insecure] [--ssl]
+wp config create [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--locale=<locale>] [--extra-php] [--skip-salts] [--skip-check] [--force] [--config-file=<path>] [--insecure] [--ssl]
 ~~~
 
 Creates a new wp-config.php with database constants, and verifies that
@@ -212,11 +212,11 @@ the database constants are correct.
 
 **OPTIONS**
 
-	--dbname=<dbname>
-		Set the database name.
+	[--dbname=<dbname>]
+		Set the database name. Required unless the SQLite integration drop-in is detected.
 
-	--dbuser=<dbuser>
-		Set the database user.
+	[--dbuser=<dbuser>]
+		Set the database user. Required unless the SQLite integration drop-in is detected.
 
 	[--dbpass=<dbpass>]
 		Set the database user password.
