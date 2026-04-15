@@ -163,12 +163,38 @@ Feature: Create a wp-config file
       Error: Database connection error
       """
 
-  @require-mysql
-  Scenario: Missing --dbname or --dbuser without SQLite integration
+  Scenario: Missing --dbname or --dbuser with --skip-check
     Given an empty directory
     And WP files
 
-    When I try `wp config create --skip-check --dbuser=someuser`
+    When I run `wp config create --skip-check --dbuser=someuser`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_NAME', '' );
+      """
+    And the wp-config.php file should contain:
+      """
+      define( 'DB_USER', 'someuser' );
+      """
+
+    Given an empty directory
+    And WP files
+
+    When I run `wp config create --skip-check --dbname=somedb`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_NAME', 'somedb' );
+      """
+    And the wp-config.php file should contain:
+      """
+      define( 'DB_USER', '' );
+      """
+
+  Scenario: Missing --dbname or --dbuser without --skip-check
+    Given an empty directory
+    And WP files
+
+    When I try `wp config create --dbuser=someuser`
     Then the return code should be 1
     And STDERR should contain:
       """
@@ -176,7 +202,7 @@ Feature: Create a wp-config file
       missing --dbname parameter (Set the database name.)
       """
 
-    When I try `wp config create --skip-check --dbname=somedb`
+    When I try `wp config create --dbname=somedb`
     Then the return code should be 1
     And STDERR should contain:
       """

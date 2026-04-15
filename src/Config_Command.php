@@ -121,10 +121,10 @@ class Config_Command extends WP_CLI_Command {
 	 * ## OPTIONS
 	 *
 	 * [--dbname=<dbname>]
-	 * : Set the database name. Required unless the SQLite integration drop-in is detected.
+	 * : Set the database name. Required unless `--skip-check` is used or the SQLite integration drop-in is detected.
 	 *
 	 * [--dbuser=<dbuser>]
-	 * : Set the database user. Required unless the SQLite integration drop-in is detected.
+	 * : Set the database user. Required unless `--skip-check` is used or the SQLite integration drop-in is detected.
 	 *
 	 * [--dbpass=<dbpass>]
 	 * : Set the database user password.
@@ -209,6 +209,8 @@ class Config_Command extends WP_CLI_Command {
 		}
 
 		$defaults   = [
+			'dbname'      => '',
+			'dbuser'      => '',
 			'dbhost'      => 'localhost',
 			'dbpass'      => '',
 			'dbprefix'    => 'wp_',
@@ -222,7 +224,7 @@ class Config_Command extends WP_CLI_Command {
 
 		$is_sqlite = self::is_sqlite_integration_active();
 
-		if ( ! $is_sqlite ) {
+		if ( ! $is_sqlite && ! Utils\get_flag_value( $assoc_args, 'skip-check' ) ) {
 			$errors = [];
 			if ( empty( $assoc_args['dbname'] ) ) {
 				$errors[] = 'missing --dbname parameter (Set the database name.)';
