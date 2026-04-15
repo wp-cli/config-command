@@ -163,7 +163,7 @@ Feature: Create a wp-config file
       Error: Database connection error
       """
 
-  Scenario: Missing --dbname or --dbuser with --skip-check
+  Scenario: Missing --dbname with --skip-check
     Given an empty directory
     And WP files
 
@@ -177,6 +177,7 @@ Feature: Create a wp-config file
       define( 'DB_USER', 'someuser' );
       """
 
+  Scenario: Missing --dbuser with --skip-check
     Given an empty directory
     And WP files
 
@@ -190,6 +191,7 @@ Feature: Create a wp-config file
       define( 'DB_USER', '' );
       """
 
+  @require-mysql
   Scenario: Missing --dbname or --dbuser without --skip-check
     Given an empty directory
     And WP files
