@@ -213,10 +213,10 @@ the database constants are correct.
 **OPTIONS**
 
 	[--dbname=<dbname>]
-		Set the database name. Required unless the SQLite integration drop-in is detected.
+		Set the database name. Required unless `--skip-check` is used or the SQLite integration drop-in is detected.
 
 	[--dbuser=<dbuser>]
-		Set the database user. Required unless the SQLite integration drop-in is detected.
+		Set the database user. Required unless `--skip-check` is used or the SQLite integration drop-in is detected.
 
 	[--dbpass=<dbpass>]
 		Set the database user password.
