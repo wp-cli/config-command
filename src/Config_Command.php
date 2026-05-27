@@ -348,32 +348,39 @@ class Config_Command extends WP_CLI_Command {
 
 			$value_map = [
 				'dbname'    => [
-					'type' => 'constant',
-					'name' => 'DB_NAME',
+					'type'   => 'constant',
+					'name'   => 'DB_NAME',
+					'anchor' => '/** Database username */',
 				],
 				'dbuser'    => [
-					'type' => 'constant',
-					'name' => 'DB_USER',
+					'type'   => 'constant',
+					'name'   => 'DB_USER',
+					'anchor' => '/** Database password */',
 				],
 				'dbpass'    => [
-					'type' => 'constant',
-					'name' => 'DB_PASSWORD',
+					'type'   => 'constant',
+					'name'   => 'DB_PASSWORD',
+					'anchor' => '/** Database hostname */',
 				],
 				'dbhost'    => [
-					'type' => 'constant',
-					'name' => 'DB_HOST',
+					'type'   => 'constant',
+					'name'   => 'DB_HOST',
+					'anchor' => '/** Database charset to use in creating database tables. */',
 				],
 				'dbcharset' => [
-					'type' => 'constant',
-					'name' => 'DB_CHARSET',
+					'type'   => 'constant',
+					'name'   => 'DB_CHARSET',
+					'anchor' => '/** The database collate type. Don\'t change this if in doubt. */',
 				],
 				'dbcollate' => [
-					'type' => 'constant',
-					'name' => 'DB_COLLATE',
+					'type'   => 'constant',
+					'name'   => 'DB_COLLATE',
+					'anchor' => '/**#@+',
 				],
 				'dbprefix'  => [
-					'type' => 'variable',
-					'name' => 'table_prefix',
+					'type'   => 'variable',
+					'name'   => 'table_prefix',
+					'anchor' => '/* Add any custom values between this line and the "stop editing" line. */',
 				],
 			];
 
@@ -388,6 +395,19 @@ class Config_Command extends WP_CLI_Command {
 					$assoc_args[ $arg_name ],
 					[ 'add' => true ]
 				);
+
+				if ( false !== strpos( $assoc_args[ $arg_name ], '\\' ) ) {
+					$config_transformer->remove( $entry['type'], $entry['name'] );
+					$config_transformer->add(
+						$entry['type'],
+						$entry['name'],
+						$assoc_args[ $arg_name ],
+						[
+							'anchor'    => $entry['anchor'],
+							'placement' => 'before',
+						]
+					);
+				}
 			}
 
 			if ( ! empty( $assoc_args['keys-and-salts'] ) ) {
