@@ -126,7 +126,7 @@ class Config_Command extends WP_CLI_Command {
 	 * [--dbuser=<dbuser>]
 	 * : Set the database user. Required unless `--skip-check` is used or the SQLite integration drop-in is detected.
 	 *
-	 * [--dbpass=<dbpass>]
+	 * [--dbpass|db_password=<dbpass>]
 	 * : Set the database user password.
 	 * ---
 	 * sensitive: true
