@@ -200,6 +200,8 @@ class Config_Command extends WP_CLI_Command {
 	 *     Success: Generated 'wp-config.php' file.
 	 */
 	public function create( $_, $assoc_args ) {
+		$provided_assoc_args = $assoc_args;
+
 		if ( ! Utils\get_flag_value( $assoc_args, 'force' ) ) {
 			if ( isset( $assoc_args['config-file'] ) && file_exists( $assoc_args['config-file'] ) ) {
 				$this->config_file_already_exist_error( basename( $assoc_args['config-file'] ) );
@@ -304,26 +306,112 @@ class Config_Command extends WP_CLI_Command {
 			}
 		}
 
-		foreach ( $assoc_args as $key => $value ) {
-			$assoc_args[ $key ] = $this->escape_config_value( $key, $value );
+		$template_args = array_merge(
+			$defaults,
+			[
+				'keys-and-salts'     => false,
+				'keys-and-salts-alt' => '',
+				'extra-php'          => '',
+			]
+		);
+
+		if ( ! empty( $assoc_args['keys-and-salts'] ) ) {
+			$template_args['keys-and-salts']    = true;
+			$template_args['auth-key']          = '';
+			$template_args['secure-auth-key']   = '';
+			$template_args['logged-in-key']     = '';
+			$template_args['nonce-key']         = '';
+			$template_args['auth-salt']         = '';
+			$template_args['secure-auth-salt']  = '';
+			$template_args['logged-in-salt']    = '';
+			$template_args['nonce-salt']        = '';
+			$template_args['wp-cache-key-salt'] = '';
+		} elseif ( ! empty( $assoc_args['keys-and-salts-alt'] ) ) {
+			$template_args['keys-and-salts-alt'] = $assoc_args['keys-and-salts-alt'];
 		}
 
-		// 'extra-php' from STDIN is retrieved after escaping to avoid breaking
-		// the PHP code.
 		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
-			$assoc_args['extra-php'] = file_get_contents( 'php://stdin' );
+			$template_args['extra-php'] = file_get_contents( 'php://stdin' );
 		}
 
 		$command_root = Path::phar_safe( dirname( __DIR__ ) );
-		$out          = Utils\mustache_render( "{$command_root}/templates/wp-config.mustache", $assoc_args );
+		$out          = Utils\mustache_render( "{$command_root}/templates/wp-config.mustache", $template_args );
 
 		$wp_config_file_name = basename( $assoc_args['config-file'] );
 		$bytes_written       = file_put_contents( $assoc_args['config-file'], $out );
 		if ( ! $bytes_written ) {
 			WP_CLI::error( "Could not create new '{$wp_config_file_name}' file." );
-		} else {
-			WP_CLI::success( "Generated '{$wp_config_file_name}' file." );
 		}
+
+		try {
+			$config_transformer = new WPConfigTransformer( $assoc_args['config-file'] );
+
+			$value_map = [
+				'dbname'    => [
+					'type' => 'constant',
+					'name' => 'DB_NAME',
+				],
+				'dbuser'    => [
+					'type' => 'constant',
+					'name' => 'DB_USER',
+				],
+				'dbpass'    => [
+					'type' => 'constant',
+					'name' => 'DB_PASSWORD',
+				],
+				'dbhost'    => [
+					'type' => 'constant',
+					'name' => 'DB_HOST',
+				],
+				'dbcharset' => [
+					'type' => 'constant',
+					'name' => 'DB_CHARSET',
+				],
+				'dbcollate' => [
+					'type' => 'constant',
+					'name' => 'DB_COLLATE',
+				],
+				'dbprefix'  => [
+					'type' => 'variable',
+					'name' => 'table_prefix',
+				],
+			];
+
+			foreach ( $value_map as $arg_name => $entry ) {
+				if ( ! array_key_exists( $arg_name, $provided_assoc_args ) ) {
+					continue;
+				}
+
+				$config_transformer->update(
+					$entry['type'],
+					$entry['name'],
+					$assoc_args[ $arg_name ],
+					[ 'add' => true ]
+				);
+			}
+
+			if ( ! empty( $assoc_args['keys-and-salts'] ) ) {
+				$salt_map = [
+					'AUTH_KEY'          => 'auth-key',
+					'SECURE_AUTH_KEY'   => 'secure-auth-key',
+					'LOGGED_IN_KEY'     => 'logged-in-key',
+					'NONCE_KEY'         => 'nonce-key',
+					'AUTH_SALT'         => 'auth-salt',
+					'SECURE_AUTH_SALT'  => 'secure-auth-salt',
+					'LOGGED_IN_SALT'    => 'logged-in-salt',
+					'NONCE_SALT'        => 'nonce-salt',
+					'WP_CACHE_KEY_SALT' => 'wp-cache-key-salt',
+				];
+
+				foreach ( $salt_map as $name => $arg_name ) {
+					$config_transformer->update( 'constant', $name, $assoc_args[ $arg_name ], [ 'add' => true ] );
+				}
+			}
+		} catch ( Exception $exception ) {
+			WP_CLI::error( "Could not process the '{$wp_config_file_name}' transformation.\nReason: {$exception->getMessage()}" );
+		}
+
+		WP_CLI::success( "Generated '{$wp_config_file_name}' file." );
 	}
 
 	/**
@@ -1520,32 +1608,5 @@ class Config_Command extends WP_CLI_Command {
 			'/\b(?:define\s*\(\s*[\'"]SQLITE_DB_DROPIN_VERSION[\'"]|const\s+SQLITE_DB_DROPIN_VERSION\b)/',
 			$db_dropin_contents
 		);
-	}
-
-	/**
-	 * Escape a config value so it can be safely used within single quotes.
-	 *
-	 * @param string $key   Key into the arguments array.
-	 * @param mixed  $value Value to escape.
-	 * @return mixed Escaped value.
-	 */
-	private function escape_config_value( $key, $value ) {
-		// Skip 'extra-php', it mustn't be escaped.
-		if ( 'extra-php' === $key ) {
-			return $value;
-		}
-
-		// Skip 'keys-and-salts-alt' and assume they are safe.
-		if ( 'keys-and-salts-alt' === $key && ! empty( $value ) ) {
-			return $value;
-		}
-
-		if ( is_string( $value ) ) {
-			$value = str_replace( '\\', '\\\\', $value );  // Escape backslashes first
-			$value = str_replace( "'", "\\'", $value );    // Then escape single quotes
-			return $value;
-		}
-
-		return $value;
 	}
 }

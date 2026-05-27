@@ -324,6 +324,22 @@ Feature: Create a wp-config file
       my\password
       """
 
+  Scenario: DB charset values with special characters are escaped
+    Given an empty directory
+    And WP files
+
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=somepassword --dbcharset="utf8mb4'latin1\legacy"`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_CHARSET', 'utf8mb4\'latin1\\legacy' )
+      """
+
+    When I run `wp config get DB_CHARSET`
+    Then STDOUT should be:
+      """
+      utf8mb4'latin1\legacy
+      """
+
   Scenario: wp-config.php in parent folder should not prevent config create in subfolder
     Given an empty directory
     And a wp-config.php file:
