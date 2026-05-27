@@ -389,7 +389,7 @@ class Config_Command extends WP_CLI_Command {
 					continue;
 				}
 
-				if ( false !== strpos( $assoc_args[ $arg_name ], '\\' ) ) {
+				if ( is_string( $provided_assoc_args[ $arg_name ] ) && false !== strpos( $provided_assoc_args[ $arg_name ], '\\' ) ) {
 					// Backslashes need the same remove+add path used by `wp config set` to preserve escaping.
 					$config_transformer->remove( $entry['type'], $entry['name'] );
 					$config_transformer->add(
@@ -426,10 +426,13 @@ class Config_Command extends WP_CLI_Command {
 				];
 
 				foreach ( $salt_map as $name => $arg_name ) {
+					if ( ! array_key_exists( $arg_name, $assoc_args ) ) {
+						continue;
+					}
 					$config_transformer->update( 'constant', $name, $assoc_args[ $arg_name ], [ 'add' => true ] );
 				}
 			}
-		} catch ( Exception $exception ) {
+		} catch ( Throwable $exception ) {
 			if ( file_exists( $assoc_args['config-file'] ) ) {
 				unlink( $assoc_args['config-file'] );
 			}
