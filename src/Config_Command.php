@@ -390,7 +390,7 @@ class Config_Command extends WP_CLI_Command {
 				}
 
 				if ( is_string( $provided_assoc_args[ $arg_name ] ) && false !== strpos( $provided_assoc_args[ $arg_name ], '\\' ) ) {
-					// Backslashes need the same remove+add path used by `wp config set` to preserve escaping.
+					// Use remove+add to preserve backslash escaping when writing with WPConfigTransformer.
 					$config_transformer->remove( $entry['type'], $entry['name'] );
 					$config_transformer->add(
 						$entry['type'],
@@ -433,10 +433,13 @@ class Config_Command extends WP_CLI_Command {
 				}
 			}
 		} catch ( Throwable $exception ) {
+			$cleanup_error = '';
 			if ( file_exists( $assoc_args['config-file'] ) ) {
-				unlink( $assoc_args['config-file'] );
+				if ( ! unlink( $assoc_args['config-file'] ) ) {
+					$cleanup_error = "\nCleanup: Could not remove '{$wp_config_file_name}' after failure.";
+				}
 			}
-			WP_CLI::error( "Could not process the '{$wp_config_file_name}' transformation.\nReason: {$exception->getMessage()}" );
+			WP_CLI::error( "Could not process the '{$wp_config_file_name}' transformation.\nReason: {$exception->getMessage()}{$cleanup_error}" );
 		}
 
 		WP_CLI::success( "Generated '{$wp_config_file_name}' file." );
