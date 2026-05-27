@@ -395,7 +395,7 @@ class Config_Command extends WP_CLI_Command {
 					$config_transformer->add(
 						$entry['type'],
 						$entry['name'],
-						$assoc_args[ $arg_name ],
+						$provided_assoc_args[ $arg_name ],
 						[
 							'anchor'    => $entry['anchor'],
 							'placement' => 'before',
@@ -407,7 +407,7 @@ class Config_Command extends WP_CLI_Command {
 				$config_transformer->update(
 					$entry['type'],
 					$entry['name'],
-					$assoc_args[ $arg_name ],
+					$provided_assoc_args[ $arg_name ],
 					[ 'add' => true ]
 				);
 			}
