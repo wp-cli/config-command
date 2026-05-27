@@ -338,6 +338,7 @@ class Config_Command extends WP_CLI_Command {
 		$out          = Utils\mustache_render( "{$command_root}/templates/wp-config.mustache", $template_args );
 
 		$wp_config_file_name = basename( $assoc_args['config-file'] );
+		$created_config_file = ! file_exists( $assoc_args['config-file'] );
 		$bytes_written       = file_put_contents( $assoc_args['config-file'], $out );
 		if ( ! $bytes_written ) {
 			WP_CLI::error( "Could not create new '{$wp_config_file_name}' file." );
@@ -434,7 +435,7 @@ class Config_Command extends WP_CLI_Command {
 			}
 		} catch ( Throwable $exception ) {
 			$cleanup_error = '';
-			if ( file_exists( $assoc_args['config-file'] ) ) {
+			if ( $created_config_file && file_exists( $assoc_args['config-file'] ) ) {
 				if ( ! unlink( $assoc_args['config-file'] ) ) {
 					$cleanup_error = "\nCleanup: Could not remove '{$wp_config_file_name}' after failure.";
 				}
