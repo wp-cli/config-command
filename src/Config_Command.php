@@ -389,14 +389,8 @@ class Config_Command extends WP_CLI_Command {
 					continue;
 				}
 
-				$config_transformer->update(
-					$entry['type'],
-					$entry['name'],
-					$assoc_args[ $arg_name ],
-					[ 'add' => true ]
-				);
-
 				if ( false !== strpos( $assoc_args[ $arg_name ], '\\' ) ) {
+					// Backslashes need the same remove+add path used by `wp config set` to preserve escaping.
 					$config_transformer->remove( $entry['type'], $entry['name'] );
 					$config_transformer->add(
 						$entry['type'],
@@ -407,7 +401,15 @@ class Config_Command extends WP_CLI_Command {
 							'placement' => 'before',
 						]
 					);
+					continue;
 				}
+
+				$config_transformer->update(
+					$entry['type'],
+					$entry['name'],
+					$assoc_args[ $arg_name ],
+					[ 'add' => true ]
+				);
 			}
 
 			if ( ! empty( $assoc_args['keys-and-salts'] ) ) {
@@ -428,6 +430,9 @@ class Config_Command extends WP_CLI_Command {
 				}
 			}
 		} catch ( Exception $exception ) {
+			if ( file_exists( $assoc_args['config-file'] ) ) {
+				unlink( $assoc_args['config-file'] );
+			}
 			WP_CLI::error( "Could not process the '{$wp_config_file_name}' transformation.\nReason: {$exception->getMessage()}" );
 		}
 
