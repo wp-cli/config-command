@@ -391,13 +391,14 @@ class Config_Command extends WP_CLI_Command {
 				}
 
 				if ( is_string( $provided_assoc_args[ $arg_name ] ) && false !== strpos( $provided_assoc_args[ $arg_name ], '\\' ) ) {
-					// Use remove+add to preserve backslash escaping when writing with WPConfigTransformer.
+					// Use remove+update to preserve backslash escaping while keeping insertion behavior aligned with the rest of this class.
 					$config_transformer->remove( $entry['type'], $entry['name'] );
-					$config_transformer->add(
+					$config_transformer->update(
 						$entry['type'],
 						$entry['name'],
 						$provided_assoc_args[ $arg_name ],
 						[
+							'add'       => true,
 							'anchor'    => $entry['anchor'],
 							'placement' => 'before',
 						]
