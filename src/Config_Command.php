@@ -441,6 +441,10 @@ class Config_Command extends WP_CLI_Command {
 				if ( ! unlink( $assoc_args['config-file'] ) ) {
 					$cleanup_error = "\nCleanup: Could not remove '{$wp_config_file_name}' after failure.";
 				}
+			} elseif ( null !== $original_config_contents ) {
+				if ( false === file_put_contents( $assoc_args['config-file'], $original_config_contents ) ) {
+					$cleanup_error = "\nCleanup: Could not restore the original '{$wp_config_file_name}' after failure.";
+				}
 			}
 			WP_CLI::error( "Could not process the '{$wp_config_file_name}' transformation.\nReason: {$exception->getMessage()}{$cleanup_error}" );
 		}
