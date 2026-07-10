@@ -330,8 +330,11 @@ class Config_Command extends WP_CLI_Command {
 			$template_args['keys-and-salts-alt'] = $assoc_args['keys-and-salts-alt'];
 		}
 
-		if ( Utils\get_flag_value( $assoc_args, 'extra-php' ) === true ) {
+		$extra_php = Utils\get_flag_value( $assoc_args, 'extra-php' );
+		if ( true === $extra_php ) {
 			$template_args['extra-php'] = file_get_contents( 'php://stdin' );
+		} elseif ( is_string( $extra_php ) ) {
+			$template_args['extra-php'] = $extra_php;
 		}
 
 		$command_root = Path::phar_safe( dirname( __DIR__ ) );
