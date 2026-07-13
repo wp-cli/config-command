@@ -126,6 +126,32 @@ Feature: Create a wp-config file
       define( 'AUTH_SALT',
       """
 
+  Scenario: wp core config uses parameters from wp-cli.yml
+    Given an empty directory
+    And WP files
+    And a wp-cli.yml file:
+      """
+      core config:
+        dbname: wordpress
+        dbuser: root
+        extra-php: |
+          define( 'WP_DEBUG', true );
+          define( 'WP_POST_REVISIONS', 50 );
+      """
+
+    When I run `wp core config --skip-check`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_NAME', 'wordpress' )
+      """
+    And the wp-config.php file should contain:
+      """
+      define( 'DB_USER', 'root' )
+      """
+
+    When I run `grep WP_POST_REVISIONS wp-config.php`
+    Then STDOUT should not be empty
+
   Scenario: Configure with invalid table prefix
     Given an empty directory
     And WP files
@@ -322,6 +348,22 @@ Feature: Create a wp-config file
     Then STDOUT should be:
       """
       my\password
+      """
+
+  Scenario: DB charset values with special characters are escaped
+    Given an empty directory
+    And WP files
+
+    When I run `wp config create --skip-check --dbname=somedb --dbuser=someuser --dbpass=somepassword --dbcharset="utf8mb4'latin1\legacy"`
+    Then the wp-config.php file should contain:
+      """
+      define( 'DB_CHARSET', 'utf8mb4\'latin1\\legacy' )
+      """
+
+    When I run `wp config get DB_CHARSET`
+    Then STDOUT should be:
+      """
+      utf8mb4'latin1\legacy
       """
 
   Scenario: wp-config.php in parent folder should not prevent config create in subfolder
