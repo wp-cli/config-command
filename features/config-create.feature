@@ -126,12 +126,12 @@ Feature: Create a wp-config file
       define( 'AUTH_SALT',
       """
 
-  Scenario: wp core config uses parameters from wp-cli.yml
+  Scenario: wp config create uses parameters from wp-cli.yml
     Given an empty directory
     And WP files
     And a wp-cli.yml file:
       """
-      core config:
+      config create:
         dbname: wordpress
         dbuser: root
         extra-php: |
@@ -139,7 +139,7 @@ Feature: Create a wp-config file
           define( 'WP_POST_REVISIONS', 50 );
       """
 
-    When I run `wp core config --skip-check`
+    When I run `wp config create --skip-check`
     Then the wp-config.php file should contain:
       """
       define( 'DB_NAME', 'wordpress' )
