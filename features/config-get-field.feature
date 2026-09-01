@@ -181,7 +181,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
       """
       $SOMENAME = 'value-a';
       define( 'SOMENAME', 'value-b' );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config list --format=table`
@@ -215,7 +215,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
       """
       $SOMENAME = 'value-a';
       define( 'SOMENAME', 'value-b' );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config list --format=table --config-file='wp-custom-config.php'`
@@ -300,7 +300,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
       """
       define( 'WP_DEBUG', true );
       define( 'WP_DEBUG_LOG', false );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config get WP_DEBUG`
@@ -321,7 +321,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
       """
       define( 'WP_DEBUG', true );
       define( 'WP_DEBUG_LOG', false );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config get WP_DEBUG --format=json`

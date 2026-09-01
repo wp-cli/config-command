@@ -248,24 +248,24 @@ Feature: Create a wp-config file
       // The WP_CLI_TEST_DBSOCKET variable can be set in the environment to
       // override the default locations and will take precedence.
       if ( ! empty( getenv( 'WP_CLI_TEST_DBSOCKET' ) ) ) {
-        echo getenv( 'WP_CLI_TEST_DBSOCKET' );
-        exit(0);
+          echo getenv( 'WP_CLI_TEST_DBSOCKET' );
+          exit( 0 );
       }
       // From within Behat, the WP_CLI_TEST_DBSOCKET will be mapped to the internal
       // DB_SOCKET variable, as Behat pushes a new environment context.
       $locations = [
-        '{DB_SOCKET}',
-        '/var/run/mysqld/mysqld.sock',
-        '/tmp/mysql.sock',
+          '{DB_SOCKET}',
+          '/var/run/mysqld/mysqld.sock',
+          '/tmp/mysql.sock',
       ];
       foreach ( $locations as $location ) {
-        if ( ! empty( $location ) && file_exists( $location ) ) {
-          echo $location;
-          exit(0);
-        }
+          if ( ! empty( $location ) && file_exists( $location ) ) {
+              echo $location;
+              exit( 0 );
+          }
       }
       echo 'No socket found';
-      exit(1);
+      exit( 1 );
       """
 
     When I run `php find-socket.php`
@@ -371,7 +371,7 @@ Feature: Create a wp-config file
     And a wp-config.php file:
       """
       <?php
-      echo "some broken or custom wp-config.php file";
+      echo 'some broken or custom wp-config.php file';
       """
 
     When I run `wp core download --path=subdir`

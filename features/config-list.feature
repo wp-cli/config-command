@@ -9,7 +9,7 @@ Feature: List the values of a wp-config.php file
       """
     And a custom-include.php file:
       """
-      <?php // This won't work without this file being empty. ?>
+      <?php // This won't work without this file being empty.
       """
 
     When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --extra-php < wp-config-extra.php`
@@ -40,7 +40,7 @@ Feature: List the values of a wp-config.php file
       """
     And a custom-include.php file:
       """
-      <?php // This won't work without this file being empty. ?>
+      <?php // This won't work without this file being empty.
       """
 
     When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --config-file='wp-custom-config.php' --extra-php < wp-config-extra.php`
@@ -339,14 +339,14 @@ Feature: List the values of a wp-config.php file
       define( 'DB_CHARSET', 'utf8' );
       define( 'DB_COLLATE', '' );
 
-      define('AUTH_KEY',         '7mj0&+HVh{90t.S]m{u)$\'tCCB$:.[7}jAf`)~hS{ZL#v+&F#kA^p|*R<YaMFR,p');
-      define('SECURE_AUTH_KEY',  'c_0aQDj2.s}]rC+,JmU(VG!g4LapYREo+akySvE.M;lS4|Y(u%:f-|5wV_8$Niwm');
-      define('LOGGED_IN_KEY',    '-wRn2hkn >J=FA3Si$i8uco>+6vB0&aej6X4r@2dc]V}|iFE!{CjOA*u#g4@Y.2j');
-      define('NONCE_KEY',        'O..4n~e~(~:7NGyA!q.(`:X,(RcR(n_o|&(*hKrX2+9D=,&1k2k-;>Y_@X+<CwRv');
-      define('AUTH_SALT',        '8+hWU&.Zb ^Fix,Y*|XzaC-*&@?Nw%u(2-G_:6vz0RH(QE5*PP;!h6z{!t>,!6g!');
-      define('SECURE_AUTH_SALT', 'VNH|C>w-z?*dtP4ofy!v%RumM.}ug]mx7$QZW|C-R4T`d-~x|xvL{Xc_5C89K(,^');
-      define('LOGGED_IN_SALT',   'Iwtez|Q`M l7lup; x&ml8^C|Lk&X[3/-l!$`P3GM$7:WI&X$Hn)unjZ9u~g4m[c');
-      define('NONCE_SALT',       'QxcY|80 $f_dRkn*Liu|Ak*aas41g(q5X_h+m8Z$)tf6#TZ+Q,D#%n]g -{=mj1)');
+      define( 'AUTH_KEY', '7mj0&+HVh{90t.S]m{u)$\'tCCB$:.[7}jAf`)~hS{ZL#v+&F#kA^p|*R<YaMFR,p' );
+      define( 'SECURE_AUTH_KEY', 'c_0aQDj2.s}]rC+,JmU(VG!g4LapYREo+akySvE.M;lS4|Y(u%:f-|5wV_8$Niwm' );
+      define( 'LOGGED_IN_KEY', '-wRn2hkn >J=FA3Si$i8uco>+6vB0&aej6X4r@2dc]V}|iFE!{CjOA*u#g4@Y.2j' );
+      define( 'NONCE_KEY', 'O..4n~e~(~:7NGyA!q.(`:X,(RcR(n_o|&(*hKrX2+9D=,&1k2k-;>Y_@X+<CwRv' );
+      define( 'AUTH_SALT', '8+hWU&.Zb ^Fix,Y*|XzaC-*&@?Nw%u(2-G_:6vz0RH(QE5*PP;!h6z{!t>,!6g!' );
+      define( 'SECURE_AUTH_SALT', 'VNH|C>w-z?*dtP4ofy!v%RumM.}ug]mx7$QZW|C-R4T`d-~x|xvL{Xc_5C89K(,^' );
+      define( 'LOGGED_IN_SALT', 'Iwtez|Q`M l7lup; x&ml8^C|Lk&X[3/-l!$`P3GM$7:WI&X$Hn)unjZ9u~g4m[c' );
+      define( 'NONCE_SALT', 'QxcY|80 $f_dRkn*Liu|Ak*aas41g(q5X_h+m8Z$)tf6#TZ+Q,D#%n]g -{=mj1)' );
 
       $table_prefix = 'wp_';
 
@@ -362,7 +362,7 @@ Feature: List the values of a wp-config.php file
       /* That's all, stop editing! Happy publishing. */
 
       if ( ! defined( 'ABSPATH' ) ) {
-        define( 'ABSPATH', dirname( __FILE__ ) . '/' );
+          define( 'ABSPATH', __DIR__ . '/' );
       }
 
       require_once ABSPATH . 'wp-settings.php';
@@ -428,7 +428,7 @@ Feature: List the values of a wp-config.php file
       define( 'WP_DEBUG', true );
       define( 'WP_DEBUG_LOG', true );
       define( 'WP_DEBUG_DISPLAY', false );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config list --fields=name,value,type --format=table`
@@ -444,7 +444,7 @@ Feature: List the values of a wp-config.php file
       """
       define( 'WP_DEBUG', true );
       define( 'WP_DEBUG_DISPLAY', false );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config list WP_DEBUG --strict --format=json`
@@ -465,7 +465,7 @@ Feature: List the values of a wp-config.php file
       """
       define( 'WP_DEBUG', true );
       define( 'WP_DEBUG_DISPLAY', false );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config list WP_DEBUG --strict --format=dotenv`

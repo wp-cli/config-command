@@ -105,7 +105,7 @@ Feature: Add a constant or variable to wp-config.php file
       define( 'CONST_A', 'val-a' );
       /** ANCHOR */
       define( 'CONST_B', 'val-b' );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config add SOME_NAME some_value --anchor="/** ANCHOR */" --placement=before --separator="\n"`

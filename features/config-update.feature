@@ -156,7 +156,7 @@ Feature: Update or add a constant or variable in wp-config.php file
       define( 'CONST_A', 'val-a' );
       /** ANCHOR */
       define( 'CONST_B', 'val-b' );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config update SOME_NAME some_value --anchor="/** ANCHOR */" --placement=before --separator="\n"`
