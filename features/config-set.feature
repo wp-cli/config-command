@@ -365,7 +365,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
       define( 'SOME_NAME', 'some_value' );
       /** ANCHOR */
       define( 'CONST_B', 'val-b' );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config set ANOTHER_NAME another_value --type=constant --anchor="/** ANCHOR */" --placement=after --separator="\n"`
@@ -380,7 +380,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
       /** ANCHOR */
       define( 'ANOTHER_NAME', 'another_value' );
       define( 'CONST_B', 'val-b' );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
   Scenario: Additions can be properly placed in wp-custom-config.php
@@ -404,7 +404,7 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
       define( 'SOME_NAME', 'some_value' );
       /** ANCHOR */
       define( 'CONST_B', 'val-b' );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config set ANOTHER_NAME another_value --type=constant --anchor="/** ANCHOR */" --placement=after --separator="\n" --config-file="wp-custom-config.php"`
@@ -419,5 +419,5 @@ Feature: Set the value of a constant or variable defined in wp-config.php file a
       /** ANCHOR */
       define( 'ANOTHER_NAME', 'another_value' );
       define( 'CONST_B', 'val-b' );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """

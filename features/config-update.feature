@@ -170,7 +170,7 @@ Feature: Update or add a constant or variable in wp-config.php file
       define( 'SOME_NAME', 'some_value' );
       /** ANCHOR */
       define( 'CONST_B', 'val-b' );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
 
     When I run `wp config update SOME_NAME updated_value --anchor="/** ANCHOR */" --placement=before --separator="\n"`
@@ -184,5 +184,5 @@ Feature: Update or add a constant or variable in wp-config.php file
       define( 'SOME_NAME', 'updated_value' );
       /** ANCHOR */
       define( 'CONST_B', 'val-b' );
-      require_once( ABSPATH . 'wp-settings.php' );
+      require_once ABSPATH . 'wp-settings.php';
       """
