@@ -344,9 +344,11 @@ class Config_Command extends WP_CLI_Command {
 		/*
 		 * WordPress 7.2 and later need WP_SECRETS_KEY to store secrets. It is a base64-encoded
 		 * random 32-byte value, unlike the salts, and it is left alone if --extra-php defines it.
+		 * PHP function names are case-insensitive and constant names are not, so only `define`
+		 * is matched in any case.
 		 */
 		$extra_php_defines_secrets_key = is_string( $template_args['extra-php'] )
-			&& preg_match( '/define\s*\(\s*[\'"]WP_SECRETS_KEY[\'"]/', $template_args['extra-php'] );
+			&& preg_match( '/(?i:define)\s*\(\s*[\'"]WP_SECRETS_KEY[\'"]/', $template_args['extra-php'] );
 
 		if ( ! Utils\get_flag_value( $assoc_args, 'skip-secrets-key' ) && ! $extra_php_defines_secrets_key ) {
 			try {

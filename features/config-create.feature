@@ -348,6 +348,23 @@ Feature: Create a wp-config file
       1
       """
 
+  Scenario: Configure with a Secrets API key passed via --extra-php in upper case
+    Given an empty directory
+    And WP files
+
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --extra-php="DEFINE( 'WP_SECRETS_KEY', 'my-own-key' );"`
+    And I run `grep -c WP_SECRETS_KEY wp-config.php`
+    Then STDOUT should be:
+      """
+      1
+      """
+
+    When I run `wp config get WP_SECRETS_KEY`
+    Then STDOUT should be:
+      """
+      my-own-key
+      """
+
   Scenario: Values are properly escaped to avoid creating invalid config files
     Given an empty directory
     And WP files
