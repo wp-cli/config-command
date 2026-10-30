@@ -302,6 +302,52 @@ Feature: Create a wp-config file
       define( 'AUTH_SALT',
       """
 
+  @require-php-7.0
+  Scenario: Configure with a Secrets API key generated
+    Given an empty directory
+    And WP files
+
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check`
+    Then the wp-config.php file should contain:
+      """
+      define( 'WP_SECRETS_KEY',
+      """
+
+    When I run `wp config get WP_SECRETS_KEY`
+    Then STDOUT should match /^[A-Za-z0-9+\/]{43}=$/
+
+  Scenario: Configure without a Secrets API key
+    Given an empty directory
+    And WP files
+
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --skip-secrets-key`
+    Then the wp-config.php file should not contain:
+      """
+      WP_SECRETS_KEY
+      """
+
+  Scenario: Configure with a Secrets API key passed via --extra-php
+    Given an empty directory
+    And WP files
+
+    When I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check --extra-php="define( 'WP_SECRETS_KEY', 'my-own-key' );"`
+    Then the wp-config.php file should contain:
+      """
+      define( 'WP_SECRETS_KEY', 'my-own-key' );
+      """
+
+    When I run `wp config get WP_SECRETS_KEY`
+    Then STDOUT should be:
+      """
+      my-own-key
+      """
+
+    When I run `grep -c WP_SECRETS_KEY wp-config.php`
+    Then STDOUT should be:
+      """
+      1
+      """
+
   Scenario: Values are properly escaped to avoid creating invalid config files
     Given an empty directory
     And WP files
