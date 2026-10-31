@@ -6,7 +6,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
     When I run `wp config get DB_NAME --type=constant`
     Then STDOUT should be:
       """
-      wp_cli_test
+      {DB_NAME}
       """
 
   Scenario: Get the value of an existing wp-config.php constant without explicit type
@@ -15,7 +15,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
     When I run `wp config get DB_NAME`
     Then STDOUT should be:
       """
-      wp_cli_test
+      {DB_NAME}
       """
 
   Scenario: Get the value of an existing wp-config.php variable
@@ -172,7 +172,7 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
     When I run `wp config get DB_NAME --type=constant --config-file='wp-custom-config.php'`
     Then STDOUT should be:
       """
-      wp_cli_test
+      {DB_NAME}
       """
 
   Scenario: Get the value of an entry that exists as both a variable and a constant should yield a helpful error
@@ -248,20 +248,20 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
     When I run `wp config get DB_NAME`
     Then STDOUT should be:
       """
-      wp_cli_test
+      {DB_NAME}
       """
 
     When I run `wp config get DB_NAME --format=json`
     Then STDOUT should be:
       """
-      "wp_cli_test"
+      "{DB_NAME}"
       """
 
     When I run `wp config get DB_NAME --format=yaml`
     Then STDOUT should be:
       """
       ---
-      - wp_cli_test
+      - {DB_NAME}
       """
 
   @custom-config-file
@@ -278,20 +278,20 @@ Feature: Get the value of a constant or variable defined in wp-config.php and wp
     When I run `wp config get DB_NAME --config-file='wp-custom-config.php'`
     Then STDOUT should be:
       """
-      wp_cli_test
+      {DB_NAME}
       """
 
     When I run `wp config get DB_NAME --format=json --config-file='wp-custom-config.php'`
     Then STDOUT should be:
       """
-      "wp_cli_test"
+      "{DB_NAME}"
       """
 
     When I run `wp config get DB_NAME --format=yaml --config-file='wp-custom-config.php'`
     Then STDOUT should be:
       """
       ---
-      - wp_cli_test
+      - {DB_NAME}
       """
 
   Scenario: Get a boolean true constant from wp-config.php shows literal "true"
