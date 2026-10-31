@@ -6,7 +6,7 @@ Feature: Backwards compatibility
     When I run `wp config get --constant=DB_NAME`
     Then STDOUT should be:
       """
-      wp_cli_test
+      {DB_NAME}
       """
 
   Scenario: wp config get --global=<global> --> wp config get <name> --type=variable
