@@ -265,3 +265,31 @@ Feature: Refresh the salts in the wp-config.php file
       """
       {NEW_KEY_ORIG}
       """
+
+  Scenario: The Secrets API key is not a salt
+    Given an empty directory
+    And WP files
+    And I run `wp config create {CORE_CONFIG_SETTINGS} --skip-check`
+    And I run `wp config get WP_SECRETS_KEY`
+    And save STDOUT as {SECRETS_KEY}
+
+    When I run `wp config shuffle-salts`
+    And I run `wp config get WP_SECRETS_KEY`
+    Then STDOUT should be:
+      """
+      {SECRETS_KEY}
+      """
+
+    When I try `wp config shuffle-salts WP_SECRETS_KEY`
+    Then STDERR should contain:
+      """
+      WP_SECRETS_KEY is not a salt and cannot be shuffled
+      """
+    And the return code should be 1
+
+    When I try `wp config shuffle-salts WP_SECRETS_KEY --force`
+    Then STDERR should contain:
+      """
+      WP_SECRETS_KEY is not a salt and cannot be shuffled
+      """
+    And the return code should be 1

@@ -165,6 +165,9 @@ class Config_Command extends WP_CLI_Command {
 	 * [--skip-salts]
 	 * : If set, keys and salts won't be generated, but should instead be passed via `--extra-php`.
 	 *
+	 * [--skip-secrets-key]
+	 * : If set, `WP_SECRETS_KEY` won't be generated. WordPress 7.2 and later need it to store secrets with the Secrets API, so pass it via `--extra-php` instead.
+	 *
 	 * [--skip-check]
 	 * : If set, the database connection is not checked.
 	 *
@@ -311,6 +314,7 @@ class Config_Command extends WP_CLI_Command {
 			[
 				'keys-and-salts'     => false,
 				'keys-and-salts-alt' => '',
+				'secrets-key'        => false,
 				'extra-php'          => '',
 			]
 		);
@@ -335,6 +339,25 @@ class Config_Command extends WP_CLI_Command {
 			$template_args['extra-php'] = file_get_contents( 'php://stdin' );
 		} elseif ( is_string( $extra_php ) ) {
 			$template_args['extra-php'] = $extra_php;
+		}
+
+		/*
+		 * WordPress 7.2 and later need WP_SECRETS_KEY to store secrets. It is a base64-encoded
+		 * random 32-byte value, unlike the salts, and it is left alone if --extra-php defines it.
+		 * PHP function names are case-insensitive and constant names are not, so only `define`
+		 * is matched in any case.
+		 */
+		$extra_php_defines_secrets_key = is_string( $template_args['extra-php'] )
+			&& preg_match( '/(?i:define)\s*\(\s*[\'"]WP_SECRETS_KEY[\'"]/', $template_args['extra-php'] );
+
+		if ( ! Utils\get_flag_value( $assoc_args, 'skip-secrets-key' ) && ! $extra_php_defines_secrets_key ) {
+			try {
+				// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- The Secrets API reads the key as base64.
+				$assoc_args['secrets-key']    = base64_encode( random_bytes( 32 ) );
+				$template_args['secrets-key'] = true;
+			} catch ( Exception $e ) {
+				WP_CLI::warning( 'Could not generate WP_SECRETS_KEY: ' . $e->getMessage() . ' Add it to the wp-config.php file to use the Secrets API.' );
+			}
 		}
 
 		$command_root = Path::phar_safe( dirname( __DIR__ ) );
@@ -440,6 +463,10 @@ class Config_Command extends WP_CLI_Command {
 					}
 					$config_transformer->update( 'constant', $name, $assoc_args[ $arg_name ], [ 'add' => true ] );
 				}
+			}
+
+			if ( ! empty( $template_args['secrets-key'] ) ) {
+				$config_transformer->update( 'constant', 'WP_SECRETS_KEY', $assoc_args['secrets-key'], [ 'add' => true ] );
 			}
 		} catch ( Throwable $exception ) {
 			$cleanup_error = '';
@@ -1246,7 +1273,7 @@ class Config_Command extends WP_CLI_Command {
 	 * ## OPTIONS
 	 *
 	 * [<keys>...]
-	 * : One ore more keys to shuffle. If none are provided, this falls back to the default WordPress Core salt keys.
+	 * : One ore more keys to shuffle. If none are provided, this falls back to the default WordPress Core salt keys. `WP_SECRETS_KEY` is not a salt and cannot be shuffled: changing it makes every stored secret unreadable.
 	 *
 	 * [--force]
 	 * : If an unknown key is requested to be shuffled, add it instead of throwing a warning.
@@ -1274,6 +1301,11 @@ class Config_Command extends WP_CLI_Command {
 	public function shuffle_salts( $args, $assoc_args ) {
 		$keys  = $args;
 		$force = Utils\get_flag_value( $assoc_args, 'force', false );
+
+		// Secrets stored with the Secrets API cannot be read once WP_SECRETS_KEY changes.
+		if ( in_array( 'WP_SECRETS_KEY', $keys, true ) ) {
+			WP_CLI::error( 'WP_SECRETS_KEY is not a salt and cannot be shuffled: changing it makes every secret stored with the Secrets API unreadable.' );
+		}
 
 		$has_keys = ( ! empty( $keys ) ) ? true : false;
 

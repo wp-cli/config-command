@@ -204,7 +204,7 @@ wp config delete <name> [--type=<type>] [--config-file=<path>]
 Generates a wp-config.php file.
 
 ~~~
-wp config create [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass|db_password=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--locale=<locale>] [--extra-php] [--skip-salts] [--skip-check] [--force] [--config-file=<path>] [--insecure] [--ssl]
+wp config create [--dbname=<dbname>] [--dbuser=<dbuser>] [--dbpass|db_password=<dbpass>] [--dbhost=<dbhost>] [--dbprefix=<dbprefix>] [--dbcharset=<dbcharset>] [--dbcollate=<dbcollate>] [--locale=<locale>] [--extra-php] [--skip-salts] [--skip-secrets-key] [--skip-check] [--force] [--config-file=<path>] [--insecure] [--ssl]
 ~~~
 
 Creates a new wp-config.php with database constants, and verifies that
@@ -256,6 +256,9 @@ the database constants are correct.
 
 	[--skip-salts]
 		If set, keys and salts won't be generated, but should instead be passed via `--extra-php`.
+
+	[--skip-secrets-key]
+		If set, `WP_SECRETS_KEY` won't be generated. WordPress 7.2 and later need it to store secrets with the Secrets API, so pass it via `--extra-php` instead.
 
 	[--skip-check]
 		If set, the database connection is not checked.
@@ -576,7 +579,7 @@ wp config shuffle-salts [<keys>...] [--force] [--config-file=<path>] [--insecure
 **OPTIONS**
 
 	[<keys>...]
-		One ore more keys to shuffle. If none are provided, this falls back to the default WordPress Core salt keys.
+		One ore more keys to shuffle. If none are provided, this falls back to the default WordPress Core salt keys. `WP_SECRETS_KEY` is not a salt and cannot be shuffled: changing it makes every stored secret unreadable.
 
 	[--force]
 		If an unknown key is requested to be shuffled, add it instead of throwing a warning.

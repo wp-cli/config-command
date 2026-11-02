@@ -63,6 +63,18 @@ define( 'WP_CACHE_KEY_SALT', '{{wp-cache-key-salt}}' );
 {{keys-and-salts-alt}}
 
 /**#@-*/
+{{#secrets-key}}
+
+/**
+ * Encryption key for the Secrets API.
+ *
+ * Secrets stored by WordPress and plugins are encrypted with this key.
+ * Unlike the keys and salts above, changing it makes every stored secret unreadable.
+ *
+ * @since 7.2.0
+ */
+define( 'WP_SECRETS_KEY', '' );
+{{/secrets-key}}
 
 /**
  * WordPress database table prefix.
