@@ -1,3 +1,4 @@
+@require-bin-ex
 Feature: Edit a wp-config file
 
   Scenario: Edit a wp-config.php file
