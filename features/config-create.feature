@@ -238,7 +238,7 @@ Feature: Create a wp-config file
       missing --dbuser parameter (Set the database user.)
       """
 
-  @require-mysql
+  @require-mysql @require-mysql-socket
   Scenario: Configure with database credentials using socket path
     Given an empty directory
     And WP files
